@@ -1,0 +1,5 @@
+# Ignore ~, fasta, classif, dia files
+*.fasta
+*.classif
+diagrammes/*.dia
+*~
