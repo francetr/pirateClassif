@@ -13,17 +13,22 @@ import re
 ############
 
 # @author: Tristan Frances
-def readPastec(PASTEC):
+def readPastec(PASTEC, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     """
-    Read a PASTEC file as input and return it as a string
+    Read a PASTEC file as input line by line, and then proceed to the categorization of each sequence
 
     Keyword argument
     PASTEC -- name of the classif file that will be opened
 
     """
     with open(PASTEC, "r") as f:
-        string=f.read().replace("\t\t", "\t").strip() # in the order : read the file; replace the first separator; delete the blank at the end of file
-        return(string)
+        for line in f:
+            sequence=line.replace("\t\t", "\t").strip()
+            categorization(sequence, NONTE, POTENTIALCHIMERIC, NOCAT, TE)
+
+        # string=f.readlines().replace("\t\t", "\t").strip() # in the order : read the file; replace the first separator; delete the blank at the end of file
+
+        # return(string)
 
 def readFasta(FASTA):
     """
@@ -45,40 +50,37 @@ def readFasta(FASTA):
             return(record)
 
 
-def categorisation(PASTEC):
+def categorization(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     """
     Categorize the Transposable Element from the input argument
 
     Return a dictionnary which contains the different catagories which caracterize the sequence.
 
     Keyword argument
-    PASTEC -- name of the string that will be parsed
+    SEQUENCE -- name of the string, which contain the sequence to categorize, that will be parsed
 
     """
     # NB : there seems to be \r\n character due to windows but it don't change the processing of the string if we split with \n or \r\n
-    try :
-        PASTEC = PASTEC.split("\n") # split the original file into a list with each lines
-    except :
-        pass
-    nonTE, potentialChimeric,  noCat, TE = {}, {}, {}, {}
+    # try :
+    #     SEQUENCE = SEQUENCE.split("\n") # split the original file into a list with each lines
+    # except :
+    #     pass
     listOrder=["SSR", "noCat", "LTR", "TRIM", "PotentialHost", "TIR", "DIRS", "LARD", "LINE", "MITE", "Helitron", "Maverick", "SINE"]
-    for line in PASTEC:
-        # This loop allow to split each lines of original file in order to retrieve each column and put it into a list
-        tmp=line.split("\t")
-        #TODO Treatment of the superfamily
-        # print(tmp[7])
-        classDetermination(tmp, nonTE, potentialChimeric,  noCat, TE)
-        # TE[tmp[0]]={"class":tmp[4],"order":tmp[5], "other":tmp[7], "superfamily":"TODO", "autonomous":"TODO", "sequence":"TODO"}
+    features=SEQUENCE.split("\t")
+    #TODO Treatment of the superfamily
+    # print(tmp[7])
+    classDetermination(features, nonTE, potentialChimeric,  noCat, TE)
+    # TE[tmp[0]]={"class":tmp[4],"order":tmp[5], "other":tmp[7], "superfamily":"TODO", "autonomous":"TODO", "sequence":"TODO"}
     # print(len(PASTEC))
 
-    print("TE : %d, noCat : %d, nonTE : %d" %(len(TE), len(noCat), len(nonTE)))
 
-    return(TE)
+
+
 
 
 def classDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     """
-    Categorize the Transposable Element from the input argument.
+    Determine the class of a sequence.
     For this, complete four dictionnaries, passed onto arguments, that will contain the different catagories that caracterize the sequence.
 
     Keyword argument
@@ -93,14 +95,16 @@ def classDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     NOCAT -- dictionnary for non categorized elemenet (noCat)
     TE -- dictionnary for transposable elemenet (I or II)
     """
-    typeOrder=None
+    # typeOrder=None
     if(SEQUENCE[4] == "I"):
         # print("I")
         TE[SEQUENCE[0]]={"class":"I"}
         # print(SEQUENCE[0])
+        orderDetermination(SEQUENCE, TE)
         pass
     elif(SEQUENCE[4] == "II"):
         TE[SEQUENCE[0]]={"class":"II"}
+        orderDetermination(SEQUENCE, TE)
         # print(SEQUENCE[0])
         pass
     elif(SEQUENCE[4] == "noCat"):
@@ -115,11 +119,25 @@ def classDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
         # print("pot")
         pass
 
+def orderDetermination(SEQUENCE, TE):
+    """
+    Determine the order of a sequence.
+    Doing so it complete a dictionnary containing the transposable element
+    """
+    TE[SEQUENCE[0]]["order"]=SEQUENCE[5]
+
+
+def superFamilyDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
+    """
+    Categorize the Transposable Element from the input argument.
+    For this, complete four dictionnaries, passed onto arguments, that will contain the different catagories that caracterize the sequence.
+    """
+    pass
 
 
 def save(DIC):
+    #TODO
     """
-    TODO
 
     Save the sequence in a file
 
@@ -158,25 +176,30 @@ except AttributeError as e:
 
 if __name__ == "__main__":
     # nom="/home/tfrances/Bureau/donnees/sortie_PASTEC/TisoMgescan.classif"
+
+    ###     Dictionnaries that will contain the results
+    nonTE, potentialChimeric,  noCat, TE = {}, {}, {}, {}
+
     ####    Reading of the classif file ####
     try:
         pastecFile=sys.argv[1] # take the second argument in the terminal command as file name
-        pastec=readPastec(pastecFile)
+        pastec=readPastec(pastecFile, nonTE, potentialChimeric,  noCat, TE)
     except IndexError:
         print("Pas de fichier PASTEC fourni")
         sys.exit(0)
 
+    print("TE : %d, noCat : %d, nonTE : %d" %(len(TE), len(noCat), len(nonTE)))
     ####    Procede to the categorisation
-    cat=categorisation(pastec)
-    for key in cat.keys():
-        # print(cat[key]['other'])
-        pass
+    # cat=categorization(pastec)
 
-    ####    Reading of the fasta file ####
-    try:
-        fastaFile=sys.argv[2] # take the second argument in the terminal command as file name
-        fasta=readFasta(fastaFile)
-    except IndexError:
-        print("Pas de fichier Fasta fourni")
-        sys.exit(0)
-    # print(fasta)
+    for key in TE.keys():
+        print(TE[key])
+    #
+    # ####    Reading of the fasta file ####
+    # try:
+    #     fastaFile=sys.argv[2] # take the second argument in the terminal command as file name
+    #     fasta=readFasta(fastaFile)
+    # except IndexError:
+    #     print("Pas de fichier Fasta fourni")
+    #     sys.exit(0)
+    # # print(fasta)
