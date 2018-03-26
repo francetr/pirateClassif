@@ -19,13 +19,20 @@ def readPastec(PASTEC, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
 
     Keyword argument
     PASTEC -- name of the classif file that will be opened
+    NONTE -- dictionnary for non transposable element (nonTE)
+    POTENTIALCHIMERIC -- dictionnary for potential chimeric elemenet
+    NOCAT -- dictionnary for non categorized elemenet (noCat)
+    TE -- dictionnary for transposable elemenet (I or II)
 
     """
-    with open(PASTEC, "r") as f:
-        for line in f:
-            sequence=line.replace("\t\t", "\t").strip()
-            categorization(sequence, NONTE, POTENTIALCHIMERIC, NOCAT, TE)
-
+    try:
+        with open(PASTEC, "r") as f:
+            for line in f:
+                sequence=line.replace("\t\t", "\t").strip()
+                categorization(sequence, NONTE, POTENTIALCHIMERIC, NOCAT, TE)
+    except FileNotFoundError as e:
+        print("No such file as {}".format(PASTEC))
+        sys.exit()
         # string=f.readlines().replace("\t\t", "\t").strip() # in the order : read the file; replace the first separator; delete the blank at the end of file
 
         # return(string)
@@ -45,10 +52,13 @@ def readFasta(FASTA):
     FASTA -- name of the FASTA file containing the sequence that will be opened
 
     """
-    with open(fastaFile, "rU") as handle:
-        for record in SeqIO.parse(handle, "fasta"):
-            return(record)
-
+    try:
+        with open(fastaFile, "rU") as handle:
+            for record in SeqIO.parse(handle, "fasta"):
+                return(record)
+    except(FileNotFoundError, NameError):
+        print("No such file as {}".format(FASTA))
+        sys.exit()
 
 def categorization(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     """
@@ -58,6 +68,10 @@ def categorization(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
 
     Keyword argument
     SEQUENCE -- name of the string, which contain the sequence to categorize, that will be parsed
+    NONTE -- dictionnary for non transposable element (nonTE)
+    POTENTIALCHIMERIC -- dictionnary for potential chimeric elemenet
+    NOCAT -- dictionnary for non categorized elemenet (noCat)
+    TE -- dictionnary for transposable elemenet (I or II)
 
     """
     # NB : there seems to be \r\n character due to windows but it don't change the processing of the string if we split with \n or \r\n
@@ -72,9 +86,6 @@ def categorization(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     classDetermination(features, nonTE, potentialChimeric,  noCat, TE)
     # TE[tmp[0]]={"class":tmp[4],"order":tmp[5], "other":tmp[7], "superfamily":"TODO", "autonomous":"TODO", "sequence":"TODO"}
     # print(len(PASTEC))
-
-
-
 
 
 
@@ -123,11 +134,15 @@ def orderDetermination(SEQUENCE, TE):
     """
     Determine the order of a sequence.
     Doing so it complete a dictionnary containing the transposable element
+
+    Keyword argument
+    SEQUENCE -- list of features for one sequence.
+    TE -- dictionnary for transposable elemenet (I or II)
     """
     TE[SEQUENCE[0]]["order"]=SEQUENCE[5]
+    superFamilyDetermination(SEQUENCE, TE)
 
-
-def superFamilyDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
+def superFamilyDetermination(SEQUENCE, TE):
     """
     Categorize the Transposable Element from the input argument.
     For this, complete four dictionnaries, passed onto arguments, that will contain the different catagories that caracterize the sequence.
@@ -150,24 +165,6 @@ def save(DIC):
     return
 
 
-"""
-parser = argparse.ArgumentParser()
-parser.add_argument("classif", type=str, help="classif file providing from PASTEC")
-parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
-
-args = parser.parse_args()
-answer = args.classif
-try:
-    classifName=re.match(r'[\S]*[/]?[\w.]+(classif)$', args.classif).groups()[0]
-    fastaName=re.match(r'[\S]*[/]?[\w.]+(fasta)$', args.fasta).groups()[0]
-    if classifName == "classif" :
-        print("the path of {} is {}".format(classifName, answer))
-    if fastaName == "fasta":
-        print("the path of {} is {}".format(fastaName, args.fasta))
-except AttributeError as e:
-    print("One of the extension file is incorrect")
-    sys.exit
-"""
 
 
 ####################
@@ -177,16 +174,37 @@ except AttributeError as e:
 if __name__ == "__main__":
     # nom="/home/tfrances/Bureau/donnees/sortie_PASTEC/TisoMgescan.classif"
 
-    ###     Dictionnaries that will contain the results
+    ###     Instanciation of dictionnaries that will contain the results
     nonTE, potentialChimeric,  noCat, TE = {}, {}, {}, {}
+
+    ###     Mananage the 2 arguments (PASTEC and FASTA file name) when the command is launched
+    parser = argparse.ArgumentParser()
+    parser.add_argument("classif", type=str, help="classif file providing from PASTEC")
+    parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
+    args = parser.parse_args()
+    try:
+        classifName=re.match(r'[\S]*[/]?[\w.]+(classif)$', args.classif).groups()[0] ### regex checking is classif file as good extension
+        fastaName=re.match(r'[\S]*[/]?[\w.]+(fasta)$', args.fasta).groups()[0] ### regex checking is fasta file as good extension
+        if classifName == "classif" :
+            # print("the path of {} is {}".format(classifName, answer))
+            pass
+        if fastaName == "fasta":
+            # print("the path of {} is {}".format(fastaName, args.fasta))
+            pass
+    except AttributeError as e:
+        print("One of the extension file is incorrect")
+        sys.exit()
+
 
     ####    Reading of the classif file ####
     try:
-        pastecFile=sys.argv[1] # take the second argument in the terminal command as file name
+        pastecFile=args.classif # take the second argument in the terminal command as file name
         pastec=readPastec(pastecFile, nonTE, potentialChimeric,  noCat, TE)
     except IndexError:
-        print("Pas de fichier PASTEC fourni")
-        sys.exit(0)
+        print("No PASTEC provided")
+        sys.exit()
+
+
 
     print("TE : %d, noCat : %d, nonTE : %d" %(len(TE), len(noCat), len(nonTE)))
     ####    Procede to the categorisation
@@ -200,6 +218,6 @@ if __name__ == "__main__":
     #     fastaFile=sys.argv[2] # take the second argument in the terminal command as file name
     #     fasta=readFasta(fastaFile)
     # except IndexError:
-    #     print("Pas de fichier Fasta fourni")
-    #     sys.exit(0)
+    #     print("No Fasta provided")
+    #     sys.exit()
     # # print(fasta)
