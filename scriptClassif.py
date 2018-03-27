@@ -20,9 +20,9 @@ def readPastec(PASTEC, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     Keyword argument
     PASTEC -- name of the classif file that will be opened
     NONTE -- dictionnary for non transposable element (nonTE)
-    POTENTIALCHIMERIC -- dictionnary for potential chimeric elemenet
-    NOCAT -- dictionnary for non categorized elemenet (noCat)
-    TE -- dictionnary for transposable elemenet (I or II)
+    POTENTIALCHIMERIC -- dictionnary for potential chimeric element
+    NOCAT -- dictionnary for non categorized element (noCat)
+    TE -- dictionnary for transposable element (I or II)
 
     """
     try:
@@ -71,9 +71,9 @@ def categorization(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     Keyword argument
     SEQUENCE -- name of the string, which contain the sequence to categorize, that will be parsed
     NONTE -- dictionnary for non transposable element (nonTE)
-    POTENTIALCHIMERIC -- dictionnary for potential chimeric elemenet
-    NOCAT -- dictionnary for non categorized elemenet (noCat)
-    TE -- dictionnary for transposable elemenet (I or II)
+    POTENTIALCHIMERIC -- dictionnary for potential chimeric element
+    NOCAT -- dictionnary for non categorized element (noCat)
+    TE -- dictionnary for transposable element (I or II)
 
     """
     # NB : there seems to be \r\n character due to windows but it don't change the processing of the string if we split with \n or \r\n
@@ -103,9 +103,9 @@ def classDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
         - [5] : order of the sequence
         - [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
     NONTE -- dictionnary for non transposable element (nonTE)
-    POTENTIALCHIMERIC -- dictionnary for potential chimeric elemenet
-    NOCAT -- dictionnary for non categorized elemenet (noCat)
-    TE -- dictionnary for transposable elemenet (I or II)
+    POTENTIALCHIMERIC -- dictionnary for potential chimeric element
+    NOCAT -- dictionnary for non categorized element (noCat)
+    TE -- dictionnary for transposable element (I or II)
     """
     # typeOrder=None
     ###     check first if the sequence is chimeric
@@ -115,11 +115,11 @@ def classDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
             # print("I")
             TE[SEQUENCE[0]]={"class":"I"}
             # print(SEQUENCE[0])
-            orderDetermination(SEQUENCE, TE)
+            orderDetermination(SEQUENCE, POTENTIALCHIMERIC, TE)
             pass
         elif(SEQUENCE[4] == "II"):
             TE[SEQUENCE[0]]={"class":"II"}
-            orderDetermination(SEQUENCE, TE)
+            orderDetermination(SEQUENCE, POTENTIALCHIMERIC, TE)
             # print(SEQUENCE[0])
             pass
         elif(SEQUENCE[4] == "noCat"):
@@ -134,42 +134,54 @@ def classDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
         POTENTIALCHIMERIC[SEQUENCE[0]]={"Class":"potentialChimeric"}
 
 
-def orderDetermination(SEQUENCE, TE):
+def orderDetermination(SEQUENCE, POTENTIALCHIMERIC, TE):
     """
-    Determine the order of a sequence. Doing so it complete a dictionnary containing the transposable element
+    Determine the order of a sequence. Doing so it complete a dictionnary containing
+    the transposable element
 
     Keyword argument
-    SEQUENCE -- list of features for one sequence.
-    TE -- dictionnary for transposable elemenet (I or II)
+    SEQUENCE -- list of features for one sequence
+    POTENTIALCHIMERIC -- dictionnary for potential chimeric element
+    TE -- dictionnary for transposable element (I or II)
     """
     TE[SEQUENCE[0]]["order"]=SEQUENCE[5]
-    superFamilyDetermination(SEQUENCE, TE)
+    if (TE[SEQUENCE[0]]["order"]=="noCat"):
+        print(SEQUENCE[0], SEQUENCE[7])
+    superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, TE)
 
-def superFamilyDetermination(SEQUENCE, TE):
+def superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, TE):
     """
-    Determine the  super family of a sequence. Doing so it complete a dictionnary containing the transposable element
+    Determine the super family of a sequence. Doing so it complete a dictionnary
+    containing the transposable element.
+    If the superFamily can't be defined, it will be noCat
+    If there is 2 or more superfamily possible, the sequence will be added to the
+    POTENTIALCHIMERIC dictionnary and then removed from TEdictionnary
 
-    SEQUENCE -- list of features for one sequence.
-    TE -- dictionnary for transposable elemenet (I or II)
+    SEQUENCE -- list of features for one sequence
+    POTENTIALCHIMERIC -- dictionnary for potential chimeric element
+    TE -- dictionnary for transposable element (I or II)
 
     """
-    # print(SEQUENCE[7])
+    ### search if there is a 'coding' part in the 7th value of SEQUENCE => needed
+    ### to defined the SEQUENCE superfamily
     try:
-        coding_record = re.search(r'coding=\(([^\)]+)\)', SEQUENCE[7]).groups()[0]
-        # print(coding_record)
+        codingRecord = re.search(r'coding=\(([^\)]+)\)', SEQUENCE[7]).groups()[0]
+        # print(codingRecord)
     except AttributeError:
         # print(SEQUENCE[7])
-        pass
-    # database_records = coding_record.split(';')
+        POTENTIALCHIMERIC[SEQUENCE[0]]=TE[SEQUENCE[0]]
+        del TE[SEQUENCE[0]]
+
+    # databaseRecords = codingRecord.split(';')
     # matches = {}
-    # for dr in database_records:
-    #     db_name = dr.split(':')[0].strip()
-    #     if db_name=='profiles': continue
-    #     matches[db_name] = []
+    # for dr in databaseRecords:
+    #     dbName = dr.split(':')[0].strip()
+    #     if dbName=='profiles': continue
+    #     matches[dbName] = []
     #     for substr in dr.split(','):
     #         try:
-    #             search_obj = re.search(r' ([^:]+):Class(I+):([^:]+):([^:]+): ([0-9\.]+)%', substr)
-    #             matches[db_name].append(search_obj.groups())
+    #             searchObj = re.search(r' ([^:]+):Class(I+):([^:]+):([^:]+): ([0-9\.]+)%', substr)
+    #             matches[dbName].append(searchObj.groups())
     #         except AttributeError:
     #             print('Issue on : '+substr)
 
