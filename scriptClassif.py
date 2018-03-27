@@ -26,16 +26,18 @@ def readPastec(PASTEC, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
 
     """
     try:
+        # open the classif file
         with open(PASTEC, "r") as f:
             for line in f:
-                sequence=line.replace("\t\t", "\t").strip()
+                # parse every line/sequence of the file
+                sequence=line.replace("\t\t", "\t").strip() # remove the first column double tab and carriage return of the line
                 categorization(sequence, NONTE, POTENTIALCHIMERIC, NOCAT, TE)
-    except FileNotFoundError as e:
-        print("No such file as {}".format(PASTEC))
-        sys.exit()
-        # string=f.readlines().replace("\t\t", "\t").strip() # in the order : read the file; replace the first separator; delete the blank at the end of file
+            print("TE : {}\nnonTE : {}\nnoCat : {}\npotentialChimeric : {}\nTotal : {}".format(len(TE), len(nonTE), len(noCat), len(potentialChimeric), len(TE)+len(nonTE)+len(noCat)+len(potentialChimeric)))
 
-        # return(string)
+    except FileNotFoundError as e:
+        # prevent the opening if the file name is incorrect
+        print("No such file as {}".format(PASTEC))
+        sys.exit(1)
 
 def readFasta(FASTA):
     """
@@ -58,7 +60,7 @@ def readFasta(FASTA):
                 return(record)
     except(FileNotFoundError, NameError):
         print("No such file as {}".format(FASTA))
-        sys.exit()
+        sys.exit(1)
 
 def categorization(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     """
@@ -82,7 +84,6 @@ def categorization(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     listOrder=["SSR", "noCat", "LTR", "TRIM", "PotentialHost", "TIR", "DIRS", "LARD", "LINE", "MITE", "Helitron", "Maverick", "SINE"]
     features=SEQUENCE.split("\t")
     #TODO Treatment of the superfamily
-    # print(tmp[7])
     classDetermination(features, nonTE, potentialChimeric,  noCat, TE)
     # TE[tmp[0]]={"class":tmp[4],"order":tmp[5], "other":tmp[7], "superfamily":"TODO", "autonomous":"TODO", "sequence":"TODO"}
     # print(len(PASTEC))
@@ -107,33 +108,35 @@ def classDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     TE -- dictionnary for transposable elemenet (I or II)
     """
     # typeOrder=None
-    if(SEQUENCE[4] == "I"):
-        # print("I")
-        TE[SEQUENCE[0]]={"class":"I"}
-        # print(SEQUENCE[0])
-        orderDetermination(SEQUENCE, TE)
-        pass
-    elif(SEQUENCE[4] == "II"):
-        TE[SEQUENCE[0]]={"class":"II"}
-        orderDetermination(SEQUENCE, TE)
-        # print(SEQUENCE[0])
-        pass
-    elif(SEQUENCE[4] == "noCat"):
-        NOCAT[SEQUENCE[0]]={"class":"noCat"}
-        # print("NoCat : %s %s" % (SEQUENCE[4], SEQUENCE[5]))
-        pass
+    ###     check first if the sequence is chimeric
+    if(SEQUENCE[3] != "PotentialChimeric"):
+        ###     check the class of the sequence if it is not chimeric
+        if(SEQUENCE[4] == "I"):
+            # print("I")
+            TE[SEQUENCE[0]]={"class":"I"}
+            # print(SEQUENCE[0])
+            orderDetermination(SEQUENCE, TE)
+            pass
+        elif(SEQUENCE[4] == "II"):
+            TE[SEQUENCE[0]]={"class":"II"}
+            orderDetermination(SEQUENCE, TE)
+            # print(SEQUENCE[0])
+            pass
+        elif(SEQUENCE[4] == "noCat"):
+            NOCAT[SEQUENCE[0]]={"class":"noCat"}
+            # print("NoCat : %s %s" % (SEQUENCE[4], SEQUENCE[5]))
+            pass
+        else:
+            NONTE[SEQUENCE[0]]={"class":"nonTE"}
+            # print("NA : %s %s" % (SEQUENCE[4], SEQUENCE[5]))
+            pass
     else:
-        NONTE[SEQUENCE[0]]={"class":"nonTE"}
-        # print("NA : %s %s" % (SEQUENCE[4], SEQUENCE[5]))
-        pass
-    if(SEQUENCE[3] == "PotentialChimeric"):
-        # print("pot")
-        pass
+        POTENTIALCHIMERIC[SEQUENCE[0]]={"Class":"potentialChimeric"}
+
 
 def orderDetermination(SEQUENCE, TE):
     """
-    Determine the order of a sequence.
-    Doing so it complete a dictionnary containing the transposable element
+    Determine the order of a sequence. Doing so it complete a dictionnary containing the transposable element
 
     Keyword argument
     SEQUENCE -- list of features for one sequence.
@@ -144,10 +147,32 @@ def orderDetermination(SEQUENCE, TE):
 
 def superFamilyDetermination(SEQUENCE, TE):
     """
-    Categorize the Transposable Element from the input argument.
-    For this, complete four dictionnaries, passed onto arguments, that will contain the different catagories that caracterize the sequence.
+    Determine the  super family of a sequence. Doing so it complete a dictionnary containing the transposable element
+
+    SEQUENCE -- list of features for one sequence.
+    TE -- dictionnary for transposable elemenet (I or II)
+
     """
-    pass
+    # print(SEQUENCE[7])
+    try:
+        coding_record = re.search(r'coding=\(([^\)]+)\)', SEQUENCE[7]).groups()[0]
+        # print(coding_record)
+    except AttributeError:
+        # print(SEQUENCE[7])
+        pass
+    # database_records = coding_record.split(';')
+    # matches = {}
+    # for dr in database_records:
+    #     db_name = dr.split(':')[0].strip()
+    #     if db_name=='profiles': continue
+    #     matches[db_name] = []
+    #     for substr in dr.split(','):
+    #         try:
+    #             search_obj = re.search(r' ([^:]+):Class(I+):([^:]+):([^:]+): ([0-9\.]+)%', substr)
+    #             matches[db_name].append(search_obj.groups())
+    #         except AttributeError:
+    #             print('Issue on : '+substr)
+
 
 
 def save(DIC):
@@ -178,8 +203,9 @@ if __name__ == "__main__":
     nonTE, potentialChimeric,  noCat, TE = {}, {}, {}, {}
 
     ###     Mananage the 2 arguments (PASTEC and FASTA file name) when the command is launched
-    parser = argparse.ArgumentParser()
-    parser.add_argument("classif", type=str, help="classif file providing from PASTEC")
+    parser = argparse.ArgumentParser(prog="scriptClassif.py", description="This program is a part of the PiRATE project. It aims\
+    to automatized the step of TE classification")
+    parser.add_argument("classif", type=str, help="classif file that comes from from PASTEC")
     parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
     args = parser.parse_args()
     try:
@@ -193,7 +219,7 @@ if __name__ == "__main__":
             pass
     except AttributeError as e:
         print("One of the extension file is incorrect")
-        sys.exit()
+        sys.exit(1)
 
 
     ####    Reading of the classif file ####
@@ -202,16 +228,16 @@ if __name__ == "__main__":
         pastec=readPastec(pastecFile, nonTE, potentialChimeric,  noCat, TE)
     except IndexError:
         print("No PASTEC provided")
-        sys.exit()
+        sys.exit(1)
 
-
-
-    print("TE : %d, noCat : %d, nonTE : %d" %(len(TE), len(noCat), len(nonTE)))
+    # print("TE : %d, noCat : %d, nonTE : %d" %(len(TE), len(noCat), len(nonTE)))
     ####    Procede to the categorisation
     # cat=categorization(pastec)
 
-    for key in TE.keys():
-        print(TE[key])
+    # for key in TE.keys():
+    #     if (TE[key]["class"]!="PotentialChimeric"):
+    #         print(TE[key])
+    #     pass
     #
     # ####    Reading of the fasta file ####
     # try:
@@ -219,5 +245,5 @@ if __name__ == "__main__":
     #     fasta=readFasta(fastaFile)
     # except IndexError:
     #     print("No Fasta provided")
-    #     sys.exit()
+    #     sys.exit(1)
     # # print(fasta)
