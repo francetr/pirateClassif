@@ -18,24 +18,26 @@ def readPastec(PASTEC, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     Read a PASTEC file as input line by line, and then proceed to the categorization of each sequence
 
     Keyword argument
-    PASTEC -- name of the classif file that will be opened
-    NONTE -- dictionnary for non transposable element (nonTE)
-    POTENTIALCHIMERIC -- dictionnary for potential chimeric element
-    NOCAT -- dictionnary for non categorized element (noCat)
-    TE -- dictionnary for transposable element (I or II)
+    :param PASTEC: name of the classif file that will be opened
+    :param NONTE: dictionnary for non transposable element (nonTE)
+    :param POTENTIALCHIMERIC: dictionnary for potential chimeric element
+    :param NOCAT: dictionnary for non categorized element (noCat)
+    :parma TE: dictionnary for transposable element (I or II)
+
+    :return: None
 
     """
     try:
-        # open the classif file
+        ### open the classif file
         with open(PASTEC, "r") as f:
+            ### parse every line/sequence of the file
             for line in f:
-                # parse every line/sequence of the file
                 sequence=line.replace("\t\t", "\t").strip() # remove the first column double tab and carriage return of the line
                 categorization(sequence, NONTE, POTENTIALCHIMERIC, NOCAT, TE)
             print("TE : {}\nnonTE : {}\nnoCat : {}\npotentialChimeric : {}\nTotal : {}".format(len(TE), len(nonTE), len(noCat), len(potentialChimeric), len(TE)+len(nonTE)+len(noCat)+len(potentialChimeric)))
 
     except FileNotFoundError as e:
-        # prevent the opening if the file name is incorrect
+        ### prevent the opening if the file name is incorrect
         print("No such file as {}".format(PASTEC))
         sys.exit(1)
 
@@ -51,14 +53,23 @@ def readFasta(FASTA):
     seq : sequence concerned
 
     Keyword argument
-    FASTA -- name of the FASTA file containing the sequence that will be opened
+    :param FASTA: name of the FASTA file containing the sequence that will be opened
+
+    :return seqReturned: Dictionnary with key: id of the sequence and value : {"seq" : sequence of the FASTA sequence}
 
     """
+    # TODO find a way to save all the sequences, for now it read only one
+    seqReturned={}
     try:
+        ###   Open the fasta file
         with open(fastaFile, "rU") as handle:
+            ### parse every line/sequence of the file
             for record in SeqIO.parse(handle, "fasta"):
-                return(record)
+                ### save the sequence in a dictionnary
+                seqReturned[record.id]={"seq":record.seq}
+            return(seqReturned)
     except(FileNotFoundError, NameError):
+        ### prevent the opening if the file name is incorrect
         print("No such file as {}".format(FASTA))
         sys.exit(1)
 
@@ -69,11 +80,18 @@ def categorization(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     Return a dictionnary which contains the different catagories which caracterize the sequence.
 
     Keyword argument
-    SEQUENCE -- name of the string, which contain the sequence to categorize, that will be parsed
-    NONTE -- dictionnary for non transposable element (nonTE)
-    POTENTIALCHIMERIC -- dictionnary for potential chimeric element
-    NOCAT -- dictionnary for non categorized element (noCat)
-    TE -- dictionnary for transposable element (I or II)
+    :param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
+        - [0] : id of the sequence
+        - [3] : potentiel chimeric
+        - [4] : class of the sequence
+        - [5] : order of the sequence
+        - [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
+    :param NONTE: dictionnary for non transposable element (nonTE)
+    :param POTENTIALCHIMERIC: dictionnary for potential chimeric element
+    :param NOCAT: dictionnary for non categorized element (noCat)
+    :param TE: dictionnary for transposable element (I or II)
+
+    :return: None
 
     """
     # NB : there seems to be \r\n character due to windows but it don't change the processing of the string if we split with \n or \r\n
@@ -86,7 +104,6 @@ def categorization(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     #TODO Treatment of the superfamily
     classDetermination(features, nonTE, potentialChimeric,  noCat, TE)
     # TE[tmp[0]]={"class":tmp[4],"order":tmp[5], "other":tmp[7], "superfamily":"TODO", "autonomous":"TODO", "sequence":"TODO"}
-    # print(len(PASTEC))
 
 
 
@@ -96,36 +113,40 @@ def classDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     For this, complete four dictionnaries, passed onto arguments, that will contain the different catagories that caracterize the sequence.
 
     Keyword argument
-    SEQUENCE -- list of features for one sequence. Usefull values of this list :
-        - [0] : id of the sequence
-        - [3] : potentiel chimeric
-        - [4] : class of the sequence
-        - [5] : order of the sequence
-        - [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
-    NONTE -- dictionnary for non transposable element (nonTE)
-    POTENTIALCHIMERIC -- dictionnary for potential chimeric element
-    NOCAT -- dictionnary for non categorized element (noCat)
-    TE -- dictionnary for transposable element (I or II)
+    :param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed
+    :param NONTE: dictionnary for non transposable element (nonTE)
+    :param POTENTIALCHIMERIC: dictionnary for potential chimeric element
+    :param NOCAT: dictionnary for non categorized element (noCat)
+    :param TE: dictionnary for transposable element (I or II)
+
+    :return: None
+
     """
     # typeOrder=None
-    ###     check first if the sequence is chimeric
+    ###   check first if the sequence is chimeric
     if(SEQUENCE[3] != "PotentialChimeric"):
-        ###     check the class of the sequence if it is not chimeric
+        ###   check the class of the sequence if it is not chimeric : class I
         if(SEQUENCE[4] == "I"):
-            # print("I")
             TE[SEQUENCE[0]]={"class":"I"}
             # print(SEQUENCE[0])
-            orderDetermination(SEQUENCE, POTENTIALCHIMERIC, TE)
+            orderDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE)
             pass
+        ###   classII
         elif(SEQUENCE[4] == "II"):
             TE[SEQUENCE[0]]={"class":"II"}
-            orderDetermination(SEQUENCE, POTENTIALCHIMERIC, TE)
+            orderDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE)
             # print(SEQUENCE[0])
             pass
+        ###   noCat
         elif(SEQUENCE[4] == "noCat"):
             NOCAT[SEQUENCE[0]]={"class":"noCat"}
             # print("NoCat : %s %s" % (SEQUENCE[4], SEQUENCE[5]))
             pass
+        ###   NonTE
+        elif(SEQUENCE[4] == "NA"):
+            NONTE[SEQUENCE[0]]={"class":"nonTE"}
+            # print("NA : %s %s" % (SEQUENCE[4], SEQUENCE[5]))
+
         else:
             NONTE[SEQUENCE[0]]={"class":"nonTE"}
             # print("NA : %s %s" % (SEQUENCE[4], SEQUENCE[5]))
@@ -134,22 +155,31 @@ def classDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
         POTENTIALCHIMERIC[SEQUENCE[0]]={"Class":"potentialChimeric"}
 
 
-def orderDetermination(SEQUENCE, POTENTIALCHIMERIC, TE):
+def orderDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE):
     """
     Determine the order of a sequence. Doing so it complete a dictionnary containing
-    the transposable element
+    the transposable element. If the order wasn't found, the sequence is placed in
+    NOCAT dictionnary and removed from TE dictionnary
 
     Keyword argument
-    SEQUENCE -- list of features for one sequence
-    POTENTIALCHIMERIC -- dictionnary for potential chimeric element
-    TE -- dictionnary for transposable element (I or II)
+    :param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed
+    :param POTENTIALCHIMERIC: dictionnary for potential chimeric element
+    :param NOCAT: dictionnary for non categorized element (noCat)
+    :param TE: dictionnary for transposable element (I or II)
+
+    :return: None
+
     """
     TE[SEQUENCE[0]]["order"]=SEQUENCE[5]
     if (TE[SEQUENCE[0]]["order"]=="noCat"):
-        print(SEQUENCE[0], SEQUENCE[7])
-    superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, TE)
+        NOCAT[SEQUENCE[0]] = TE[SEQUENCE[0]]
+        del TE[SEQUENCE[0]]
+        # print(NOCAT[SEQUENCE[0]])
 
-def superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, TE):
+    else:
+        superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE)
+
+def superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE):
     """
     Determine the super family of a sequence. Doing so it complete a dictionnary
     containing the transposable element.
@@ -157,9 +187,12 @@ def superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, TE):
     If there is 2 or more superfamily possible, the sequence will be added to the
     POTENTIALCHIMERIC dictionnary and then removed from TEdictionnary
 
-    SEQUENCE -- list of features for one sequence
-    POTENTIALCHIMERIC -- dictionnary for potential chimeric element
-    TE -- dictionnary for transposable element (I or II)
+    :param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed
+    :param POTENTIALCHIMERIC: dictionnary for potential chimeric element
+    :param NOCAT: dictionnary for non categorized element (noCat)
+    :param TE: dictionnary for transposable element (I or II)
+
+    :return: None
 
     """
     ### search if there is a 'coding' part in the 7th value of SEQUENCE => needed
@@ -187,7 +220,7 @@ def superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, TE):
 
 
 
-def save(DIC):
+def save(FASTA, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     #TODO
     """
 
@@ -196,10 +229,18 @@ def save(DIC):
     Return a dictionnary which contains the different catagories which caracterize the sequence.
 
     Keyword argument
-    DIC -- dictionnary containing the different sequences categorisation
+    :param FASTA: name of the list of strings, which contain the nucleotid of the sequences
+    :param NONTE: dictionnary for non transposable element (nonTE)
+    :param POTENTIALCHIMERIC: dictionnary for potential chimeric element
+    :param NOCAT: dictionnary for non categorized element (noCat)
+    :param TE: dictionnary for transposable element (I or II)
 
     """
-    return
+
+    # for sequenceName in TE:
+    #     if FASTA.id!=sequenceName:
+    #         print(FASTA.id, sequenceName)
+    # return
 
 
 
@@ -221,8 +262,8 @@ if __name__ == "__main__":
     parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
     args = parser.parse_args()
     try:
-        classifName=re.match(r'[\S]*[/]?[\w.]+(classif)$', args.classif).groups()[0] ### regex checking is classif file as good extension
-        fastaName=re.match(r'[\S]*[/]?[\w.]+(fasta)$', args.fasta).groups()[0] ### regex checking is fasta file as good extension
+        classifName=re.match(r'[\S]*[/]?[\w\-.]+(classif)$', args.classif).groups()[0] ### regex checking is classif file as good extension
+        fastaName=re.match(r'[\S]*[/]?[\w\-.]+(fasta)$', args.fasta).groups()[0] ### regex checking is fasta file as good extension
         if classifName == "classif" :
             # print("the path of {} is {}".format(classifName, answer))
             pass
@@ -237,7 +278,7 @@ if __name__ == "__main__":
     ####    Reading of the classif file ####
     try:
         pastecFile=args.classif # take the second argument in the terminal command as file name
-        pastec=readPastec(pastecFile, nonTE, potentialChimeric,  noCat, TE)
+        pastec=readPastec(pastecFile, nonTE, potentialChimeric, noCat, TE)
     except IndexError:
         print("No PASTEC provided")
         sys.exit(1)
@@ -251,11 +292,13 @@ if __name__ == "__main__":
     #         print(TE[key])
     #     pass
     #
-    # ####    Reading of the fasta file ####
+    ####    Reading of the fasta file ####
     # try:
     #     fastaFile=sys.argv[2] # take the second argument in the terminal command as file name
     #     fasta=readFasta(fastaFile)
     # except IndexError:
     #     print("No Fasta provided")
     #     sys.exit(1)
-    # # print(fasta)
+    # for key in fasta.keys():
+    #     print(fasta[key]["seq"])
+    # save(fasta, nonTE, potentialChimeric, noCat, TE)
