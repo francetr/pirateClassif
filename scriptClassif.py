@@ -13,6 +13,49 @@ import re
 ############
 
 # @author: Tristan Frances
+
+def retrieveArguments():
+    """
+    Retrieve the arguments from the command line
+
+    :return parser: attributes NameSpace of object argParse that contain the two argument name
+
+    """
+    ###     Mananage the 2 arguments (PASTEC and FASTA file name) when the command is launched
+    parser = argparse.ArgumentParser(prog="scriptClassif.py", description="This program is a part of the PiRATE project. It aims\
+    to automatized the step of TE classification")
+    parser.add_argument("classif", type=str, help="classif file that comes from from PASTEC")
+    parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
+    args = parser.parse_args()
+    checkArgument(args.classif, args.fasta)
+
+    return(args)
+
+def checkArgument(CLASSIFNAME, FASTANAME):
+    """
+    Check the extension of the two arguments of command line. If it is not correct, stop the programm.
+
+    Keyword argument
+    :param CLASSIFNAME: name of the argument for the CLASSIF file
+    :param FASTANAME: name of the argument for the FASTA file
+
+    :return: None
+
+    """
+    try:
+        classifName=re.match(r'[\S]*[/]?[\w\-.]+(classif)$',CLASSIFNAME).groups()[0] ### regex checking is classif file as good extension
+        fastaName=re.match(r'[\S]*[/]?[\w\-.]+(fasta)$', FASTANAME).groups()[0] ### regex checking is fasta file as good extension
+        if classifName == "classif" :
+            # print("the path of {} is {}".format(classifName, answer))
+            pass
+        if fastaName == "fasta":
+            # print("the path of {} is {}".format(fastaName, args.fasta))
+            pass
+    except AttributeError as e:
+        print("One of the extension file is incorrect")
+        sys.exit(1)
+
+
 def readPastec(PASTEC, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
     """
     Read a PASTEC file as input line by line, and then proceed to the categorization of each sequence
@@ -255,25 +298,7 @@ if __name__ == "__main__":
     ###     Instanciation of dictionnaries that will contain the results
     nonTE, potentialChimeric,  noCat, TE = {}, {}, {}, {}
 
-    ###     Mananage the 2 arguments (PASTEC and FASTA file name) when the command is launched
-    parser = argparse.ArgumentParser(prog="scriptClassif.py", description="This program is a part of the PiRATE project. It aims\
-    to automatized the step of TE classification")
-    parser.add_argument("classif", type=str, help="classif file that comes from from PASTEC")
-    parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
-    args = parser.parse_args()
-    try:
-        classifName=re.match(r'[\S]*[/]?[\w\-.]+(classif)$', args.classif).groups()[0] ### regex checking is classif file as good extension
-        fastaName=re.match(r'[\S]*[/]?[\w\-.]+(fasta)$', args.fasta).groups()[0] ### regex checking is fasta file as good extension
-        if classifName == "classif" :
-            # print("the path of {} is {}".format(classifName, answer))
-            pass
-        if fastaName == "fasta":
-            # print("the path of {} is {}".format(fastaName, args.fasta))
-            pass
-    except AttributeError as e:
-        print("One of the extension file is incorrect")
-        sys.exit(1)
-
+    args = retrieveArguments();
 
     ####    Reading of the classif file ####
     try:
