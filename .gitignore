@@ -1,5 +1,6 @@
-# Ignore ~, fasta, classif, dia files
+# Ignore ~, fasta, classif, dia files and pycache folder
 *.fasta
 *.classif
 diagrammes/*.dia
 *~
+**/__pycache__
