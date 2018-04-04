@@ -2,5 +2,6 @@
 *.fasta
 *.classif
 diagrammes/*.dia
+jeu_simple/
 *~
 **/__pycache__
