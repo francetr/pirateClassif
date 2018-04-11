@@ -11,7 +11,10 @@ _http://www.seanoe.org/data/00406/51795/_
 ## Files used for this script:
 * _pastecFile_ : Output file of the pastec tool. The script will retrieve the class, order and superfamily for each sequence in this file
 
-* _baselineFile_ : File containing the baseline of the superFamilies names (multiple names can define the same superFamily). This is useful to determine if a sequence can be classified as multiple families or if her superFamily is not defined yet.
+* _baselineFile_ : File containing the baseline of the superFamilies names (multiple names can define the same superFamily). This is useful to determine if a sequence can be classified as multiple families or if her superFamily is not defined yet.  
+This file can be completed, for this you just need to enter the new family name in a new line followed by a tabulation and the different names (separated by :) that can design this superfamily.  
+Example :
+> Mariner&nbsp;&nbsp;&nbsp;&nbsp;Tc1-mariner:mariner:TASE
 
 * _fastaFile_ : Original file containing the sequences used. Usefull to retrieve the sequences after the classification has be done
 
