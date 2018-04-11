@@ -21,7 +21,7 @@ def retrieveArguments():
 	"""
 	Retrieve the arguments from the command line
 
-	:return args: attributes NameSpace of object argParse that contain the two arguments name
+	@return: attributes NameSpace of object argParse that contain the two arguments name
 
 	"""
 	####	 Mananage the 2 arguments (PASTEC and FASTA file name) when the command is launched
@@ -38,10 +38,10 @@ def retrieveArguments():
 # 	Check the extension of the two arguments of command line. If it is not correct, stop the programm.
 #
 # 	Keyword argument
-# 	:param CLASSIFNAME: name of the argument for the CLASSIF file
-# 	:param FASTANAME: name of the argument for the FASTA file
+# 	@param CLASSIFNAME: name of the argument for the CLASSIF file
+# 	@param FASTANAME: name of the argument for the FASTA file
 #
-# 	:return: None
+# 	@return: None
 #
 # 	"""
 # 	try:
@@ -63,13 +63,13 @@ def readPastec(PASTEC, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
 	Read a PASTEC file as input line by line, and then proceed to the categorization of each sequence
 
 	Keyword argument
-	:param PASTEC: name of the classif file that will be opened
-	:param NONTE: dictionnary for non transposable element (nonTE)
-	:param POTENTIALCHIMERIC: dictionnary for potential chimeric element
-	:param NOCAT: dictionnary for non categorized element (noCat)
-	:param TE: dictionnary for transposable element (I or II)
+	@param PASTEC: name of the classif file that will be opened
+	@param NONTE: dictionnary for non transposable element (nonTE)
+	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element
+	@param NOCAT: dictionnary for non categorized element (noCat)
+	@param TE: dictionnary for transposable element (I or II)
 
-	:return: None
+	@return: None
 
 	"""
 	try:
@@ -86,18 +86,19 @@ def readPastec(PASTEC, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
 
 	except FileNotFoundError:
 		####	Prevent the opening if the file name is incorrect
-		print("####	No such file as {}\n####	Classification aborted".format(PASTEC))
+		print("/!\	Error: No such file as {}\n####	Classification aborted".format(PASTEC))
 		sys.exit(1)
 
 def readBaseline(BASELINE):
 	"""
 	Read a PASTEC file as input line by line, and then proceed to the categorization of each sequence
 
+	Return a dictionnary which contains the sequence and the id of each sequences which are in the FASTA file.
+
 	Keyword argument
-	:param BASELINE: name of the baseline file that will be opened.
+	@param BASELINE: name of the baseline file that will be opened.
 
-	:return baselineDictionnary: Dictionnary containing the different names of possible superFamily. Key = name of superfamily used later; Values = list of possible names for this superfamily
-
+	@return: Dictionnary containing the different names of possible superFamily. {Key = name of superfamily used later : Values = [list of possible names for this superfamily]}
 	"""
 	baselineDictionnary={}
 	try:
@@ -105,34 +106,34 @@ def readBaseline(BASELINE):
 			for line in f:
 				####	List that will contains the different possibles names of a superfamily
 				listPossibleNames=[]
-				####	Retrieve the reference name for the superfamily
+				####	Recover the reference name for the superfamily
 				superFamilyNames = line.split("\t")
-				####	Retrieve the possible names for the superfamily
-				possibleNames = superFamilyNames[1].strip().split(":")
-				for possibleName in possibleNames:
+				####	Recover the possible names for the superfamily
+				allPossibleNames = superFamilyNames[1].strip().split(":")
+				for possibleName in allPossibleNames:
 					####	Add the possibles names for a superFamily in the list
 					listPossibleNames.append(possibleName)
 				####	Complete the dictionnary with : Key = name of superfamily used later; Value = list of possible names for this superfamily
 				baselineDictionnary[superFamilyNames[0]]=listPossibleNames
 	except FileNotFoundError:
-		print("####	No such file as {}\n####	Classification aborted".format(BASELINE))
+		print("/!\	Error: No such file as {}\n####	Classification aborted".format(BASELINE))
 	return(baselineDictionnary)
 
 def readFasta(FASTA):
 	"""
 	Read a FASTA file as input and return it as a string. Use the SeqIO from the package Bio of BioPython
 
-	Return a dictionnary with keys:
-	id : id of the sequence
-	name : name of the sequence
-	description : description of the sequence
-	number of features : number of features of the sequence
-	seq : sequence concerned
+	Return a dictionnary which contains the sequence and the id of each sequences which are in the FASTA file.
 
 	Keyword argument
-	:param FASTA: name of the FASTA file containing the sequence that will be opened
+	@param FASTA: name of the FASTA file containing the sequence that will be opened
 
-	:return seqReturned: Dictionnary with key: id of the sequence and value : {"seq" : sequence of the FASTA sequence}
+	@return: Dictionnary with {key = id of the sequence and value : {"seq" : sequence of the FASTA sequence}}
+		- id : id of the sequence
+		- name : name of the sequence
+		- description : description of the sequence
+		- number of features : number of features of the sequence
+		- seq : sequence concerned
 
 	"""
 	seqReturned={}
@@ -146,28 +147,26 @@ def readFasta(FASTA):
 		return seqReturned
 	except (FileNotFoundError, NameError):
 		####	prevent the opening if the file name is incorrect
-		print("####	No such file as {}\n####	Classification aborted".format(FASTA))
+		print("/!\	Error: No such file as {}\n####	Classification aborted".format(FASTA))
 		sys.exit(1)
 
 def categorization(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
 	"""
 	Categorize the Transposable Element from the input argument
 
-	Return a dictionnary which contains the different catagories which caracterize the sequence.
+	Keyword arguments
+	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
+		- [0] : id of the sequence
+		- [3] : potentiel chimeric
+		- [4] : class of the sequence
+		- [5] : order of the sequence
+		- [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
+	@param NONTE: dictionnary for non transposable element (nonTE)
+	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element
+	@param NOCAT: dictionnary for non categorized element (noCat)
+	@param TE: dictionnary for transposable element (I or II)
 
-	Keyword argument
-	:param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
-	- [0] : id of the sequence
-	- [3] : potentiel chimeric
-	- [4] : class of the sequence
-	- [5] : order of the sequence
-	- [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
-	:param NONTE: dictionnary for non transposable element (nonTE)
-	:param POTENTIALCHIMERIC: dictionnary for potential chimeric element
-	:param NOCAT: dictionnary for non categorized element (noCat)
-	:param TE: dictionnary for transposable element (I or II)
-
-	:return: None
+	@return: None
 
 	"""
 	features=SEQUENCE.split("\t")
@@ -180,14 +179,14 @@ def classDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
 	Determine the class of a sequence.
 	For this, complete four dictionnaries, passed onto arguments, that will contain the different catagories that caracterize the sequence.
 
-	Keyword argument
-	:param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed
-	:param NONTE: dictionnary for non transposable element (nonTE)
-	:param POTENTIALCHIMERIC: dictionnary for potential chimeric element
-	:param NOCAT: dictionnary for non categorized element (noCat)
-	:param TE: dictionnary for transposable element (I or II)
+	Keyword arguments
+	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed
+	@param NONTE: dictionnary for non transposable element (nonTE)
+	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element
+	@param NOCAT: dictionnary for non categorized element (noCat)
+	@param TE: dictionnary for transposable element (I or II)
 
-	:return: None
+	@return: None
 
 	"""
 	####	Check first if the sequence is chimeric
@@ -206,9 +205,9 @@ def classDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
 			pass
 		####	NoCat
 		elif SEQUENCE[4] == "noCat":
-			NOCAT[SEQUENCE[0]]={"class":"noCat"}
+			NOCAT[SEQUENCE[0]]={"class":"unknown"}
 			# print("NoCat : %s %s" % (SEQUENCE[4], SEQUENCE[5]))
-			pass
+			# pass
 		####	 NonTE
 		else:
 			NONTE[SEQUENCE[0]]={"class":"nonTE"}
@@ -223,35 +222,39 @@ def orderDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE):
 	Determine the order of a sequence. Doing so it complete a dictionnary containing the transposable element.
 	If the order wasn't found, the order's sequence is considered as unknown.
 
-	Keyword argument
-	:param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed
-	:param POTENTIALCHIMERIC: dictionnary for potential chimeric element
-	:param NOCAT: dictionnary for non categorized element (noCat)
-	:param TE: dictionnary for transposable element (I or II)
+	Keyword arguments
+	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed
+	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element
+	@param NOCAT: dictionnary for non categorized element (noCat)
+	@param TE: dictionnary for transposable element (I or II)
 
-	:return: None
+	@return: None
 
 	"""
-	if SEQUENCE[5] == "noCat" or "NA":
+	if SEQUENCE[5] == "noCat" :
+		####	 The order of the TE is not determined, the super family of the TE will not be determined
 		TE[SEQUENCE[0]]["order"]="unknown"
-	else:
+	elif SEQUENCE[5] == "MITE":
+		####	 The order of the TE is a MITE : the super family of the TE will not be determined
 		TE[SEQUENCE[0]]["order"]=SEQUENCE[5]
-	####	 The order of the TE is determined : the super family of the TE will be determined
-	superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE)
+	else:
+		####	 The order of the TE is determined : the super family of the TE will be determined
+		TE[SEQUENCE[0]]["order"]=SEQUENCE[5]
+		superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE)
 
 def superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE):
 	"""
-	Determine the super family of one sequence. Doing so it complete a dictionnary
-	containing the transposable element.
-	If the superFamily can't be defined, it will be unknown
-	If there is 2 or more superfamily possible, the superFamily sequence will be considered as POTENTIALCHIMERIC
+	Determine the super family of one sequence. Doing so it complete a dictionnary	containing the transposable element.
+	If the superFamily can't be defined, it will be unknown.
+	@todo: Consider if POTENTIALCHIMERIC and NOCAT arguments are mandatory
 
-	:param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed
-	:param POTENTIALCHIMERIC: dictionnary for potential chimeric element
-	:param NOCAT: dictionnary for non categorized element (noCat)
-	:param TE: dictionnary for transposable element (I or II)
+	Keyword arguments
+	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed
+	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element
+	@param NOCAT: dictionnary for non categorized element (noCat)
+	@param TE: dictionnary for transposable element (I or II)
 
-	:return: None
+	@return: None
 
 	"""
 	#TODO deal with sequence that don't have DB comparisons
@@ -261,40 +264,57 @@ def superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE):
 		# print(codingRecord)
 		####	Split the coding part to obtain the different results according to the comparison with different databases (3 possibilties: TEBLRtx, TEBLRx and profiles)
 		databaseRecords = codingRecord.split(';')
-		####	Dictionnary that will contains (or not) the different superFamilies find for the concerned sequence
-		matches={SEQUENCE[0]:{}}
-		####	Scan the different results obtain for each comparisons
-		for dr in databaseRecords:
-			####	Split to obtain the name of the database used (TE_BLRx or TE_BLRtx)
-			dbName = dr.split(':')[0].strip()
-			matches[SEQUENCE[0]] = {dbName:[]}
-			####	List to store the super family found for a sequence. Usefull to compare if there are differences between them
-			superFamilyFound=[]
+		####	Search if there are different names contained in the codingRecord
+		searchDifferentName(SEQUENCE, TE, databaseRecords)
 
-			####	Do nothing for the profil hmm database. TODO implement the code to search regex in the case it exists
-			if dbName=='profiles': continue
-			####	Split to obtain each comparison, and parse them in order to search interesting regex
-			# TODO compare the superFamily find for each substr, !!!!!! troubles if the sequence don't have DB but just profiles => put in noCat
-			for substr in dr.split(','):
-				try:
-					searchObj = re.search(r' ([^:]+):Class(I+):([^:]+):([^:]+): ([0-9\.]+)%', substr)
-					superFamilyFound.append(searchObj.groups()[3])
-					####	TODO If a sequence haven't been detemined, put it in NOCAT dictionnary and remove it from the TE. !!!! Troubles : don't take into account ? can be found in multiple time for 1 sequence
-					# if searchObj.groups()[3] == "?":
-						# TE[SEQUENCE[0]]["superFamily"]="unknown"
-				except AttributeError:
-					print('Issue on : '+ substr)
-			superFamilyComparison(SEQUENCE, superFamilyFound)
-			matches[SEQUENCE[0]][dbName].append(searchObj.groups())
-			TE[SEQUENCE[0]]["superFamily"]=searchObj.groups()[3]
 
 			# print(SEQUENCE[0], dbName, (matches[SEQUENCE[0]][dbName]))
 	except AttributeError:
-		####	If there is no coding part : the sequence is put in the NOCAT dictionnary and removed from the TE dictionnary
+		####	If there is no coding part : do nothing (the order has been previously defined as unknown)
 		# print(SEQUENCE[7])
-		NOCAT[SEQUENCE[0]]=TE[SEQUENCE[0]]
-		del TE[SEQUENCE[0]]
+		# NOCAT[SEQUENCE[0]]=TE[SEQUENCE[0]]
+		# del TE[SEQUENCE[0]]
 		return
+
+def searchDifferentName(SEQUENCE, TE, DATABASERECORDS):
+	"""
+	If the superFamily can't be defined, it will be unknown
+	The name is recovered from two : the hmm profiles (profiles part) and BLAST (TE_BLRx and TE_BLRtx part)
+
+	Keyword arguments
+	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed
+	@param TE: dictionnary for transposable element (I or II) which will be completed with superfamily name
+
+	@return: None
+
+	"""
+	####	Dictionnary that will contains (or not) the different superFamilies find for the concerned sequence
+	matches={SEQUENCE[0]:{}}
+	####	Scan the different results obtain for each comparisons
+	for dr in DATABASERECORDS:
+		####	Split to obtain the name of the database used (TE_BLRx or TE_BLRtx)
+		dbName = dr.split(':')[0].strip()
+		matches[SEQUENCE[0]] = {dbName:[]}
+		####	List to store the super family found for a sequence. Usefull to compare if there are differences between them
+		superFamilyFound=[]
+
+		####	Do nothing for the profil hmm database. TODO implement the code to search regex in the case it exists
+		if dbName=='profiles': continue
+		####	Split to obtain each comparison, and parse them in order to search interesting regex
+		# TODO compare the superFamily find for each substr take into account ?, !!!!!! troubles if the sequence don't have DB but just profiles => put in noCat
+		for substr in dr.split(','):
+			try:
+				searchObj = re.search(r' ([^:]+):Class(I+):([^:]+):([^:]+): ([0-9\.]+)%', substr)
+				superFamilyFound.append(searchObj.groups()[3])
+				####	TODO If a sequence haven't been detemined, put it in NOCAT dictionnary and remove it from the TE. !!!! Troubles : don't take into account ? can be found in multiple time for 1 sequence
+				# if searchObj.groups()[3] == "?":
+					# TE[SEQUENCE[0]]["superFamily"]="unknown"
+			except AttributeError:
+				print('Issue on : '+ substr)
+		superFamilyComparison(SEQUENCE, superFamilyFound)
+		matches[SEQUENCE[0]][dbName].append(searchObj.groups())
+		TE[SEQUENCE[0]]["superFamily"]=searchObj.groups()[3]
+
 
 def superFamilyComparison(SEQUENCE, SUPERFAMILYFOUND):
 	"""
@@ -303,21 +323,21 @@ def superFamilyComparison(SEQUENCE, SUPERFAMILYFOUND):
 
 	Return a dictionnary which contains the different catagories which caracterize the sequence.
 
-	Keyword argument
-	:param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed
-	:param SUPERFAMILYFOUND: list of the the superfamilies found for one sequence during the superFamilyDetermination
+	Keyword arguments
+	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed
+	@param SUPERFAMILYFOUND: list of the the superfamilies found for one sequence during the superFamilyDetermination
 
 	"""
 	####	TODO Comparison with a reference base
 	####	Assignation of 2 counter, 1 for the identical superfamily and the other for the different superfamily
-	cptIdentique = 0; cptDifferent = 0
+	cptIdentique = cptDifferent = 0
 	####	Draft
-	####	Construction of the different pair of family possible
+	####	Construction of the different pairs	 of family possible
 	for familyA, familyB in itertools.combinations(SUPERFAMILYFOUND, 2):
-		if SEQUENCE[0] == "TEDENOVO_Arabidopsis_thaliana1723" and familyA != familyB:
+		if familyA != familyB:
 			# print("%s : A = %s different de B= %s" %(SEQUENCE[0], familyA, familyB))
 			cptDifferent+=1
-		elif SEQUENCE[0] == "TEDENOVO_Arabidopsis_thaliana1723" and familyA == familyB :
+		elif familyA == familyB :
 			# print("%s : A = %s identique a B = %s" %(SEQUENCE[0], familyA, familyB))
 			cptIdentique+=1
 
@@ -332,12 +352,12 @@ def save(FASTA, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
 
 	Return a dictionnary which contains the different catagories which caracterize the sequence.
 
-	Keyword argument
-	:param FASTA: name of the list of strings, which contain the nucleotid of the sequences
-	:param NONTE: dictionnary for non transposable element (nonTE)
-	:param POTENTIALCHIMERIC: dictionnary for potential chimeric element
-	:param NOCAT: dictionnary for non categorized element (noCat)
-	:param TE: dictionnary for transposable element (I or II)
+	Keyword arguments
+	@param FASTA: name of the list of strings, which contain the nucleotid of the sequences
+	@param NONTE: dictionnary for non transposable element (nonTE)
+	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element
+	@param NOCAT: dictionnary for non categorized element (noCat)
+	@param TE: dictionnary for transposable element (I or II)
 
 	"""
 	#TODO
@@ -361,29 +381,36 @@ if __name__ == "__main__":
 	nonTE, potentialChimeric,  noCat, TE = {}, {}, {}, {}
 
 	####	 retrieve and check the arguments used in command line
-	print("####	Check the extensions of the files")
+	print("####	Recovery of the arguments\n")
 	args = retrieveArguments();
-	print("####	Valid extension of the files\n")
+	# print("####	Valid extension of the files\n")
 	pastecFile=args.classif
 	baselineFile=args.baseline
-	####	Reading of the classif file ####
+	####	Reading of the baseline file ####
 	try:
 		# take the second argument in the terminal command as file name
-		print("####	Read of the Baseline file")
+		print("####	Import of the Baseline file")
 		baseline=readBaseline(baselineFile)
 		print(baseline)
-		print("####	End of reading of the Baseline file\n")
+		print("####	Baseline succesfully imported\n")
+	except IndexError:
+		print("/!\	Error: The baseline file provided is badly written\n####	Classification aborted")
+		sys.exit(1)
+
+	####	Reading of the classif file ####
+	try:
 		print("####	Read of the classif file")
 		pastec=readPastec(pastecFile, nonTE, potentialChimeric, noCat, TE)
 		# print(TE)
 		print("####	End of reading of the classif file\n")
 	except IndexError:
-		print("####	No PASTEC provided\n####	Classification aborted")
+		print("/!\	Error: No PASTEC provided\n####	Classification aborted")
 		sys.exit(1)
 
-
-	print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d" %(len(TE), len(noCat), len(nonTE), len(potentialChimeric)))
 	# print(TE)
+	print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(TE), len(noCat), len(nonTE), len(potentialChimeric), (len(TE)+len(noCat)+len(nonTE)+len(potentialChimeric))))
+	# print(TE, len(TE))
+	# print(noCat)
 
 	# for key in TE.keys():
 	#	 if (TE[key]["class"]!="PotentialChimeric"):
