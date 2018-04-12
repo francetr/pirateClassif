@@ -4,6 +4,7 @@ PIF-Harbinger	PIF-Harbinger:Tase:Tase*
 PiggyBac	PiggyBac:Tase:Tase*
 Merlin	Merlin:Tase:Tase*
 Transib	Transib:Tase:Tase*
+CACTA	CACTA:Tase:ORF2:Tase*
 P	P:Tase:Tase*
 Academ	Academ
 MuDR	MuDR
