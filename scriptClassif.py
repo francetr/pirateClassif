@@ -62,11 +62,17 @@ def readPastec(PASTEC, NONTE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 	Read a PASTEC file as input line by line, and then proceed to the categorization of each sequence.
 
 	Keyword arguments:
+	@type PASTEC: string
 	@param PASTEC: name of the classif file that will be opened.
+	@type NONTE: dictionnary
 	@param NONTE: dictionnary for non transposable element (nonTE).
+	@type POTENTIALCHIMERIC: dictionnary
 	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element.
+	@type NOCAT: dictionnary
 	@param NOCAT: dictionnary for non categorized element (noCat).
+	@type TE: dictionnary
 	@param TE: dictionnary for transposable element (I or II).
+	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
 	@return: None.
@@ -96,6 +102,7 @@ def readBaseline(BASELINE):
 	Return a dictionnary which contains the sequence and the id of each sequences which are in the FASTA file.
 
 	Keyword argument:
+	@type BASELINE: string
 	@param BASELINE: name of the baseline file that will be opened.
 
 	@return: Dictionnary containing the different names of possible superFamily. {Key = name of superfamily used later : Values = [list of possible names for this superfamily]}.
@@ -123,18 +130,18 @@ def readFasta(FASTA):
 	"""
 	Read a FASTA file as input and return it as a string. Use the SeqIO from the package Bio of BioPython.
 
-	Return a dictionnary which contains the sequence and the id of each sequences which are in the FASTA file.
+	Return a dictionnary which contains the sequence and the id of each sequences that are in the FASTA file.
 
 	Keyword argument:
+	@type FASTA: string
 	@param FASTA: name of the FASTA file containing the sequence that will be opened.
 
-	@return: Dictionnary with {key = id of the sequence and value : value = {"seq" : sequence of the FASTA sequence}}
+	@return: Dictionnary with {key = id of the sequence and value : value = {"seq" : sequence of the FASTA sequence} }
 		- id : id of the sequence
 		- name : name of the sequence
 		- description : description of the sequence
 		- number of features : number of features of the sequence
 		- seq : sequence concerned
-
 	"""
 	seqReturned={}
 	try:
@@ -156,20 +163,25 @@ def categorization(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 	Categorize the Transposable Element from the input argument.
 
 	Keyword arguments:
+	@type SEQUENCE: list
 	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
 		- [0] : id of the sequence
 		- [3] : potentiel chimeric
 		- [4] : class of the sequence
 		- [5] : order of the sequence
 		- [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
+	@type NONTE: dictionnary
 	@param NONTE: dictionnary for non transposable element (nonTE).
+	@type POTENTIALCHIMERIC: dictionnary
 	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element.
+	@type NOCAT: dictionnary
 	@param NOCAT: dictionnary for non categorized element (noCat).
+	@type TE: dictionnary
 	@param TE: dictionnary for transposable element (I or II).
+	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
 	@return: None.
-
 	"""
 	features=SEQUENCE.split("\t")
 	#TODO Treatment of the superfamily
@@ -182,15 +194,18 @@ def classDetermination(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 	For this, complete four dictionnaries, passed onto arguments, that will contain the different catagories that caracterize the sequence.
 
 	Keyword arguments:
-	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed.
+	@type NONTE: dictionnary
 	@param NONTE: dictionnary for non transposable element (nonTE).
+	@type POTENTIALCHIMERIC: dictionnary
 	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element.
+	@type NOCAT: dictionnary
 	@param NOCAT: dictionnary for non categorized element (noCat).
+	@type TE: dictionnary
 	@param TE: dictionnary for transposable element (I or II).
+	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
-	@return: None
-
+	@return: None.
 	"""
 	####	Check first if the sequence is chimeric
 	if SEQUENCE[3] != "PotentialChimeric":
@@ -226,23 +241,27 @@ def orderDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 	If the order wasn't found, the order's sequence is considered as unknown.
 
 	Keyword arguments:
+	@type SEQUENCE: list
 	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed.
+	@type POTENTIALCHIMERIC: dictionnary
 	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element.
+	@type NOCAT: dictionnary
 	@param NOCAT: dictionnary for non categorized element (noCat).
+	@type TE: dictionnary
 	@param TE: dictionnary for transposable element (I or II).
+	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
 	@return: None.
-
 	"""
+	####	 The order of the TE is not determined, the superfamily of the TE will not be determined
 	if SEQUENCE[5] == "noCat" :
-		####	 The order of the TE is not determined, the superfamily of the TE will not be determined
 		TE[SEQUENCE[0]]["order"]="unknown"
+	####	 The order of the TE is a MITE : the superfamily of the TE will not be determined
 	elif SEQUENCE[5] == "MITE":
-		####	 The order of the TE is a MITE : the superfamily of the TE will not be determined
 		TE[SEQUENCE[0]]["order"]=SEQUENCE[5]
+	####	 The order of the TE is determined : the superfamily of the TE will be determined
 	else:
-		####	 The order of the TE is determined : the superfamily of the TE will be determined
 		TE[SEQUENCE[0]]["order"]=SEQUENCE[5]
 		superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE)
 
@@ -253,14 +272,18 @@ def superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 	@todo: Consider if POTENTIALCHIMERIC and NOCAT arguments are mandatory
 
 	Keyword arguments:
+	@type SEQUENCE: list
 	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed.
+	@type POTENTIALCHIMERIC: dictionnary
 	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element.
+	@type NOCAT: dictionnary
 	@param NOCAT: dictionnary for non categorized element (noCat).
+	@type TE: dictionnary
 	@param TE: dictionnary for transposable element (I or II).
+	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
 	@return: None.
-
 	"""
 	#TODO deal with sequence that don't have DB comparisons
 	try:
@@ -274,8 +297,8 @@ def superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 
 		# print(SEQUENCE[0], dbName, (matches[SEQUENCE[0]][dbName]))
 	except AttributeError:
-		####	If there is no coding part : do nothing (the order has been previously defined as unknown)
-		# print(SEQUENCE[7])
+		####	If there is no coding part : declaration of superfamily as unknown
+		TE[SEQUENCE[0]]["superfamily"] = "unknown"
 		# NOCAT[SEQUENCE[0]]=TE[SEQUENCE[0]]
 		# del TE[SEQUENCE[0]]
 		return
@@ -286,45 +309,100 @@ def searchDifferentName(SEQUENCE, TE, DATABASERECORDS, BASELINE):
 	The name is recovered from two : the hmm profiles (profiles part) and REPET (TE_BLRx and TE_BLRtx part).
 
 	Keyword arguments:
+	@type SEQUENCE: list
 	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed.
-	@param TE: dictionnary for transposable element (I or II) which will be completed with superfamily name.
-	@param DATABASERECORDS: list containing the different results for the different database (TE_BLRx, TE_BLRtx, profiles).
+	@type DATABASERECORDS: list
+	@param DATABASERECORDS: list of string in which there are the superFamily name to search.
+	@type TE: dictionnary
+	@param TE: dictionnary for transposable element (I or II).
+	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
 	@return: None.
-
 	"""
 	####	Dictionnary that will contains (or not) the different superFamilies find for the concerned sequence
 	matches={SEQUENCE[0]:{}}
+	####	List to store the superfamily found for a sequence. Usefull to compare if there are differences between them
 	superFamilyFound=[]
 	####	Scan the different results obtain for each comparisons
 	for dr in DATABASERECORDS:
 		####	Split to obtain the name of the database used (TE_BLRx or TE_BLRtx)
 		dbName = dr.split(':')[0].strip()
-		matches[SEQUENCE[0]] = {dbName:[]}
-		####	List to store the superfamily found for a sequence. Usefull to compare if there are differences between them
-
+		# matches[SEQUENCE[0]] = {dbName:[]}
 
 		####	Do nothing for the profil hmm database. TODO implement the code to search regex in the case it exists
-		if dbName=='profiles': continue
+		if dbName=='profiles':
+			searchProfilesName(SEQUENCE, dr, superFamilyFound)
 		####	Split to obtain each comparison, and parse them in order to search interesting regex
-		# TODO compare the superFamily find for each substr, !!!!!! troubles if the sequence don't have DB but just profiles => put in noCat
-		for substr in dr.split(','):
-			try:
-				####	regex split into groups. Group's number correspondance : 0 : name of the sequence; 1 : type of class; 2 : type of order; 3 : superFamily name
-				searchObj = re.search(r' ([^:]+):(?:Class)?(I+|\?):([^:]+):([^:]+): ([0-9\.]+)%', substr)
-				superFamilyFound.append(searchObj.groups()[3])
-				# print(SEQUENCE[0], searchObj.groups()[1], searchObj.groups()[2], searchObj.groups()[3])
-				####	TODO If a sequence superfamily haven't been determined.
-				if searchObj.groups()[3] == "?":
-					TE[SEQUENCE[0]]["superFamily"]="unknown"
-			except AttributeError:
-				print('Issue on : '+ substr)
-	# if multiple names for superfamily are found tor the sequence, proceed to the comparison between all the names found
+		elif dbName=="TE_BLRx" or "TE_BLRtx":
+			searchRepBaseName(SEQUENCE, dr, superFamilyFound)
+	####	String that will contain the final supefamily name of the sequence
+	finalSuperFamily=""
+	####	if multiple names for superfamily are found tor the sequence, proceed to the comparison between all the names found
 	if len(superFamilyFound) > 1:
-		superFamilyComparison(SEQUENCE, superFamilyFound, BASELINE)
+		finalSuperFamily=superFamilyComparison(SEQUENCE, superFamilyFound, BASELINE)
+	#### One superFamily name have been found
+	elif len(superFamilyFound) == 1:
+		####	Replace the superfamily name by "unknown"
+		if superFamilyFound[0] == "?":
+			finalSuperFamily = "unknown"
+		else:
+			finalSuperFamily=superFamilyFound[0]
+	####	No superFamily name have been found
+	else:
+		finalSuperFamily="unknown"
 	# matches[SEQUENCE[0]][dbName].append(searchObj.groups())
-	# TE[SEQUENCE[0]]["superFamily"]=searchObj.groups()[3]
+	TE[SEQUENCE[0]]["superFamily"]=finalSuperFamily
+
+def searchProfilesName(SEQUENCE, DATABASERECORD, SUPERFAMILYFOUND):
+	"""
+
+	Search the keywords in the profiles part of coding.
+
+	Keyword arguments:
+	@type SEQUENCE: list
+	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed.
+	@type DATABASERECORD: string
+	@param DATABASERECORD: profiles that will be parsed to find the keywords.
+	@type SUPERFAMILYFOUND: list
+	@param SUPERFAMILYFOUND: names of the superfamily found for one sequence during the superFamilyDetermination.
+
+	@return: None
+	"""
+	for substr in DATABASERECORD.split(','):
+		try:
+			searchObj = re.search(r' ([^:]+):(?:Class)?(I+|\?):([^:]+):([^:]+): ([0-9\.]+)%', substr)
+			# print(searchObj)
+		except AttributeError:
+			print('Issue on : '+ substr)
+
+
+def searchRepBaseName(SEQUENCE, DATABASERECORD, SUPERFAMILYFOUND):
+	"""
+
+	Search the keywords in the TE_BLRx and TE_BLRtx part of coding.
+
+	Keyword arguments:
+	@type SEQUENCE: list
+	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed.
+	@type DATABASERECORD: string
+	@param DATABASERECORD: profiles that will be parsed to find the keywords.
+	@type SUPERFAMILYFOUND: list
+	@param SUPERFAMILYFOUND: names of the superfamily found for one sequence during the superFamilyDetermination.
+
+	@return: None
+	"""
+	for substr in DATABASERECORD.split(','):
+		try:
+			####	regex split into groups. Group's number correspondance : 0 : name of the sequence; 1 : type of class; 2 : type of order; 3 : superFamily name
+			searchObj = re.search(r' ([^:]+):(?:Class)?(I+|\?):([^:]+):([^:]+): ([0-9\.]+)%', substr)
+			SUPERFAMILYFOUND.append(searchObj.groups()[3])
+			# print(SEQUENCE[0], searchObj.groups()[1], searchObj.groups()[2], searchObj.groups()[3])
+			####	TODO If a sequence superfamily haven't been determined.
+			if searchObj.groups()[3] == "?":
+				TE[SEQUENCE[0]]["superFamily"]="unknown"
+		except AttributeError:
+			print('Issue on : '+ substr)
 
 
 def superFamilyComparison(SEQUENCE, SUPERFAMILYFOUND, BASELINE):
@@ -332,13 +410,15 @@ def superFamilyComparison(SEQUENCE, SUPERFAMILYFOUND, BASELINE):
 
 	Compare the different superFamilies found for one sequence. For this uses the method combinations of the package itertools allowing to combine 2 by 2 the different elements of a list.
 
-	Return a dictionnary which contains the different catagories which caracterize the sequence.
-
 	Keyword arguments:
+	@type SEQUENCE: list
 	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed.
-	@param SUPERFAMILYFOUND: list of the name of the superfamilies found for one sequence during the superFamilyDetermination.
+	@type SUPERFAMILYFOUND: list
+	@param SUPERFAMILYFOUND: names of the superfamily found for one sequence during the superFamilyDetermination.
+	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily.
 
+	@return: name of the superfamily corresponding to the sequence
 	"""
 	####	TODO Comparison with a reference base
 	####	Dictionnary with key = name of superFamily : value = number of presence of this name in the SUPERFAMILYFOUND list
@@ -363,15 +443,19 @@ def superFamilyComparison(SEQUENCE, SUPERFAMILYFOUND, BASELINE):
 	for superFamily in superFamilyCount.keys():
 		####	If the count of superfamily name is superior to max, max is equal to this count and name is the superFamily name
 		if superFamilyCount[superFamily] > max:
-			name=superFamily
 			max=superFamilyCount[superFamily]
+			name=superFamily
 		####	Else if the count is equal to the max
 		elif superFamilyCount[superFamily] == max:
 			max=superFamilyCount[superFamily]
 			name="potentialChimeric"
-	# print(SEQUENCE[0], name, max)
+	#### if the name is ? convert it into unknown
+	if name=="?":
+		name="unknown"
 
-	print("{}, {}, count: {}, len: {}".format(SEQUENCE[0], SUPERFAMILYFOUND, superFamilyCount, len(SUPERFAMILYFOUND)))
+	# print(SEQUENCE[0], name, max)
+	return name
+	# print("{}, {}, count: {}, len: {}".format(SEQUENCE[0], SUPERFAMILYFOUND, superFamilyCount, len(SUPERFAMILYFOUND)))
 
 def save(FASTA, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
 	"""
@@ -381,12 +465,18 @@ def save(FASTA, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
 	Return a dictionnary which contains the different catagories which caracterize the sequence.
 
 	Keyword arguments:
-	@param FASTA: name of the list of strings, which contain the nucleotid of the sequences.
+	@type FASTA: string
+	@param FASTA: name of the FASTA file containing the sequence that will be opened.
+	@type NONTE: dictionnary
 	@param NONTE: dictionnary for non transposable element (nonTE).
+	@type POTENTIALCHIMERIC: dictionnary
 	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element.
+	@type NOCAT: dictionnary
 	@param NOCAT: dictionnary for non categorized element (noCat).
+	@type TE: dictionnary
 	@param TE: dictionnary for transposable element (I or II).
 
+	@return: TODO
 	"""
 	#TODO
 	# for sequenceName in TE:
@@ -435,18 +525,13 @@ if __name__ == "__main__":
 	except IndexError:
 		print("/!\	Error: No PASTEC provided\n####	Classification aborted")
 		sys.exit(1)
-	# for referenceName in baseline.keys():
-	# 	for i in range(len(baseline[referenceName])):
-	# 		print(referenceName, baseline[referenceName][i])
+
+	# for seq in TE.keys():
+	# 	print(TE[seq])
 
 	print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(TE), len(noCat), len(nonTE), len(potentialChimeric), (len(TE)+len(noCat)+len(nonTE)+len(potentialChimeric))))
 	# print(TE, len(TE))
 	# print(noCat)
-
-	# for key in TE.keys():
-	# 	if (TE[key]["class"]!="PotentialChimeric"):
-	# 		print(TE[key])
-	# 	pass
 
 	###	Reading of the fasta file ####
 	# try:
