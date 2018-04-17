@@ -20,8 +20,8 @@ def retrieveArguments():
 	"""
 	Retrieve the arguments from the command line.
 
+	@rtype: argParse
 	@return: attributes NameSpace of object argParse that contain the two arguments name.
-
 	"""
 	####	 Mananage the 2 arguments (PASTEC and FASTA file name) when the command is launched
 	parser = argparse.ArgumentParser(prog="scriptClassif.py", description="This program is a part of the PiRATE project. It aims to automatized the step of TE classification")
@@ -76,7 +76,6 @@ def readPastec(PASTEC, NONTE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
 	@return: None.
-
 	"""
 	try:
 		####	Open the classif file
@@ -98,6 +97,8 @@ def readPastec(PASTEC, NONTE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 def readBaseline(BASELINE):
 	"""
 	Read a PASTEC file as input line by line, and then proceed to the categorization of each sequence.
+	It first search if the beginning of line contains the character > typical of non specific keyword.
+	The keywords are then added to the dictionnary
 
 	Return a dictionnary which contains the sequence and the id of each sequences which are in the FASTA file.
 
@@ -105,26 +106,45 @@ def readBaseline(BASELINE):
 	@type BASELINE: string
 	@param BASELINE: name of the baseline file that will be opened.
 
-	@return: Dictionnary containing the different names of possible superFamily. {Key = name of superfamily used later : Values = [list of possible names for this superfamily]}.
+	@rtype: dictionnary
+	@return: Dictionnary containing the different names of possible superFamily.
+	{B{Key} = specific : {B{Key} = name of specific keywords for superfamily used later : B{I{Values}} = [list of possible names for this superfamily]},
+	B{Key} = non specific :{B{Key} = name of non specific keyword for superfamily used later : B{I{Values}} = [list of possible names for this superfamily]}}.
 	"""
-	baselineDictionnary={}
+	baselineDictionnary={"specific":{},"non specific":{}}
 	try:
 		with open(BASELINE, "r") as f:
 			for line in f:
 				####	List that will contains the different possibles names of a superfamily
 				listPossibleNames=[]
-				####	Recover the reference name for the superfamily
-				superFamilyNames = line.split("\t")
-				####	Recover the possible names for the superfamily
-				allPossibleNames = superFamilyNames[1].strip().split(":")
-				for possibleName in allPossibleNames:
-					####	Add the possibles names for a superFamily in the list
-					listPossibleNames.append(possibleName)
-				####	Complete the dictionnary with : Key = name of superfamily used later; Value = list of possible names for this superfamily
-				baselineDictionnary[superFamilyNames[0]]=listPossibleNames
+				####	check the content of the file and look for > character (It indicates if the keyword is specific or non specific)
+				keywords=re.search(r'>([^\n]+)', line)
+				####	For specific keywords
+				if not keywords:
+					####	Recover the reference name for the superfamily
+					superFamilyNames = line.split("\t")
+					####	Recover the possible names for the superfamily
+					allPossibleNames = superFamilyNames[1].strip().split(":")
+					for possibleName in allPossibleNames:
+						####	Add the possibles names for a superFamily in the list
+						listPossibleNames.append(possibleName)
+					####	Complete the dictionnary with : Key = name of superfamily used later; Value = list of possible names for this superfamily
+					baselineDictionnary["specific"][superFamilyNames[0]]=listPossibleNames
+				####	For non specific keyword
+				else:
+					####	Recover the reference name for the superfamily
+					superFamilyNames = keywords.groups()[0].split("\t")
+					####	Recover the possible names for the superfamily
+					allPossibleNames = superFamilyNames[1].strip().split(":")
+					for possibleName in allPossibleNames:
+						####	Add the possibles names for a superFamily in the list
+						listPossibleNames.append(possibleName)
+					####	Complete the dictionnary with : Key = name of superfamily used later; Value = list of possible names for this superfamily
+					baselineDictionnary["non specific"][superFamilyNames[0]]=listPossibleNames				# ####	List that will contains the different possibles names of a superfamily
+
 	except FileNotFoundError:
 		print("/!\	Error: No such file as {}\n####	Classification aborted".format(BASELINE))
-	return(baselineDictionnary)
+	return baselineDictionnary
 
 def readFasta(FASTA):
 	"""
@@ -136,7 +156,8 @@ def readFasta(FASTA):
 	@type FASTA: string
 	@param FASTA: name of the FASTA file containing the sequence that will be opened.
 
-	@return: Dictionnary with {key = id of the sequence and value : value = {"seq" : sequence of the FASTA sequence} }
+	@rtype: dictionnary
+	@return: Dictionnary with {B{key} = id of the sequence and value : B{I{value}} = {"seq" : sequence of the FASTA sequence} }
 		- id : id of the sequence
 		- name : name of the sequence
 		- description : description of the sequence
@@ -257,8 +278,8 @@ def orderDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 	####	 The order of the TE is not determined, the superfamily of the TE will not be determined
 	if SEQUENCE[5] == "noCat" :
 		TE[SEQUENCE[0]]["order"]="unknown"
-	####	 The order of the TE is a MITE : the superfamily of the TE will not be determined
-	elif SEQUENCE[5] == "MITE":
+	####	 The order of the TE is a MITE, a LARD or a TRIM : the superfamily of the TE will not be determined
+	elif SEQUENCE[5] == "MITE" or SEQUENCE[5] == "LARD" or SEQUENCE[5] == "TRIM" :
 		TE[SEQUENCE[0]]["order"]=SEQUENCE[5]
 	####	 The order of the TE is determined : the superfamily of the TE will be determined
 	else:
@@ -269,7 +290,6 @@ def superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 	"""
 	Determine the superfamily of one sequence. Doing so it complete a dictionnary containing the transposable element.
 	If the superFamily can't be defined, it will be unknown.
-	@todo: Consider if POTENTIALCHIMERIC and NOCAT arguments are mandatory
 
 	Keyword arguments:
 	@type SEQUENCE: list
@@ -283,20 +303,22 @@ def superFamilyDetermination(SEQUENCE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
+	@todo: Consider if POTENTIALCHIMERIC and NOCAT arguments are mandatory
+
 	@return: None.
 	"""
 	#TODO deal with sequence that don't have DB comparisons
 	try:
-		####	 search if there is a 'coding' part in the 7th value of SEQUENCE => needed to defined the SEQUENCE superfamily
-		codingRecord = re.search(r'coding=\(([^\)]+)\)', SEQUENCE[7]).groups()[0]
-		# print(codingRecord)
+		####	 search if there is a 'coding' part in the 7th value of SEQUENCE => needed to defined the SEQUENCE superfamily. Search for coding(<anything that is not ));>); NB : regex (?!) anything that is not in ()
+		codingRecord = re.search(r'coding=\(((?!\)\);).+?)\);', SEQUENCE[7]).groups()[0]
+		# codingRecord = re.search(r'coding=\(([^\)]+?)\);?', SEQUENCE[7]).groups()[0] Another possibility of regex
 		####	Split the coding part to obtain the different results according to the comparison with different databases (3 possibilties: TEBLRtx, TEBLRx and profiles)
 		databaseRecords = codingRecord.split(';')
 		####	Search if there are different names contained in the codingRecord
 		searchDifferentName(SEQUENCE, TE, databaseRecords, BASELINE)
 
 		# print(SEQUENCE[0], dbName, (matches[SEQUENCE[0]][dbName]))
-	except AttributeError:
+	except AttributeError as e:
 		####	If there is no coding part : declaration of superfamily as unknown
 		TE[SEQUENCE[0]]["superfamily"] = "unknown"
 		# NOCAT[SEQUENCE[0]]=TE[SEQUENCE[0]]
@@ -321,7 +343,7 @@ def searchDifferentName(SEQUENCE, TE, DATABASERECORDS, BASELINE):
 	@return: None.
 	"""
 	####	Dictionnary that will contains (or not) the different superFamilies find for the concerned sequence
-	matches={SEQUENCE[0]:{}}
+	# matches={SEQUENCE[0]:{}}
 	####	List to store the superfamily found for a sequence. Usefull to compare if there are differences between them
 	superFamilyFound=[]
 	####	Scan the different results obtain for each comparisons
@@ -329,11 +351,10 @@ def searchDifferentName(SEQUENCE, TE, DATABASERECORDS, BASELINE):
 		####	Split to obtain the name of the database used (TE_BLRx or TE_BLRtx)
 		dbName = dr.split(':')[0].strip()
 		# matches[SEQUENCE[0]] = {dbName:[]}
-
-		####	Do nothing for the profil hmm database. TODO implement the code to search regex in the case it exists
+		####	if profiles is found in coding, search for superFamily name using function searchProfilesName
 		if dbName=='profiles':
 			searchProfilesName(SEQUENCE, dr, superFamilyFound)
-		####	Split to obtain each comparison, and parse them in order to search interesting regex
+		####	if TE_BLRx or TE_BLRtx is found in coding, search for superFamily name using function searchRepBaseName
 		elif dbName=="TE_BLRx" or "TE_BLRtx":
 			searchRepBaseName(SEQUENCE, dr, superFamilyFound)
 	####	String that will contain the final supefamily name of the sequence
@@ -341,7 +362,7 @@ def searchDifferentName(SEQUENCE, TE, DATABASERECORDS, BASELINE):
 	####	if multiple names for superfamily are found tor the sequence, proceed to the comparison between all the names found
 	if len(superFamilyFound) > 1:
 		finalSuperFamily=superFamilyComparison(SEQUENCE, superFamilyFound, BASELINE)
-	#### One superFamily name have been found
+	####	One superFamily name have been found
 	elif len(superFamilyFound) == 1:
 		####	Replace the superfamily name by "unknown"
 		if superFamilyFound[0] == "?":
@@ -367,14 +388,17 @@ def searchProfilesName(SEQUENCE, DATABASERECORD, SUPERFAMILYFOUND):
 	@type SUPERFAMILYFOUND: list
 	@param SUPERFAMILYFOUND: names of the superfamily found for one sequence during the superFamilyDetermination.
 
-	@return: None
+	@return: TODO
 	"""
+	#TODO
+	# print(DATABASERECORD)
 	for substr in DATABASERECORD.split(','):
+		# print(substr)
 		try:
-			searchObj = re.search(r' ([^:]+):(?:Class)?(I+|\?):([^:]+):([^:]+): ([0-9\.]+)%', substr)
-			# print(searchObj)
+			searchObj = re.search(r' ?(?:profiles)?:?([^_]+)_([^_]+)_([^_]+)_([^:]+): ([0-9\.])%\([0-9.]%', substr)
+			# print(searchObj.groups()[1])
 		except AttributeError:
-			print('Issue on : '+ substr)
+			print('Issue during searching profiles on : '+ substr)
 
 
 def searchRepBaseName(SEQUENCE, DATABASERECORD, SUPERFAMILYFOUND):
@@ -402,7 +426,7 @@ def searchRepBaseName(SEQUENCE, DATABASERECORD, SUPERFAMILYFOUND):
 			if searchObj.groups()[3] == "?":
 				TE[SEQUENCE[0]]["superFamily"]="unknown"
 		except AttributeError:
-			print('Issue on : '+ substr)
+			print('Issue during searching RepBase name on : '+ substr)
 
 
 def superFamilyComparison(SEQUENCE, SUPERFAMILYFOUND, BASELINE):
@@ -418,7 +442,8 @@ def superFamilyComparison(SEQUENCE, SUPERFAMILYFOUND, BASELINE):
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily.
 
-	@return: name of the superfamily corresponding to the sequence
+	@rtype: string
+	@return: name of the superfamily corresponding to the sequence.
 	"""
 	####	TODO Comparison with a reference base
 	####	Dictionnary with key = name of superFamily : value = number of presence of this name in the SUPERFAMILYFOUND list
@@ -428,12 +453,13 @@ def superFamilyComparison(SEQUENCE, SUPERFAMILYFOUND, BASELINE):
 	####	Run through the list of superFamily found
 	for superFamily in SUPERFAMILYFOUND:
 		####	Run through the reference name of the BASELINE
-		for possibleName in BASELINE.keys():
+		for possibleName in BASELINE["specific"].keys():
+
 			####	If the superfamily name is not in the BASELINE AND is not a key of the dictionnary count, its string is declared as value of this dictionnary and has its counter equal to 1
-			if superFamily in BASELINE[possibleName] and (not(superFamily in superFamilyCount.keys())):
+			if superFamily in BASELINE["specific"][possibleName] and (not(superFamily in superFamilyCount.keys())):
 				superFamilyCount[superFamily]=1
 			####	If the superfamily name is already in the dictionnary and exists in the BASELINE, its counter is incremented by 1
-			elif (superFamily in BASELINE[possibleName]) and (superFamily in superFamilyCount.keys()):
+			elif (superFamily in BASELINE["specific"][possibleName]) and (superFamily in superFamilyCount.keys()):
 				superFamilyCount[superFamily]+=1
 	# print(SEQUENCE[0], superFamilyCount)
 
@@ -527,9 +553,9 @@ if __name__ == "__main__":
 		sys.exit(1)
 
 	# for seq in TE.keys():
-	# 	print(TE[seq])
+	# 	print(seq, TE[seq])
 
-	print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(TE), len(noCat), len(nonTE), len(potentialChimeric), (len(TE)+len(noCat)+len(nonTE)+len(potentialChimeric))))
+	# print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(TE), len(noCat), len(nonTE), len(potentialChimeric), (len(TE)+len(noCat)+len(nonTE)+len(potentialChimeric))))
 	# print(TE, len(TE))
 	# print(noCat)
 
