@@ -1,6 +1,6 @@
 Mariner	Tc1-Mariner
 hAT	hAT
-PIF-Harbinger	PIF-Harbinger:pifharpinger
+PIF-Harbinger	PIF-Harbinger
 PiggyBac	PiggyBac
 Merlin	Merlin
 Transib	Transib
@@ -28,7 +28,6 @@ L1	L1
 I	I
 >Tase	Mariner:hAT:PIF-Harbinger:PiggyBac:Merlin:Transib:CACTA:P
 >Tase*	Mariner:hAT:PIF-Harbinger:PiggyBac:Merlin:Transib:CACTA:P
->pifharpinger	PIF-Harbinger
 >ORF1	L1
 >ORF2	CACTA
 >RPA	Helitron
@@ -36,9 +35,6 @@ I	I
 >CYP	Crytpon
 >POLB	Crypton
 >OTHER	unknown
->copiart	Copia
->dirs	DIRS
->gypsy	Gypsy
 >GAG	Copia:Gypsy:Bel-Pao:ERV:DIRS
 >AP	Copia:Gypsy:Bel-Pao:ERV:DIRS
 >RT	Copia:Gypsy:Bel-Pao:ERV:DIRS:Penelope:R2:RTE:Jockey:L1:I
@@ -47,7 +43,6 @@ I	I
 >POL	Gypsy
 >ENV	ERV
 >YR	DIRS
->tyr	DIRS
 >EN	Penelope:R2
 >LINER2	R2
 >LINER1	L1

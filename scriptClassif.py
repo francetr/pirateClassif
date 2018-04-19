@@ -111,7 +111,7 @@ def readBaseline(BASELINE):
 	{B{Key} = specific : {B{Key} = name of specific keywords for superfamily used later : B{I{Values}} = [list of possible names for this superfamily]},
 	B{Key} = non specific :{B{Key} = name of non specific keyword for superfamily used later : B{I{Values}} = [list of possible names for this superfamily]}}.
 	"""
-	baselineDictionnary={"specific":{},"non specific":{}}
+	baselineDictionnary={"specific":{},"nonSpecific":{}}
 	try:
 		with open(BASELINE, "r") as f:
 			for line in f:
@@ -140,7 +140,7 @@ def readBaseline(BASELINE):
 						####	Add the possibles names for a superFamily in the list
 						listPossibleNames.append(possibleName)
 					####	Complete the dictionnary with : Key = name of superfamily used later; Value = list of possible names for this superfamily
-					baselineDictionnary["non specific"][superFamilyNames[0]]=listPossibleNames				# ####	List that will contains the different possibles names of a superfamily
+					baselineDictionnary["nonSpecific"][superFamilyNames[0]]=listPossibleNames				# ####	List that will contains the different possibles names of a superfamily
 
 	except FileNotFoundError:
 		print("/!\	Error: No such file as {}\n####	Classification aborted".format(BASELINE))
@@ -315,7 +315,7 @@ def superFamilyDetermination(FEATURES, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 		searchDifferentName(FEATURES, TE, databaseRecords, BASELINE)
 
 		# print(FEATURES[0], dbName, (matches[FEATURES[0]][dbName]))
-	except AttributeError as e:
+	except AttributeError:
 		####	If there is no coding part : declaration of superfamily as unknown
 		TE[FEATURES[0]]["superfamily"] = "unknown"
 		# NOCAT[FEATURES[0]]=TE[FEATURES[0]]
@@ -350,7 +350,7 @@ def searchDifferentName(FEATURES, TE, DATABASERECORDS, BASELINE):
 		# matches[FEATURES[0]] = {dbName:[]}
 		####	if profiles is found in coding, search for superFamily name using function searchProfilesName
 		if dbName=='profiles':
-			searchProfilesName(FEATURES, dr, superFamilyFound)
+			searchProfilesName(FEATURES, dr, superFamilyFound, BASELINE)
 		####	if TE_BLRx or TE_BLRtx is found in coding, search for superFamily name using function searchRepBaseName
 		elif dbName=="TE_BLRx" or "TE_BLRtx":
 			searchRepBaseName(FEATURES, dr, superFamilyFound)
@@ -372,7 +372,7 @@ def searchDifferentName(FEATURES, TE, DATABASERECORDS, BASELINE):
 	# matches[FEATURES[0]][dbName].append(searchObj.groups())
 	TE[FEATURES[0]]["superFamily"]=finalSuperFamily
 
-def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND):
+def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 	"""
 
 	Search the keywords in the profiles part of coding.
@@ -387,23 +387,54 @@ def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND):
 
 	@return: TODO
 	"""
-	#TODO try to differenciate different possible syntax according the first regex found. Ex: PiRATEdb_CACTA_Tase_NA or _RT_reina_NA_RT_NA or PF05699.9_Dimer_Tnp_hAT_NA_Tase_21.4
+	#TODO try to differenciate different possible syntax according the first regex found. Ex:
+	# case 1: PiRATEdb_CACTA_Tase_NA
+	# case 2: _RT_reina_NA_RT_NA
+	# case 3: PF05699.9_Dimer_Tnp_hAT_NA_Tase_21.4
 	# print(DATABASERECORD)
 	####	first split to get rid of profiles:
 	DATABASERECORD=DATABASERECORD.split("profiles:")
+	keywordFound=False
 	####	Parse all the results of profiles and search for regex
 	for substr in DATABASERECORD[1].split(','):
 		# print(substr+"\n")
 		try:
-			searchObj = re.search(r'(?:profiles:)? _?([^_]+)_([^_]+)_([^_]+)_([^:]+): ([0-9\.]+)%\(([0-9\.]+)%\)', substr)
+			####	SECOND APPROACH : find keywords by match with BASELINE keyword
+			####	Split the substr with _ : the profiles keywords are separated by a
+			substr=substr.split("_")
+			####	parse the profiles keywords one by one
+			for word in substr:
+				####	parse the possible name which are in the BASELINE
+				for possibleName in BASELINE["nonSpecific"]:
+					####	check if the keywords in profiles is in the BASELINE (convert string into lower case berfore comparing)
+					if word.lower() == possibleName.lower():
+						SUPERFAMILYFOUND.append(word)
+						keywordFound=True
+				# if not keywordFound:
+				# 	print("%s, %s not in BASELINE"%(FEATURES[0], word))
+
+			print(FEATURES[0], SUPERFAMILYFOUND)
 			# print(FEATURES[0], searchObj.groups()[0])
+			####	FIRST APPROACH : find keywords by position
 			####	Proceed to different operations according the first string of the first regex
-			####	If first regex is PiRATEdb
-			if searchObj.groups()[0] == "PiRATEdb":
-				print("Base de Données PiRATE : ", FEATURES[0], searchObj.groups()[1], searchObj.groups()[2])
+			####	If first regex is PiRATEdb or mydatabase (NB maybe should delete this one)
+			# searchObj = re.search(r' (_?[^_]+)_([^_]+)_([^_]+)_([^:]+)(?:_[0-9\.]+)?: ([0-9\.]+)%\(([0-9\.]+)%\)', substr)
+			# if searchObj.groups()[0] == "PiRATEdb" or searchObj.groups()[0] == "mydatabase":
+			# 	# print("Base de Données PiRATE : ", FEATURES[0], searchObj.groups()[1], searchObj.groups()[2])
+			# 	pass
+			# ####	if second regex begin by PF... (case 2)
+			# elif re.search(r'^PF[.\w]+', searchObj.groups()[0]):
+			# 	# print(substr)
+			# 	# print("Base de Données PF : ", FEATURES[0], searchObj.groups()[-3])
+			# 	pass
+			# ####	if third regex begin by _... (case 3)
+			# elif re.search(r'^_[.\w]+', searchObj.groups()[0]) :
+			# 	# print(substr)
+			# 	# print("Base de Données _ : ", FEATURES[0], searchObj.groups()[-3])
+			# 	pass
 			# print(searchObj.groups())
 		except AttributeError:
-			print('Issue during searching profiles on : '+ substr + "\n")
+			print('Issue during searching profiles on : '+ substr)
 
 
 def searchRepBaseName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND):

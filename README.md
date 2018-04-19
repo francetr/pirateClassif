@@ -9,28 +9,31 @@ For more information, you can go read the research paper that lead to the creati
 _http://www.seanoe.org/data/00406/51795/_
 
 ## Files used for this script:
-* _pastecFile_ : Output file of the pastec tool. The script will retrieve the class, order and superfamily for each sequence in this file
+* ***pastecFile*** : Output file of the pastec tool. This file must be correctly written, meaning all columns are separated by one or two tabulation characters.  
+The script will retrieve the class, order and superfamily for each sequence in this file.
 
-* _baselineFile_ : File containing the baseline of the superFamilies names (multiple names can define the same superFamily). This is useful to determine if a sequence can be classified as multiple families or if her superFamily is not defined yet.  
-This file can be completed, for this you just need to enter the new family name in a new line followed by a tabulation and the different names (separated by :) that can design this superfamily.  
+* ***baselineFile*** : File containing the baseline of the superFamilies names (multiple names can define the same superFamily). This is useful to determine if a sequence can be classified as multiple families or if its superFamily is not defined yet.  
+For the classification step, we used _specific_ and _non specific_ keywords. The first concerned keywords that can be find in the _TE&#95;BLRx_ or _TE&#95;BLRtx_ part of coding, and the last can be found in the _profiles_ part  
+This file can be completed, for this, you just need to enter the new family name in a new line followed by a _tabulation_ and the different names (separated by _:_ ) that can design this superfamily.  
 Example :
-> Mariner&nbsp;&nbsp;&nbsp;&nbsp;Tc1-mariner:mariner:TASE
+> Mariner&nbsp;&nbsp;&nbsp;&nbsp;Tc1-mariner:mariner:TASE  
+> &gt;TASE&nbsp;&nbsp;&nbsp;&nbsp;Mariner:hAT:PIF-Harbinger:PiggyBac:Merlin:Transib:CACTA:P
 
-* _fastaFile_ : Original file containing the sequences used. Usefull to retrieve the sequences after the classification has be done
+* ***fastaFile*** : Original file containing the sequences used. Usefull to retrieve the sequences after the classification has be done
 
 
 ## Command line to launch the script:
 
->_python3 path/toward/this/script path/toward/the/classif/file path/toward/the/baseline/file path/toward/the/fasta/file_
+>_python3&nbsp;&nbsp;path/toward/this/script&nbsp;&nbsp;path/toward/the/classif/file  path/toward/the/baseline/file&nbsp;&nbsp;path/toward/the/fasta/file_
 
 example:
 ~~~
-python3 code/scriptClassif.py TisoRepet1.classif base_reference.txt hat.fasta
+python3 scriptClassif.py TisoRepet1.classif base_reference.txt hat.fasta
 ~~~
 
-> _./path/toward/the/scriptClassif.py path/toward/the/classif/file path/toward/the/baseline/file path/toward/the/fasta/file_
+> _./path/toward/the/scriptClassif.py&nbsp;&nbsp;path/toward/the/classif/file path/toward/the/baseline/file&nbsp;&nbsp;path/toward/the/fasta/file_
 
 example:
 ~~~
-./code/scriptClassif.py TisoRepet1.classif base_reference.txt hat.fasta
+./scriptClassif.py TisoRepet1.classif base_reference.txt hat.fasta
 ~~~
