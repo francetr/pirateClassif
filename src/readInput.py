@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 # coding: utf8
+
+""" @author: Tristan Frances """
+
 import sys
 import argparse
 import re
 import categorization
 
-""" @author: Tristan Frances """
 
 def retrieveArguments():
 	"""
@@ -21,7 +23,7 @@ def retrieveArguments():
 	parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
 	args = parser.parse_args()
 	# checkArguments(args.classif, args.fasta)
-	return(args)
+	return args
 
 # def checkArguments(CLASSIFNAME, FASTANAME):
 # 	"""
@@ -108,16 +110,16 @@ def readBaseline(BASELINE):
 				keywords=re.search(r'>([^\n]+)', line)
 				####	For specific keywords
 				if not keywords:
-					specificBaselineKeywords(line, baselineDictionnary)
+					readSpecificBaselineKeywords(line, baselineDictionnary)
 				####	For nonSpecific keyword
 				else:
-					nonSpecificBaselineKeywords(keywords.groups()[0], baselineDictionnary)
+					readNonSpecificBaselineKeywords(keywords.groups()[0], baselineDictionnary)
 
 	except FileNotFoundError:
 		print("/!\	Error: No such file as {}\n####	Classification aborted".format(BASELINE))
 	return baselineDictionnary
 
-def specificBaselineKeywords(SPECIFICKEYWORDS, BASELINEDICTIONNARY):
+def readSpecificBaselineKeywords(SPECIFICKEYWORDS, BASELINEDICTIONNARY):
 	"""
 	From one line of the BASELINE file, it add the specific keyword founded as a key of the BASELINEDICTIONNARY and all the possible names associated as the value.
 
@@ -143,7 +145,7 @@ def specificBaselineKeywords(SPECIFICKEYWORDS, BASELINEDICTIONNARY):
 	####	Complete the dictionnary with : Key = name of superfamily used later; Value = list of possible names for this superfamily
 	BASELINEDICTIONNARY["specific"][superFamilyNames[0]]=listPossibleNames
 
-def nonSpecificBaselineKeywords(NONSPECIFICKEYWORDS, BASELINEDICTIONNARY):
+def readNonSpecificBaselineKeywords(NONSPECIFICKEYWORDS, BASELINEDICTIONNARY):
 	"""
 	From one line of the BASELINE file, it add the non specific keyword founded as a key of the BASELINEDICTIONNARY and all the possible names associated as the value.
 
@@ -170,35 +172,35 @@ def nonSpecificBaselineKeywords(NONSPECIFICKEYWORDS, BASELINEDICTIONNARY):
 	BASELINEDICTIONNARY["nonSpecific"][superFamilyNames[0]]=listPossibleNames				# ####	List that will contains the different possibles names of a superfamily
 
 
-# def readFasta(FASTA):
-# 	"""
-# 	Read a FASTA file as input and return it as a string. Use the SeqIO from the package Bio of BioPython.
-#
-# 	Return a dictionnary which contains the sequence and the id of each sequences that are in the FASTA file.
-#
-# 	Keyword argument:
-# 	@type FASTA: string
-# 	@param FASTA: name of the FASTA file containing the sequence that will be opened.
-#
-# 	@rtype: dictionnary
-# 	@return: Dictionnary with {B{key} = id of the sequence and value : B{I{value}} = {"seq" : sequence of the FASTA sequence} }
-# 		- id : id of the sequence
-# 		- name : name of the sequence
-# 		- description : description of the sequence
-# 		- number of features : number of features of the sequence
-# 		- seq : sequence concerned
-# 	"""
-# 	seqReturned={}
-# 	try:
-# 		####	 Open the fasta file
-# 		with open(fastaFile, "rU") as handle:
-# 			print(handle)
-# 		####	Parse every line/sequence of the file
-# 			for record in SeqIO.parse(handle, "fasta"):
-# 				####	Save the sequence in a dictionnary
-# 				seqReturned[record.id]={"seq":record.seq}
-# 		return seqReturned
-# 	except (FileNotFoundError, NameError):
-# 		####	prevent the opening if the file name is incorrect
-# 		print("/!\	Error: No such file as {}\n####	Classification aborted".format(FASTA))
-# 		sys.exit(1)
+def readFasta(FASTA):
+	"""
+	Read a FASTA file as input and return it as a string. Use the SeqIO from the package Bio of BioPython.
+
+	Return a dictionnary which contains the sequence and the id of each sequences that are in the FASTA file.
+
+	Keyword argument:
+	@type FASTA: string
+	@param FASTA: name of the FASTA file containing the sequence that will be opened.
+
+	@rtype: dictionnary
+	@return: Dictionnary with {B{key} = id of the sequence and value : B{I{value}} = {"seq" : sequence of the FASTA sequence} }
+		- id : id of the sequence
+		- name : name of the sequence
+		- description : description of the sequence
+		- number of features : number of features of the sequence
+		- seq : sequence concerned
+	"""
+	seqReturned={}
+	try:
+		####	 Open the fasta file
+		with open(fastaFile, "rU") as handle:
+			print(handle)
+		####	Parse every line/sequence of the file
+			for record in SeqIO.parse(handle, "fasta"):
+				####	Save the sequence in a dictionnary
+				seqReturned[record.id]={"seq":record.seq}
+		return seqReturned
+	except (FileNotFoundError, NameError):
+		####	prevent the opening if the file name is incorrect
+		print("/!\	Error: No such file as {}\n####	Classification aborted".format(FASTA))
+		sys.exit(1)

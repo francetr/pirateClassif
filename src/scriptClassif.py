@@ -1,15 +1,11 @@
 #!/usr/bin/python3
 # coding: utf8
+
+""" @author: Tristan Frances """
+
 import sys
 from Bio import SeqIO # For the fasta reading
 import readInput
-
-"""
-
-Main of the Classification package
-@author: Tristan Frances
-
-"""
 
 ############
 #	Help command : scriptClassif -h
@@ -21,44 +17,7 @@ Main of the Classification package
 
 # @author: Tristan Frances
 
-
-def save(FASTA, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
-	"""
-
-	Save the sequence in a file.
-
-	Return a dictionnary which contains the different catagories which caracterize the sequence.
-
-	Keyword arguments:
-	@type FASTA: string
-	@param FASTA: name of the FASTA file containing the sequence that will be opened.
-	@type NONTE: dictionnary
-	@param NONTE: dictionnary for non transposable element (nonTE).
-	@type POTENTIALCHIMERIC: dictionnary
-	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element.
-	@type NOCAT: dictionnary
-	@param NOCAT: dictionnary for non categorized element (noCat).
-	@type TE: dictionnary
-	@param TE: dictionnary for transposable element (I or II).
-
-	@rtype: TODO
-	"""
-	#TODO
-	# for sequenceName in TE:
-	#	 if FASTA.id!=sequenceName:
-	#	 print(FASTA.id, sequenceName)
-	# return
-
-
-
-
-####################
-#	   MAIN
-####################
-
-if __name__ == "__main__":
-	# nom="/home/tfrances/Bureau/donnees/sortie_PASTEC/TisoMgescan.classif"
-
+def main():
 	print("Start of the classification\n")
 	####	 Instanciation of dictionnaries that will contain the results
 	nonTE, potentialChimeric,  noCat, TE = {}, {}, {}, {}
@@ -109,3 +68,40 @@ if __name__ == "__main__":
 	# 	print("####	No Fasta provided\n####	Classification aborted")
 	# 	sys.exit(1)
 	# save(fasta, nonTE, potentialChimeric, noCat, TE)
+
+def save(FASTA, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
+	"""
+
+	Save the sequence in a file.
+
+	Return a dictionnary which contains the different catagories which caracterize the sequence.
+
+	Keyword arguments:
+	@type FASTA: string
+	@param FASTA: name of the FASTA file containing the sequence that will be opened.
+	@type NONTE: dictionnary
+	@param NONTE: dictionnary for non transposable element (nonTE).
+	@type POTENTIALCHIMERIC: dictionnary
+	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element.
+	@type NOCAT: dictionnary
+	@param NOCAT: dictionnary for non categorized element (noCat).
+	@type TE: dictionnary
+	@param TE: dictionnary for transposable element (I or II).
+
+	@rtype: TODO
+	"""
+	#TODO
+	# for sequenceName in TE:
+	#	 if FASTA.id!=sequenceName:
+	#	 print(FASTA.id, sequenceName)
+	# return
+
+
+
+
+####################
+#	   MAIN
+####################
+
+if __name__ == "__main__":
+	main()

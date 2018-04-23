@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 # coding: utf8
-import re
-import search
 
 """ @author: Tristan Frances """
+
+import re
+import search
 
 def initCategorization(SEQUENCE, NONTE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 	"""
@@ -130,7 +131,6 @@ def superFamilyDetermination(FEATURES, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 
 	@rtype: None
 	"""
-	#TODO deal with sequence that don't have DB comparisons
 	try:
 		####	 search if there is a 'coding' part in the 7th value of FEATURES => needed to defined the FEATURES superfamily. Search for coding(<anything that is not ));>); NB : regex (?!) anything that is not in ()
 		codingRecord = re.search(r'coding=\(((?!\)\);).+?)\);', FEATURES[7]).groups()[0]
