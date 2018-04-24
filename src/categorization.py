@@ -134,7 +134,6 @@ def superFamilyDetermination(FEATURES, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 	try:
 		####	 search if there is a 'coding' part in the 7th value of FEATURES => needed to defined the FEATURES superfamily. Search for coding(<anything that is not ));>); NB : regex (?!) anything that is not in ()
 		codingRecord = re.search(r'coding=\(((?!\)\);).+?)\);', FEATURES[7]).groups()[0]
-		# codingRecord = re.search(r'coding=\(([^\)]+?)\);?', FEATURES[7]).groups()[0] Another possibility of regex
 		####	Split the coding part to obtain the different results according to the comparison with different databases (3 possibilties: TEBLRtx, TEBLRx and profiles)
 		databaseRecords = codingRecord.split(';')
 		####	Search if there are different names contained in the codingRecord
