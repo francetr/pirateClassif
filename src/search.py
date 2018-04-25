@@ -33,8 +33,6 @@ def searchDifferentName(FEATURES, TE, DATABASERECORDS, BASELINE):
 	for dr in DATABASERECORDS:
 		####	Split to obtain the name of the database used (TE_BLRx or TE_BLRtx)
 		dbName = dr.split(':')[0].strip()
-		# print(FEATURES[0], dbName)
-		# matches[FEATURES[0]] = {dbName:[]}
 		####	if profiles is found in coding, search for superFamily name using function searchProfilesName
 		if dbName=='profiles':
 			searchProfilesName(FEATURES, dr, superFamilyFound, BASELINE)
@@ -77,11 +75,10 @@ def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 	@type SUPERFAMILYFOUND: dictionnary
 	@param SUPERFAMILYFOUND: count the names of the superfamily found for one sequence during the superFamilyDetermination.
 	@type BASELINE: dictionnary
-	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
+	@param BASELINE: dictionnary containing different profiles keyword possible for a given superfamily (usefull for the function superFamilyComparison).
 
 	@rtype: TODO
 	"""
-	# print(DATABASERECORD)
 	####	first split to get rid of profiles:
 	DATABASERECORD=DATABASERECORD.split("profiles:")
 	####	Parse all the results of profiles and search for regex
@@ -89,8 +86,6 @@ def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 		# print(substr+"\n")
 		try:
 			####	APPROACH : Find keywords by match with BASELINE keyword
-			####	Counter for the keyword found
-			cptKeyword=0
 			####	Boolean allowing to know if the keyword is in the baseline
 			keywordFound=False
 			####	parse the possible name which are in the BASELINE
@@ -102,11 +97,10 @@ def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 					keywordFound=True
 					####	If the keyword hasn't been found in the SUPERFAMILYFOUND dictionnary, its counter is 1
 					if not nonSpecificName in SUPERFAMILYFOUND["nonSpecific"]:
-						cptKeyword+=1
 						if nonSpecificName == "Tase" or nonSpecificName == "Tase*":
-							SUPERFAMILYFOUND["nonSpecific"]["Tase"]=cptKeyword
+							SUPERFAMILYFOUND["nonSpecific"]["Tase"]=1
 						else:
-							SUPERFAMILYFOUND["nonSpecific"][nonSpecificName]=cptKeyword
+							SUPERFAMILYFOUND["nonSpecific"][nonSpecificName]=1
 					####	If the keyword has already been found in the SUPERFAMILYFOUND dictionnary, its counter is incremented by 1
 					else:
 						if nonSpecificName == "Tase" or nonSpecificName == "Tase*":
@@ -140,26 +134,22 @@ def searchRepBaseName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 
 	@rtype: None
 	"""
-	####	Counter for the keyword found
-	cptKeyword=0
 	for substr in DATABASERECORD.split(','):
 		try:
+			####	Approach: use regex to find the keyword
 			####	regex split into groups. Group's number correspondance : 0 : name of the sequence; 1 : type of class; 2 : type of order; 3 : superFamily name
-			keywordSearch = re.search(r' ([^:]+):(?:Class)?(I+|\?):([^:]+):([^:]+): ([0-9\.]+)%', substr)
+			keywordSearch = re.search(r' ?([^:]+):(?:Class)?(I+|\?):([^:]+):([^:]+): ([0-9\.]+)%', substr)
 			keyword = keywordSearch.groups()[3]
-
 			####	Boolean allowing to know if the keyword is in the baseline
 			keywordFound=False
-
 			####	Parse the key of the specific keywords in the BASELINE file
 			for specificName in BASELINE["specific"]:
 				####	Check if the keywords in profiles is in the BASELINE
 				if keyword in BASELINE["specific"][specificName]:
 					keywordFound=True
-					####	If the keyword hasn't been found in the SUPERFAMILYFOUND dictionnary, its counter is 1
-					if not keyword in SUPERFAMILYFOUND["specific"]:
-						cptKeyword+=1
-						SUPERFAMILYFOUND["specific"][specificName]=cptKeyword
+					####	If the keyword hasn't been found in the SUPERFAMILYFOUND dictionnary, we creates its value in SUPERFAMILYFOUND and define its counter as 1
+					if not specificName in SUPERFAMILYFOUND["specific"]:
+						SUPERFAMILYFOUND["specific"][specificName]=1
 					####	If the keyword has already been found in the SUPERFAMILYFOUND dictionnary, its counter is incremented by 1
 					else:
 						SUPERFAMILYFOUND["specific"][specificName]+=1

@@ -98,9 +98,9 @@ def readBaseline(BASELINE):
 	@param BASELINE: name of the baseline file that will be opened.
 
 	@rtype: dictionnary
-	@return: Dictionnary containing the different names of possible superFamily.
-	{B{Key} = specific : {B{Key} = name of specific keywords for superfamily used later : B{I{Values}} = [list of possible names for this superfamily]},
-	B{Key} = nonSpecific :{B{Key} = name of non specific keyword for superfamily used later : B{I{Values}} = [list of possible names for this superfamily]}}.
+	@return: dictionnary containing the different names of possible superFamily.
+	{B{Key} = specific : {B{Key} = name of specific keywords for superFamily used later : B{I{Values}} = [list of possible names for this superFamily]},
+	B{Key} = nonSpecific :{B{Key} = name of non specific keyword for superFamily used later : B{I{Values}} = [list of possible names for this superFamily]}}.
 	"""
 	baselineDictionnary={"specific":{},"nonSpecific":{}}
 	try:

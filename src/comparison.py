@@ -21,12 +21,21 @@ def superFamilyComparison(FEATURES, SUPERFAMILYFOUND, BASELINE):
 	"""
 	####	TODO Comparison with a reference base
 	####	Draft
+
+	####	String for the final superFamily name
+	name = ""
 	####	Comparison between names found for a sequence and names in the BASELINE
 	####	Run through the list of superFamily found
-	name = ""
 	specificResult = specificComparison(FEATURES, SUPERFAMILYFOUND, BASELINE)
-	# print(specificResult)
-	nonSpecificComparison(FEATURES, SUPERFAMILYFOUND, BASELINE, specificResult)
+
+	####	If the sequence have more than 1 specific keyword,
+	if "potentialChimeric" in specificResult:
+		# print(specificResult)
+		pass
+
+	####	If the sequence have 1 specific sequence or no specific sequence: compare the nonSpecificName found
+	else:
+		nonSpecificComparison(FEATURES, SUPERFAMILYFOUND, BASELINE, specificResult)
 
 	# for superFamily in SUPERFAMILYFOUND:
 	# 	####	Run through the reference name of the BASELINE
@@ -72,17 +81,28 @@ def specificComparison(FEATURES, SUPERFAMILYFOUND, BASELINE):
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily.
 
-	@rtype: tuple
-	@return: name of the superfamily corresponding to the sequence and number of specific keyword(s) founded for this sequence.
+	@rtype: dictionnary
+	@return: dictionnary containing the name of superFamily found and its count.
+	{B{Key} = specific : B{I{Values}} = count of this keyword}\n
+	3 return possible.
+
+		1. If no keyword => None: 0
+
+		2. If 1 keyword => name of keyword : count of this keyword
+
+		3. If more than 1 keyword => potentialChimeric : number of keyword found
 	"""
-	#TODO
+	####	If no specific keyword has been found
+	if len(SUPERFAMILYFOUND["specific"]) == 0:
+		return {"None": 0}
+
 	####	If one specific keyword has been found
-	if len(SUPERFAMILYFOUND["specific"]) == 1:
+	elif len(SUPERFAMILYFOUND["specific"]) == 1:
 		for key in SUPERFAMILYFOUND["specific"].keys():
 			nameSuperfamily = key
 			return {nameSuperfamily: SUPERFAMILYFOUND["specific"][key]}
 
-	####	If multple specific keywords have been found
+	####	If multiple specific keywords have been found
 	elif len(SUPERFAMILYFOUND["specific"]) >= 1:
 		return {"potentialChimeric": len(SUPERFAMILYFOUND["specific"])}
 
@@ -98,7 +118,7 @@ def nonSpecificComparison(FEATURES, SUPERFAMILYFOUND, BASELINE, SPECIFICRESULT):
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily.
 	@type SPECIFICRESULT: TODO
-	@param SPECIFICRESULT: TODO):
+	@param SPECIFICRESULT: TODO
 
 	@rtype: tuple
 	@return: name of the superfamily corresponding to the sequence and number of non specific keyword(s) founded for this sequence.
