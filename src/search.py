@@ -24,9 +24,8 @@ def searchDifferentName(FEATURES, TE, DATABASERECORDS, BASELINE):
 	@rtype: None.
 	"""
 	####	Dictionnary that will contains (or not) the different superFamilies find for the concerned sequence
-	# matches={FEATURES[0]:{}}
-	####	Dictionnary with key = specific : value = { key = specifc keyword found : value = number of presence of this keyword},
-	####					 key = nonSpecific : value = { key = non specifc keyword found : value = number of presence of this keyword}}
+	####		key = specific : value = { key = specifc keyword found : value = number of presence of this keyword},
+	####		key = nonSpecific : value = { key = non specifc keyword found : value = number of presence of this keyword}}
 	superFamilyFound={"specific":{}, "nonSpecific":{}}
 
 	####	Scan the different results obtain for each comparisons
@@ -39,7 +38,7 @@ def searchDifferentName(FEATURES, TE, DATABASERECORDS, BASELINE):
 		####	if TE_BLRx or TE_BLRtx is found in coding, search for superFamily name using function searchRepBaseName
 		elif dbName=="TE_BLRx" or "TE_BLRtx":
 			searchRepBaseName(FEATURES, dr, superFamilyFound, BASELINE)
-	print(FEATURES[0], superFamilyFound)
+	# print(FEATURES[0], superFamilyFound)
 	####	String that will contain the final supefamily name of the sequence
 	finalSuperFamily = ""
 	####	if no keywords have been found, finalSuperFamily will be unknown

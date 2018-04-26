@@ -77,7 +77,7 @@ def classDetermination(FEATURES, NONTE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 			NONTE[FEATURES[0]]={"class":"nonTE"}
 			# print("NA : %s %s" % (FEATURES[4], FEATURES[5]))
 	else:
-		POTENTIALCHIMERIC[FEATURES[0]]={"Class":"potentialChimeric"}
+		POTENTIALCHIMERIC[FEATURES[0]]={"class":"potentialChimeric"}
 		# print("chimere : %s %s %s" % (FEATURES[0], FEATURES[4], FEATURES[5]))
 
 def orderDetermination(FEATURES, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):

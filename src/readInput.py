@@ -7,6 +7,7 @@ import sys
 import argparse
 import re
 import categorization
+from Bio import SeqIO # For the fasta reading
 
 
 def retrieveArguments():
@@ -193,8 +194,7 @@ def readFasta(FASTA):
 	seqReturned={}
 	try:
 		####	 Open the fasta file
-		with open(fastaFile, "rU") as handle:
-			print(handle)
+		with open(FASTA, "rU") as handle:
 		####	Parse every line/sequence of the file
 			for record in SeqIO.parse(handle, "fasta"):
 				####	Save the sequence in a dictionnary

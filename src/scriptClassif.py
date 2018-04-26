@@ -4,8 +4,8 @@
 """ @author: Tristan Frances """
 
 import sys
-from Bio import SeqIO # For the fasta reading
 import readInput
+import save
 
 ############
 #	Help command : scriptClassif -h
@@ -31,10 +31,8 @@ def main():
 	fastaFile=args.fasta
 	####	Reading of the baseline file ####
 	try:
-		# take the second argument in the terminal command as file name
 		print("####	Import of the Baseline file")
 		baseline=readInput.readBaseline(baselineFile)
-		# print(baseline)
 		print("####	Baseline succesfully imported\n")
 	except IndexError:
 		print("/!\	Error: The baseline file provided is badly written\n####	Classification aborted")
@@ -44,57 +42,33 @@ def main():
 	try:
 		print("####	Read of the classif file")
 		pastec=readInput.readPastec(pastecFile, nonTE, potentialChimeric, noCat, TE, baseline)
-		# print(TE)
 		print("####	End of reading of the classif file\n")
 	except IndexError:
 		print("/!\	Error: No PASTEC provided\n####	Classification aborted")
 		sys.exit(1)
+	#
+	#
+	# # for seq in TE.keys():
+	# # 	print(seq, TE[seq])
+	#
+	# print("TE : %s, noCat : %s, nonTE : %s, chimeric: %s" %(TE, noCat, nonTE, potentialChimeric))
+	print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(TE), len(noCat), len(nonTE), len(potentialChimeric), (len(TE)+len(noCat)+len(nonTE)+len(potentialChimeric))))
 
-	# for seq in TE.keys():
-	# 	print(seq, TE[seq])
-
-	# print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(TE), len(noCat), len(nonTE), len(potentialChimeric), (len(TE)+len(noCat)+len(nonTE)+len(potentialChimeric))))
 	# print(TE, len(TE))
 	# print(noCat)
 
-	###	Reading of the fasta file ####
-	# try:
-	# 	print("####	Read of the FASTA file")
-	# 	fasta=readFasta(fastaFile)
-	# 	print("####	End of reading of the FASTA file\n")
-	# 	for key in fasta.keys():
-	# 		print(">%s :\n%s\n" %(key, fasta[key]["seq"]))
-	# except IndexError:
-	# 	print("####	No Fasta provided\n####	Classification aborted")
-	# 	sys.exit(1)
-	# save(fasta, nonTE, potentialChimeric, noCat, TE)
+	##	Reading of the fasta file ####
+	try:
+		print("####	Read of the FASTA file")
+		fasta=readInput.readFasta(fastaFile)
+		print("####	End of reading of the FASTA file\n")
+		# for key in fasta.keys():
+		# 	print(">%s :\n%s\n" %(key, fasta[key]["seq"]))
+	except IndexError:
+		print("####	No Fasta provided\n####	Classification aborted")
+		sys.exit(1)
+	save.save(fasta, nonTE, potentialChimeric, noCat, TE)
 
-def save(FASTA, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
-	"""
-
-	Save the sequence in a file.
-
-	Return a dictionnary which contains the different catagories which caracterize the sequence.
-
-	Keyword arguments:
-	@type FASTA: string
-	@param FASTA: name of the FASTA file containing the sequence that will be opened.
-	@type NONTE: dictionnary
-	@param NONTE: dictionnary for non transposable element (nonTE).
-	@type POTENTIALCHIMERIC: dictionnary
-	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element.
-	@type NOCAT: dictionnary
-	@param NOCAT: dictionnary for non categorized element (noCat).
-	@type TE: dictionnary
-	@param TE: dictionnary for transposable element (I or II).
-
-	@rtype: TODO
-	"""
-	#TODO
-	# for sequenceName in TE:
-	#	 if FASTA.id!=sequenceName:
-	#	 print(FASTA.id, sequenceName)
-	# return
 
 
 
