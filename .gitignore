@@ -3,6 +3,7 @@
 *.classif
 diagrammes/*.dia
 jeu_simple/
+jeu_chimere/
 *~
 **/__pycache__
 **/*.pyc
