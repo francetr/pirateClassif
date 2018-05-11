@@ -24,16 +24,16 @@ Example :
 
 ## Command line to launch the script:
 
->_python3&nbsp;&nbsp;path/toward/this/script&nbsp;&nbsp;path/toward/the/classif/file  path/toward/the/baseline/file&nbsp;&nbsp;path/toward/the/fasta/file_
+>_python3&nbsp;&nbsp;path/toward/this/script&nbsp;&nbsp;path/toward/the/classif/file  path/toward/the/fasta/file&nbsp;&nbsp;path/toward/the/baseline/file_
 
-example:
+>example:
 ~~~
-python3 scriptClassif.py TisoRepet1.classif base_reference.txt hat.fasta
+python3 scriptClassif.py TisoRepet1.classif hat.fasta base_reference.txt
 ~~~
 
-> _./path/toward/the/scriptClassif.py&nbsp;&nbsp;path/toward/the/classif/file path/toward/the/baseline/file&nbsp;&nbsp;path/toward/the/fasta/file_
+> _./path/toward/the/scriptClassif.py&nbsp;&nbsp;path/toward/the/classif/file path/toward/the/fasta/file&nbsp;&nbsp;path/toward/the/baseline/file_
 
-example:
+>example:
 ~~~
-./scriptClassif.py TisoRepet1.classif base_reference.txt hat.fasta
+./scriptClassif.py TisoRepet1.classif hat.fasta base_reference.txt
 ~~~

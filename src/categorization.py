@@ -69,7 +69,7 @@ def classDetermination(FEATURES, NONTE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 			# print(FEATURES[0])
 		####	NoCat
 		elif FEATURES[4] == "noCat":
-			NOCAT[FEATURES[0]]={"class":"unknown"}
+			NOCAT[FEATURES[0]]={"class":"undefined"}
 			# print("NoCat : %s %s" % (FEATURES[4], FEATURES[5]))
 			# pass
 		####	 NonTE
@@ -139,10 +139,7 @@ def superFamilyDetermination(FEATURES, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 		####	Search if there are different names contained in the codingRecord
 		search.searchDifferentName(FEATURES, TE, databaseRecords, BASELINE)
 
-		# print(FEATURES[0], dbName, (matches[FEATURES[0]][dbName]))
 	except AttributeError:
-		####	If there is no coding part : declaration of superfamily as unknown
-		TE[FEATURES[0]]["superfamily"] = "unknown"
-		# NOCAT[FEATURES[0]]=TE[FEATURES[0]]
-		# del TE[FEATURES[0]]
+		####	If there is no coding part : declaration of superfamily as undefined
+		TE[FEATURES[0]]["superfamily"] = "undefined"
 		return

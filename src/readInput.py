@@ -20,8 +20,8 @@ def retrieveArguments():
 	####	 Mananage the 2 arguments (PASTEC and FASTA file name) when the command is launched
 	parser = argparse.ArgumentParser(prog="scriptClassif.py", description="This program is a part of the PiRATE project. It aims to automatized the step of TE classification")
 	parser.add_argument("classif", type=str, help="classif file that comes from PASTEC")
-	parser.add_argument("baseline", type=str, help="baseline file giving the different names possible for a superfamily")
 	parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
+	parser.add_argument("baseline", type=str, help="baseline file giving the different names possible for a superfamily")
 	args = parser.parse_args()
 	# checkArguments(args.classif, args.fasta)
 	return args
@@ -170,8 +170,7 @@ def readNonSpecificBaselineKeywords(NONSPECIFICKEYWORDS, BASELINEDICTIONNARY):
 		####	Add the possibles names for a superFamily in the list
 		listPossibleNames.append(possibleName)
 	####	Complete the dictionnary with : Key = name of superfamily used later; Value = list of possible names for this superfamily
-	BASELINEDICTIONNARY["nonSpecific"][superFamilyNames[0]]=listPossibleNames				# ####	List that will contains the different possibles names of a superfamily
-
+	BASELINEDICTIONNARY["nonSpecific"][superFamilyNames[0]]=listPossibleNames
 
 def readFasta(FASTA):
 	"""

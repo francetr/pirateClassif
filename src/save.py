@@ -36,14 +36,14 @@ def saveNoCat(FASTA, NOCAT):
 	Keyword arguments:
 	@type FASTA: dictionnary
 	@param FASTA: dictionnary with the nucleotide sequence which has been categorized
-	@type FASTA: string
-	@param FASTA: name of the FASTA file containing the sequence that will be opened.
+	@type NOCAT: string
+	@param NOCAT: name of the FASTA file containing the sequence that will be opened.
 
 	@rtype: None
 	"""
 	with open("noCat.fasta", "w") as f:
 		for id in NOCAT.keys():
-			f.write(">{}:{}\n{}\n".format(id, NOCAT[id]["class"], FASTA[id]["seq"]))
+			f.write(">{id}:{seqClass}\n{seq}\n".format(id=id, seqClass=NOCAT[id]["class"], seq=FASTA[id]["seq"]))
 
 
 def savePotentialChimeric(FASTA, POTENTIALCHIMERIC):
@@ -61,7 +61,7 @@ def savePotentialChimeric(FASTA, POTENTIALCHIMERIC):
 	"""
 	with open("potentialChimeric.fasta", "w") as f:
 		for id in POTENTIALCHIMERIC.keys():
-			f.write(">{}:{}\n{}\n".format(id, POTENTIALCHIMERIC[id]["class"], FASTA[id]["seq"]))
+			f.write(">{id}:{seqClass}\n{seq}\n".format(id=id, seqClass=POTENTIALCHIMERIC[id]["class"], seq=FASTA[id]["seq"]))
 
 def saveTE(FASTA, TE):
 	"""
@@ -78,8 +78,10 @@ def saveTE(FASTA, TE):
 	"""
 	with open("TE.fasta", "w") as f:
 		for id in TE.keys():
-			f.write(">{}:{}:{}\n{}\n".format(id, TE[id]["class"], TE[id]["order"], FASTA[id]["seq"]))
-
+			if not "superFamily" in TE[id]:
+				f.write(">{id}:{seqClass}:{order}\n{seq}\n".format(id=id, seqClass=TE[id]["class"], order=TE[id]["order"], seq=FASTA[id]["seq"]))
+			else:
+				f.write(">{id}:{seqClass}:{order}:{superFamily}\n{seq}\n".format(id=id, seqClass=TE[id]["class"], order=TE[id]["order"], superFamily=TE[id]["superFamily"], seq=FASTA[id]["seq"]))
 
 def saveNonTE(FASTA, NONTE):
 	"""
@@ -96,4 +98,4 @@ def saveNonTE(FASTA, NONTE):
 	"""
 	with open("nonTE.fasta", "w") as f:
 		for id in NONTE.keys():
-			f.write(">{}:{}\n{}\n".format(id, NONTE[id]["class"], FASTA[id]["seq"]))
+			f.write(">{id}:{seqClass}\n{seq}\n".format(id=id, seqClass=NONTE[id]["class"], seq=FASTA[id]["seq"]))

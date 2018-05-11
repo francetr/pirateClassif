@@ -21,11 +21,11 @@ def searchDifferentName(FEATURES, TE, DATABASERECORDS, BASELINE):
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
-	@rtype: None.
+	@rtype: None
 	"""
 	####	Dictionnary that will contains (or not) the different superFamilies find for the concerned sequence
-	####		key = specific : value = { key = specifc keyword found : value = number of presence of this keyword},
-	####		key = nonSpecific : value = { key = non specifc keyword found : value = number of presence of this keyword}}
+	####		key = specific : value = { key = specific keyword found : value = number of presence of this keyword},
+	####		key = nonSpecific : value = { key = non specific keyword found : value = number of presence of this keyword}}
 	superFamilyFound={"specific":{}, "nonSpecific":{}}
 
 	####	Scan the different results obtain for each comparisons
@@ -38,28 +38,15 @@ def searchDifferentName(FEATURES, TE, DATABASERECORDS, BASELINE):
 		####	if TE_BLRx or TE_BLRtx is found in coding, search for superFamily name using function searchRepBaseName
 		elif dbName=="TE_BLRx" or "TE_BLRtx":
 			searchRepBaseName(FEATURES, dr, superFamilyFound, BASELINE)
-	# print(FEATURES[0], superFamilyFound)
 	####	String that will contain the final supefamily name of the sequence
 	finalSuperFamily = ""
 	####	if no keywords have been found, finalSuperFamily will be unknown
 	if len(superFamilyFound["specific"]) == 0 and len(superFamilyFound["nonSpecific"]) == 0 :
-		finalSuperFamily = "unknown"
+		finalSuperFamily = "undefined"
 	####	else, a comparison between the keywords founded is done
 	else:
-		comparison.superFamilyComparison(FEATURES, superFamilyFound, BASELINE)
-		# finalSuperFamily=comparison.superFamilyComparison(FEATURES, superFamilyFound, BASELINE)
-	# ####	One superFamily name have been found
-	# elif len(superFamilyFound) == 1:
-	# 	####	Replace the superfamily name by "unknown"
-	# 	if superFamilyFound[0] == "?":
-	# 		finalSuperFamily = "unknown"
-	# 	else:
-	# 		finalSuperFamily=superFamilyFound[0]
-	# ####	No superFamily name have been found
-	# else:
-	# 	finalSuperFamily="unknown"
-	# # matches[FEATURES[0]][dbName].append(keywordSearch.groups())
-	# TE[FEATURES[0]]["superFamily"]=finalSuperFamily
+		finalSuperFamily = comparison.superFamilyComparison(FEATURES, superFamilyFound, BASELINE)
+	TE[FEATURES[0]]["superFamily"]=finalSuperFamily
 
 def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 	"""
@@ -76,13 +63,12 @@ def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different profiles keyword possible for a given superfamily (usefull for the function superFamilyComparison).
 
-	@rtype: TODO
+	@rtype: None
 	"""
 	####	first split to get rid of profiles:
 	DATABASERECORD=DATABASERECORD.split("profiles:")
 	####	Parse all the results of profiles and search for regex
 	for substr in DATABASERECORD[1].split(','):
-		# print(substr+"\n")
 		try:
 			####	APPROACH : Find keywords by match with BASELINE keyword
 			####	Boolean allowing to know if the keyword is in the baseline
@@ -90,16 +76,19 @@ def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 			####	parse the possible name which are in the BASELINE
 			for nonSpecificName in BASELINE["nonSpecific"]:
 				####	Search in the BASELINE file if there is a keyword matching with the profiles. NB: need to escape the keyword because of special character like *
-				keywordSearch = re.search(r'_%s_'%(re.escape(nonSpecificName)), substr)
+				keywordSearch = re.search(r'_%s_'%(re.escape(nonSpecificName)), substr, re.IGNORECASE)
 				####	Check if the keywords in profiles is in the BASELINE (convert string into lower case berfore comparing)
 				if keywordSearch:
 					keywordFound=True
 					####	If the keyword hasn't been found in the SUPERFAMILYFOUND dictionnary, its counter is 1
 					if not nonSpecificName in SUPERFAMILYFOUND["nonSpecific"]:
+						####	Consider that keyword Tase and Tase* have the same counter
 						if nonSpecificName == "Tase" or nonSpecificName == "Tase*":
 							SUPERFAMILYFOUND["nonSpecific"]["Tase"]=1
+						####	Counter for all the rest of the possibles keywords
 						else:
 							SUPERFAMILYFOUND["nonSpecific"][nonSpecificName]=1
+
 					####	If the keyword has already been found in the SUPERFAMILYFOUND dictionnary, its counter is incremented by 1
 					else:
 						if nonSpecificName == "Tase" or nonSpecificName == "Tase*":
