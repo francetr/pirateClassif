@@ -17,8 +17,8 @@ import save
 
 def main():
 	print("Start of the classification\n")
-	####	 Instanciation of dictionnaries that will contain the results
-	nonTE, potentialChimeric,  noCat, TE = {}, {}, {}, {}
+	####	 Instanciation of a dictionnary that will contain 4 dictionnaries (4 keys, one for each categories: nonTE, TE, potentialChimeric and noCat) that will contain the results
+	seqClassified = {"nonTE" : {}, "potentialChimeric" : {},  "noCat" : {}, "TE" : {}}
 
 	####	 retrieve and check the arguments used in command line
 	print("####	Recovery of the arguments\n")
@@ -39,22 +39,22 @@ def main():
 	####	Reading of the classif file ####
 	try:
 		print("####	Read of the classif file")
-		pastec=readInput.readPastec(pastecFile, nonTE, potentialChimeric, noCat, TE, baseline)
+		pastec=readInput.readPastec(pastecFile, seqClassified, baseline)
 		print("####	End of reading of the classif file\n")
 	except IndexError:
 		print("/!\	Error: Error with the PASTEC file provided {}\n####	Classification aborted".format(pastecFile))
 		sys.exit(1)
 
-	# # for seq in TE.keys():
-	# # 	print(seq, TE[seq])
+	# # for seq in sequencesClassified["TE"].keys():
+	# # 	print(seq, sequencesClassified["TE"][seq])
 	#
-	# print("TE : %s, noCat : %s, nonTE : %s, chimeric: %s" %(TE, noCat, nonTE, potentialChimeric))
-	# print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(TE), len(noCat), len(nonTE), len(potentialChimeric), (len(TE)+len(noCat)+len(nonTE)+len(potentialChimeric))))
+	# print("TE : %s, noCat : %s, nonTE : %s, chimeric: %s" %(sequencesClassified["TE"], sequencesClassified["noCat"], sequencesClassified["nonTE"], sequencesClassified["potentialChimeric"]))
+	# print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(sequencesClassified["TE"]), len(sequencesCategorizednoCat), len(sequencesClassified["nonTE"]), len(sequencesClassified["potentialChimeric"]), (len(sequencesClassified["TE"])+len(sequencesClassified["noCat"])+len(sequencesClassified["nonTE"])+len(sequencesClassified["potentialChimeric"]))))
 	#
-	# print(TE, len(TE))
-	# print(noCat)
+	# print(sequencesClassified["TE"], len(sequencesClassified["TE"]))
+	# print(sequencesClassified["noCat"])
 	#
-	# ##	Reading of the fasta file ####
+	####	Reading of the fasta file ####
 	# try:
 	# 	print("####	Read of the FASTA file")
 	# 	fasta=readInput.readFasta(fastaFile)
@@ -64,7 +64,7 @@ def main():
 	# except IndexError:
 	# 	print("/!\ Error: Error with the Fasta file provided {}\n####	Classification aborted".format(fastaFile))
 	# 	sys.exit(1)
-	# save.save(fasta, nonTE, potentialChimeric, noCat, TE)
+	# save.save(fasta, sequencesClassified)
 
 
 

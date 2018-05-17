@@ -3,7 +3,7 @@
 
 """ @author: Tristan Frances """
 
-def save(FASTA, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
+def save(FASTA, SEQUENCESCLASSIFIED):
 	"""
 
 	Save the categorized sequences in different FASTA files.
@@ -11,22 +11,16 @@ def save(FASTA, NONTE, POTENTIALCHIMERIC, NOCAT, TE):
 	Keyword arguments:
 	@type FASTA: dictionnary
 	@param FASTA: dictionnary with the nucleotide sequence which has been categorized
-	@type NONTE: dictionnary
-	@param NONTE: dictionnary for non transposable element (nonTE).
-	@type POTENTIALCHIMERIC: dictionnary
-	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element.
-	@type NOCAT: dictionnary
-	@param NOCAT: dictionnary for non categorized element (noCat).
-	@type TE: dictionnary
-	@param TE: dictionnary for transposable element (I or II).
+	@type SEQUENCESCLASSIFIED: dictionnary
+	@param SEQUENCESCLASSIFIED: dictionnary storing the result of the classification into 4 dictionnaries (TE, nonTE, potentialChimeric and noCat)
 
 	@rtype: None
 	"""
 	#TODO: Organize the way TE are saved
-	saveNoCat(FASTA, NOCAT)
-	savePotentialChimeric(FASTA, POTENTIALCHIMERIC)
-	saveTE(FASTA, TE)
-	saveNonTE(FASTA, NONTE)
+	saveNoCat(FASTA, SEQUENCESCLASSIFIED["noCat"])
+	savePotentialChimeric(FASTA, SEQUENCESCLASSIFIED["potentialChimeric"])
+	saveTE(FASTA, SEQUENCESCLASSIFIED["TE"])
+	saveNonTE(FASTA, SEQUENCESCLASSIFIED["nonTE"])
 
 def saveNoCat(FASTA, NOCAT):
 	"""

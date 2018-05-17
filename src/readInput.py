@@ -49,21 +49,15 @@ def retrieveArguments():
 # 		print("####	Wrong extension for the fasta file\n####	Classification aborted")
 # 		sys.exit(1)
 
-def readPastec(PASTEC, NONTE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
+def readPastec(PASTEC, SEQCLASSIFIED, BASELINE):
 	"""
 	Read a PASTEC file as input line by line, and then proceed to the categorization of each sequence.
 
 	Keyword arguments:
 	@type PASTEC: string
 	@param PASTEC: name of the classif file that will be opened.
-	@type NONTE: dictionnary
-	@param NONTE: dictionnary for non transposable element (nonTE).
-	@type POTENTIALCHIMERIC: dictionnary
-	@param POTENTIALCHIMERIC: dictionnary for potential chimeric element.
-	@type NOCAT: dictionnary
-	@param NOCAT: dictionnary for non categorized element (noCat).
-	@type TE: dictionnary
-	@param TE: dictionnary for transposable element (I or II).
+	@type SEQCLASSIFIED: dictionnary
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 4 dictionnaries (TE, nonTE, potentialChimeric and noCat)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
@@ -76,7 +70,7 @@ def readPastec(PASTEC, NONTE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE):
 			####	Parse every line/sequence of the file
 			for line in f:
 				sequence=line.replace("\t\t", "\t").strip() # remove the first column double tab and carriage return of the line
-				categorization.initCategorization(sequence, NONTE, POTENTIALCHIMERIC, NOCAT, TE, BASELINE)
+				categorization.initCategorization(sequence, SEQCLASSIFIED, BASELINE)
 				# print("Summary, sequences find by type :\nTE : {}\nnonTE : {}\nnoCat : {}\npotentialChimeric : {}\nTotal : {}".format(len(TE),\
 				# len(nonTE), len(noCat), len(potentialChimeric), (len(TE)+len(nonTE)+len(noCat)+len(potentialChimeric))))
 			print("End of the categorization\n")
@@ -100,10 +94,10 @@ def readBaseline(BASELINE):
 
 	@rtype: dictionnary
 	@return: dictionnary containing the different names of possible superFamily.
-	{B{Key} = specific : {B{Key} = name of specific keywords for superFamily used later : B{I{Values}} = [list of possible names for this superFamily]},
-	B{Key} = nonSpecific :{B{Key} = name of non specific keyword for superFamily used later : B{I{Values}} = [list of possible names for this superFamily]}}.
+	{B{Key} = blast : {B{Key} = name of blast keywords for superFamily used later : B{I{Values}} = [list of possible names for this superFamily]},
+	B{Key} = protProfiles :{B{Key} = name of proteines profiles keyword for superFamily used later : B{I{Values}} = [list of possible names for this superFamily]}}.
 	"""
-	baselineDictionnary={"specific":{},"nonSpecific":{}}
+	baselineDictionnary={"blast":{},"protProfiles":{}}
 	try:
 		with open(BASELINE, "r") as f:
 			for line in f:
@@ -111,16 +105,16 @@ def readBaseline(BASELINE):
 				keywords=re.search(r'>([^\n]+)', line)
 				####	For specific keywords
 				if not keywords:
-					readSpecificBaselineKeywords(line, baselineDictionnary)
+					readBlastBaselineKeywords(line, baselineDictionnary)
 				####	For nonSpecific keyword
 				else:
-					readNonSpecificBaselineKeywords(keywords.groups()[0], baselineDictionnary)
+					readProtProfilesBaselineKeywords(keywords.groups()[0], baselineDictionnary)
 
 	except FileNotFoundError:
 		print("/!\	Error: No such file as {}\n####	Classification aborted".format(BASELINE))
 	return baselineDictionnary
 
-def readSpecificBaselineKeywords(SPECIFICKEYWORDS, BASELINEDICTIONNARY):
+def readBlastBaselineKeywords(SPECIFICKEYWORDS, BASELINEDICTIONNARY):
 	"""
 	From one line of the BASELINE file, it add the specific keyword founded as a key of the BASELINEDICTIONNARY and all the possible names associated as the value.
 
@@ -144,18 +138,18 @@ def readSpecificBaselineKeywords(SPECIFICKEYWORDS, BASELINEDICTIONNARY):
 		####	Add the possibles names for a superFamily in the list
 		listPossibleNames.append(possibleName)
 	####	Complete the dictionnary with : Key = name of superfamily used later; Value = list of possible names for this superfamily
-	BASELINEDICTIONNARY["specific"][superFamilyNames[0]]=listPossibleNames
+	BASELINEDICTIONNARY["blast"][superFamilyNames[0]]=listPossibleNames
 
-def readNonSpecificBaselineKeywords(NONSPECIFICKEYWORDS, BASELINEDICTIONNARY):
+def readProtProfilesBaselineKeywords(NONSPECIFICKEYWORDS, BASELINEDICTIONNARY):
 	"""
 	From one line of the BASELINE file, it add the non specific keyword founded as a key of the BASELINEDICTIONNARY and all the possible names associated as the value.
 
 	Keyword argument:
 	@type NONSPECIFICKEYWORDS: string
-	@param NONSPECIFICKEYWORDS: One line read of the BASELINE file (doesn't have the > character), which contains the non specific keywords..
+	@param NONSPECIFICKEYWORDS: One line read of the BASELINE file (here doesn't have the > character), which contains the proteines profiles keywords..
 	@type BASELINEDICTIONNARY: dictionnary
-	@param BASELINEDICTIONNARY: Dictionnary containing all the keywords founded in the BASELINE fileself.
-	It contains 2 key, one for the storage of specific keywords and the other for the storage of specific keywords.
+	@param BASELINEDICTIONNARY: Dictionnary containing all the keywords founded in the BASELINE file.
+	It contains 2 key, one for the storage of blast keywords and the other for the storage of proteines profiles keywords.
 
 
 	@rtype: None
@@ -170,7 +164,7 @@ def readNonSpecificBaselineKeywords(NONSPECIFICKEYWORDS, BASELINEDICTIONNARY):
 		####	Add the possibles names for a superFamily in the list
 		listPossibleNames.append(possibleName)
 	####	Complete the dictionnary with : Key = name of superfamily used later; Value = list of possible names for this superfamily
-	BASELINEDICTIONNARY["nonSpecific"][superFamilyNames[0]]=listPossibleNames
+	BASELINEDICTIONNARY["protProfiles"][superFamilyNames[0]]=listPossibleNames
 
 def readFasta(FASTA):
 	"""

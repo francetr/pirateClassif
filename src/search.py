@@ -6,7 +6,7 @@
 import re
 import comparison
 
-def searchDifferentName(FEATURES, TE, DATABASERECORDS, BASELINE):
+def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE):
 	"""
 	If the superFamily can't be defined, it will be unknown.
 	The name is recovered from two : the hmm profiles (profiles part) and REPET (TE_BLRx and TE_BLRtx part).
@@ -16,17 +16,17 @@ def searchDifferentName(FEATURES, TE, DATABASERECORDS, BASELINE):
 	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence. Usefull to know the sequence concerned.
 	@type DATABASERECORDS: list
 	@param DATABASERECORDS: list of string in which there are the superFamily name to search.
-	@type TE: dictionnary
-	@param TE: dictionnary for transposable element (I or II).
+	@type SEQCLASSIFIED: dictionnary
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 4 dictionnaries (TE, nonTE, potentialChimeric and noCat)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
 	@rtype: None
 	"""
 	####	Dictionnary that will contains (or not) the different superFamilies find for the concerned sequence
-	####		key = specific : value = { key = specific keyword found : value = number of presence of this keyword},
-	####		key = nonSpecific : value = { key = non specific keyword found : value = number of presence of this keyword}}
-	superFamilyFound={"specific":{}, "nonSpecific":{}}
+	####		key = blast : value = { key = blast keyword found : value = number of presence of this keyword},
+	####		key = protProfiles : value = { key = proteine Profiles keyword found : value = number of presence of this keyword}}
+	superFamilyFound={"blast":{}, "protProfiles":{}}
 
 	####	Scan the different results obtain for each comparisons
 	for dr in DATABASERECORDS:
@@ -41,12 +41,12 @@ def searchDifferentName(FEATURES, TE, DATABASERECORDS, BASELINE):
 	####	String that will contain the final supefamily name of the sequence
 	finalSuperFamily = ""
 	####	if no keywords have been found, finalSuperFamily will be unknown
-	if len(superFamilyFound["specific"]) == 0 and len(superFamilyFound["nonSpecific"]) == 0 :
+	if len(superFamilyFound["blast"]) == 0 and len(superFamilyFound["protProfiles"]) == 0 :
 		finalSuperFamily = "undefined"
 	####	else, a comparison between the keywords founded is done
 	else:
 		finalSuperFamily = comparison.superFamilyComparison(FEATURES, superFamilyFound, BASELINE)
-	TE[FEATURES[0]]["superFamily"]=finalSuperFamily
+	SEQCLASSIFIED["TE"][FEATURES[0]]["superFamily"]=finalSuperFamily
 
 def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 	"""
@@ -74,27 +74,27 @@ def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 			####	Boolean allowing to know if the keyword is in the baseline
 			keywordFound=False
 			####	parse the possible name which are in the BASELINE
-			for nonSpecificName in BASELINE["nonSpecific"]:
+			for protProfilesKeyword in BASELINE["protProfiles"]:
 				####	Search in the BASELINE file if there is a keyword matching with the profiles. NB: need to escape the keyword because of special character like *
-				keywordSearch = re.search(r'_%s_'%(re.escape(nonSpecificName)), substr, re.IGNORECASE)
+				keywordSearch = re.search(r'_%s_'%(re.escape(protProfilesKeyword)), substr, re.IGNORECASE)
 				####	Check if the keywords in profiles is in the BASELINE (convert string into lower case berfore comparing)
 				if keywordSearch:
 					keywordFound=True
 					####	If the keyword hasn't been found in the SUPERFAMILYFOUND dictionnary, its counter is 1
-					if not nonSpecificName in SUPERFAMILYFOUND["nonSpecific"]:
+					if not protProfilesKeyword in SUPERFAMILYFOUND["protProfiles"]:
 						####	Consider that keyword Tase and Tase* have the same counter
-						if nonSpecificName == "Tase" or nonSpecificName == "Tase*":
-							SUPERFAMILYFOUND["nonSpecific"]["Tase"]=1
+						if protProfilesKeyword == "Tase" or protProfilesKeyword == "Tase*":
+							SUPERFAMILYFOUND["protProfiles"]["Tase"]=1
 						####	Counter for all the rest of the possibles keywords
 						else:
-							SUPERFAMILYFOUND["nonSpecific"][nonSpecificName]=1
+							SUPERFAMILYFOUND["protProfiles"][protProfilesKeyword]=1
 
 					####	If the keyword has already been found in the SUPERFAMILYFOUND dictionnary, its counter is incremented by 1
 					else:
-						if nonSpecificName == "Tase" or nonSpecificName == "Tase*":
-							SUPERFAMILYFOUND["nonSpecific"]["Tase"]+=1
+						if protProfilesKeyword == "Tase" or protProfilesKeyword == "Tase*":
+							SUPERFAMILYFOUND["protProfiles"]["Tase"]+=1
 						else:
-							SUPERFAMILYFOUND["nonSpecific"][nonSpecificName]+=1
+							SUPERFAMILYFOUND["protProfiles"][protProfilesKeyword]+=1
 
 			####	If there is no matches between the string and the baseline, print the string
 			if not keywordFound:
@@ -131,16 +131,16 @@ def searchRepBaseName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 			####	Boolean allowing to know if the keyword is in the baseline
 			keywordFound=False
 			####	Parse the key of the specific keywords in the BASELINE file
-			for specificName in BASELINE["specific"]:
+			for blastKeyword in BASELINE["blast"]:
 				####	Check if the keywords in profiles is in the BASELINE
-				if keyword in BASELINE["specific"][specificName]:
+				if keyword in BASELINE["blast"][blastKeyword]:
 					keywordFound=True
 					####	If the keyword hasn't been found in the SUPERFAMILYFOUND dictionnary, we creates its value in SUPERFAMILYFOUND and define its counter as 1
-					if not specificName in SUPERFAMILYFOUND["specific"]:
-						SUPERFAMILYFOUND["specific"][specificName]=1
+					if not blastKeyword in SUPERFAMILYFOUND["blast"]:
+						SUPERFAMILYFOUND["blast"][blastKeyword]=1
 					####	If the keyword has already been found in the SUPERFAMILYFOUND dictionnary, its counter is incremented by 1
 					else:
-						SUPERFAMILYFOUND["specific"][specificName]+=1
+						SUPERFAMILYFOUND["blast"][blastKeyword]+=1
 
 			####	If there is no matches between the string and the baseline, print the string
 			if not keywordFound:

@@ -12,7 +12,7 @@ Helitron	Helitron
 Crypton	Crypton
 Maverick	Maverick
 RTE	RTE
-unknown	?
+undefined	?
 Ginger2	Ginger2/TDD
 Ginger1	Ginger1
 ISL2EU	ISL2EU
@@ -53,4 +53,4 @@ tRNA	tRNA
 >LINER2	R2
 >LINER1	L1
 >APE	RTE:Jockey:L1:I
->OTHER	unknown
+>OTHER	undefined

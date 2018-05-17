@@ -21,20 +21,17 @@ def superFamilyComparison(FEATURES, SUPERFAMILYFOUND, BASELINE):
 	####	TODO Comparison with a reference base
 	####	Draft
 
-	####	String for the final superFamily name
-	name = "SUPERFAMILYNAME"
-	####	Dictionnaries that will contain the specificResult and nonSpecificResult
-
 	####	First compare differents specific keywords founded for the sequence
 	# specificResult = specificComparison(SUPERFAMILYFOUND)
 
 	####	Second compare differents non specific keyword founded for the sequence
 	# nonSpecificResult = nonSpecificComparison(SUPERFAMILYFOUND)
 
-	####	Then compare the concordance between the non specific keywords and the specific keywords
-	compareKeywordsFounded(SUPERFAMILYFOUND["specific"], SUPERFAMILYFOUND["nonSpecific"], BASELINE["nonSpecific"])
+	####	Then compare the concordance between the non specific keywords and the specific keywords. Then the result is assigned to a string
+	name = compareKeywordsFounded(SUPERFAMILYFOUND["blast"], SUPERFAMILYFOUND["protProfiles"], BASELINE["protProfiles"])
 
 	# print(FEATURES[0], SUPERFAMILYFOUND)
+	####	String for the final superFamily name
 	return name
 	# print("{}, {}, count: {}, len: {}".format(FEATURES[0], SUPERFAMILYFOUND, superFamilyCount, len(SUPERFAMILYFOUND)))
 
@@ -49,6 +46,7 @@ def percentageCalculation(KEYWORDFOUND):
 	@rtype: dictionnary
 	@return: Percentage foud for each superFamily name in a given sequence.
 	"""
+	# TODO Check if usefull
 	####	Calculus of the percentage of each superFamilyName found for this sequence
 	tot = 0
 	####	Dictionnary that will contains the percentage of the superFamilyNames found
@@ -57,22 +55,22 @@ def percentageCalculation(KEYWORDFOUND):
 	for key in KEYWORDFOUND.keys():
 		tot+=KEYWORDFOUND[key]
 
-		####	Calculus of the percentage for each superFamilyName found
-		for key in KEYWORDFOUND.keys():
-			percentage=round(KEYWORDFOUND[key]/tot*100, 1)
-			percent[key]=percentage
-			return percent
+	####	Calculus of the percentage for each superFamilyName found
+	for key in KEYWORDFOUND.keys():
+		percentage=round(KEYWORDFOUND[key]/tot*100, 1)
+		percent[key]=percentage
+	return percent
 
-def compareKeywordsFounded(SPECIFIC, NONSPECIFIC, BASELINE):
+def compareKeywordsFounded(BLAST, PROTPROFILES, BASELINE):
 	"""
 	Comparison between the specific and the non specific keywords to check if it's in accordance with Wicker classification.
 	This classification is implemented in the BASELINE dictionnary. Key = specific keyword : Value = non specific keywords possible
 
 	Keyword arguments:
-	@type SPECIFIC: dictionnary
-	@param SPECIFIC: All the specific keywords found and their proportion for a given sequence.
-	@type NONSPECIFIC: dictionnary
-	@param NONSPECIFIC: All the keywords found and their proportion for a given sequence.
+	@type BLAST: dictionnary
+	@param BLAST: All the specific keywords found and their proportion for a given sequence.
+	@type PROTPROFILES: dictionnary
+	@param PROTPROFILES: All the non specific keywords found and their proportion for a given sequence.
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily.
 
@@ -80,47 +78,69 @@ def compareKeywordsFounded(SPECIFIC, NONSPECIFIC, BASELINE):
 	@return: Name of the superFamily with different matches found.
 	"""
 	name = ""
-	####	First THREE CASES, Consider NO specific keywords have been founded
-	####	NO non specific keyword have been founded
-	if len(SPECIFIC) == 0 and len(NONSPECIFIC) == 0:
-		name="undefined"
+	####	For this part, 7 cases have been identified
+	####	First THREE CASES, Consider NO blast keywords have been founded
+	if len(BLAST) == 0:
+		####	NO type of proteine profiles keyword have been founded
+		if len(PROTPROFILES) == 0:
+			name = "unknown"
 
-	####	ONE non specific keyword have been founded
-	elif len(SPECIFIC) == 0 and len(NONSPECIFIC) == 1:
-		name = compareWickerClassification(SPECIFIC, NONSPECIFIC, BASELINE)
-		# name = str("undefined_" + NONSPECIFIC)
+		####	ONE or MULTIPLE type of proteine profiles keyword have been founded
+	elif len(PROTPROFILES) >= 1:
+			# name = compareWickerClassification(BLAST, PROTPROFILES, BASELINE)
+			pass
 
-	####	MULTIPLE non specific keyword have been founded
-	elif len(SPECIFIC) == 0 and len(NONSPECIFIC) > 1:
-		# name = str("potentialChimeric_" + NONSPECIFIC)
-		name = compareWickerClassification(SPECIFIC, NONSPECIFIC, BASELINE)
+	####	Second THREE CASES, Consider ONE blast keywords have been founded
+	elif len(BLAST) == 1:
+		####	NO type of proteine profiles keyword have been founded
+		if len(PROTPROFILES) == 0:
+			name = "TE_"
+			####	Retrieve the blast superFamily keyword
+			for superFamily in BLAST:
+				name += str(superFamily)
 
-	####	MULTIPLE specific keyword have been founded
-	elif len(SPECIFIC) > 1:
-		name = "potentialChimeric_"
-		for superFamily in SPECIFIC:
-			name += str(superFamily+"_")
+		####	ONE or MULTIPLE type of proteine profiles keyword have been founded
+		elif len(PROTPROFILES) >= 1:
+			name = compareWickerClassification(BLAST, PROTPROFILES, BASELINE)
+			pass
+
+	####	Last case, MULTIPLE blast keyword have been founded
+	elif len(BLAST) > 1:
+		name = "potentialChimeric"
+		for superFamily in BLAST:
+			name += str("_"+superFamily+"_")
 
 	return name
 
-def compareWickerClassification(SPECIFIC, NONSPECIFIC, BASELINE):
+def compareWickerClassification(BLAST, PROTPROFILES, BASELINE):
 	"""
 	Comparison between the specific and the non specific keywords to check if it's in accordance with Wicker classification.
+	Procceed in 2 steps : first check the non spe keyword length
 	This classification is implemented in the BASELINE dictionnary. Key = specific keyword : Value = non specific keywords possible
 
 	Keyword arguments:
-	@type SPECIFIC: dictionnary
-	@param SPECIFIC: All the specific keywords found and their proportion for a given sequence.
-	@type NONSPECIFIC: dictionnary
-	@param NONSPECIFIC: All the keywords found and their proportion for a given sequence.
+	@type BLAST: dictionnary
+	@param BLAST: All the specific keywords found and their proportion for a given sequence.
+	@type PROTPROFILES: dictionnary
+	@param PROTPROFILES: All the non specific keywords found and their proportion for a given sequence.
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily.
 
 	@rtype: string
 	@return: Name of the superFamily with differents matches found.
 	"""
-	####	Check
-	pass
+	####	Check the coherence between specific and non specific keywords
+	name = ""
+	keywordsCompared = []
+	####	First parse PROTPROFILES keyowrds founded
+	for protProfilesFounded in PROTPROFILES:
+		keywordsCompared.append(BASELINE[protProfilesFounded])
+
+	print(keywordsCompared)
+	####	Second compare the PROTPROFILES keywords founded
+
+
+	return name
 
 
 # def specificComparison(SUPERFAMILYFOUND):
