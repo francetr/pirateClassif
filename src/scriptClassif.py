@@ -45,14 +45,14 @@ def main():
 		print("/!\	Error: Error with the PASTEC file provided {}\n####	Classification aborted".format(pastecFile))
 		sys.exit(1)
 
-	# # for seq in sequencesClassified["TE"].keys():
-	# # 	print(seq, sequencesClassified["TE"][seq])
+	# # for seq in seqClassified["TE"].keys():
+	# # 	print(seq, seqClassified["TE"][seq])
 	#
-	# print("TE : %s, noCat : %s, nonTE : %s, chimeric: %s" %(sequencesClassified["TE"], sequencesClassified["noCat"], sequencesClassified["nonTE"], sequencesClassified["potentialChimeric"]))
-	# print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(sequencesClassified["TE"]), len(sequencesCategorizednoCat), len(sequencesClassified["nonTE"]), len(sequencesClassified["potentialChimeric"]), (len(sequencesClassified["TE"])+len(sequencesClassified["noCat"])+len(sequencesClassified["nonTE"])+len(sequencesClassified["potentialChimeric"]))))
+	# print("TE : %s, noCat : %s, nonTE : %s, chimeric: %s" %(seqClassified["TE"], seqClassified["noCat"], seqClassified["nonTE"], seqClassified["potentialChimeric"]))
+	# print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(seqClassified["TE"]), len(sequencesCategorizednoCat), len(seqClassified["nonTE"]), len(seqClassified["potentialChimeric"]), (len(seqClassified["TE"])+len(seqClassified["noCat"])+len(seqClassified["nonTE"])+len(seqClassified["potentialChimeric"]))))
 	#
-	# print(sequencesClassified["TE"], len(sequencesClassified["TE"]))
-	# print(sequencesClassified["noCat"])
+	# print(seqClassified["TE"], len(seqClassified["TE"]))
+	# print(seqClassified["noCat"])
 	#
 	####	Reading of the fasta file ####
 	# try:
@@ -64,7 +64,7 @@ def main():
 	# except IndexError:
 	# 	print("/!\ Error: Error with the Fasta file provided {}\n####	Classification aborted".format(fastaFile))
 	# 	sys.exit(1)
-	# save.save(fasta, sequencesClassified)
+	# save.save(fasta, seqClassified)
 
 
 

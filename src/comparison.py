@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 # coding: utf8
+from collections import Counter
 
 """ @author: Tristan Frances """
 
-def superFamilyComparison(FEATURES, SUPERFAMILYFOUND, BASELINE):
+def superFamilyComparison(FEATURES, SUPERFAMILYFOUND, SUPERFAMILYASSOCIATED):
 	"""
 	Compare the different superFamilies found for one sequence. For this uses the method combinations of the package itertools allowing to combine 2 by 2 the different elements of a list.
 
@@ -12,36 +13,221 @@ def superFamilyComparison(FEATURES, SUPERFAMILYFOUND, BASELINE):
 	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence.
 	@type SUPERFAMILYFOUND: dictionnary
 	@param SUPERFAMILYFOUND: count the names of the superfamily found for one sequence during the superFamilyDetermination.
-	@type BASELINE: dictionnary
-	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily.
+	@type SUPERFAMILYASSOCIATED: dictionnary
+	@param SUPERFAMILYASSOCIATED: dictionnary containing different superfamily names possible for a given superfamily.
 
 	@rtype: string
 	@return: name of the superfamily corresponding to the sequence.
 	"""
-	####	TODO Comparison with a reference base
-	####	Draft
-
-	####	First compare differents specific keywords founded for the sequence
-	# specificResult = specificComparison(SUPERFAMILYFOUND)
-
-	####	Second compare differents non specific keyword founded for the sequence
-	# nonSpecificResult = nonSpecificComparison(SUPERFAMILYFOUND)
-
-	####	Then compare the concordance between the non specific keywords and the specific keywords. Then the result is assigned to a string
-	name = compareKeywordsFounded(SUPERFAMILYFOUND["blast"], SUPERFAMILYFOUND["protProfiles"], BASELINE["protProfiles"])
-
-	# print(FEATURES[0], SUPERFAMILYFOUND)
+	####	Compare all the keywords founded for one sequence (providing from blast or protProfiles) . Then the result is assigned to a string
+	name = compareKeywordsFounded(SUPERFAMILYFOUND["blast"], SUPERFAMILYFOUND["protProfiles"], SUPERFAMILYASSOCIATED["protProfiles"])
 	####	String for the final superFamily name
 	return name
-	# print("{}, {}, count: {}, len: {}".format(FEATURES[0], SUPERFAMILYFOUND, superFamilyCount, len(SUPERFAMILYFOUND)))
+
+def compareKeywordsFounded(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
+	"""
+	Comparison between the blast and the proteines profiles keywords to check if it's in accordance with Wicker classification.
+	This classification is implemented in the SUPERFAMILYASSOCIATED dictionnary. Key = blast keyword : Value = protProfile keywords possible
+
+	Keyword arguments:
+	@type BLAST: dictionnary
+	@param BLAST: All the blast keywords found and their proportion for a given sequence.
+	@type PROTPROFILES: dictionnary
+	@param PROTPROFILES: All the proteines profiles keywords found and their proportion for a given sequence.
+	@type SUPERFAMILYASSOCIATED: dictionnary
+	@param SUPERFAMILYASSOCIATED: dictionnary containing different superfamily names possible for a given proteine profile.
+
+	@rtype: string
+	@return: Name of the superFamily with different matches found.
+	"""
+	name = ""
+	####	For this part, 7 cases have been identified
+	####	First THREE CASES, Consider NO BLAST keywords have been founded
+	if len(BLAST) == 0:
+		####	NO type of PROPROFILES keyword have been founded
+		if len(PROTPROFILES) == 0:
+			name = "unknown"
+
+		####	ONE type of PROPROFILES keyword have been founded
+		elif len(PROTPROFILES) == 1:
+			name = compareSingleProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED)
+
+		####	MULTIPLE type of PROPROFILES keyword have been founded
+		elif len(PROTPROFILES) > 1:
+			name = compareMultipleProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED)
+
+	####	Second THREE CASES, Consider ONE blast keywords have been founded
+	elif len(BLAST) == 1:
+		####	NO type of PROPROFILES keyword have been founded
+		if len(PROTPROFILES) == 0:
+			####	Retrieve the BLAST superFamily keyword
+			for superFamily in BLAST:
+				name += str(superFamily)
+
+		####	ONE or MULTIPLE type of PROPROFILES keyword have been founded
+		elif len(PROTPROFILES) >= 1:
+			name = compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED)
+
+	####	Last case, MULTIPLE BLAST keywords have been founded
+	elif len(BLAST) > 1:
+		name = "potentialChimeric"
+		for superFamily in BLAST:
+			name += str("_"+superFamily)
+
+	return name
+
+def compareSingleProtProfiles(PROTPROFILE, SUPERFAMILYASSOCIATED):
+	"""
+	Comparison between the blast and the proteines profiles keywords to check if it's in accordance with Wicker classification.
+	This classification is implemented in the SUPERFAMILYASSOCIATED dictionnary. Key = blast keyword : Value = protProfile keywords possible
+
+	Keyword arguments:
+	@type PROTPROFILE: dictionnary
+	@param PROTPROFILE: Proteine profile keyword found and its proportion for a given sequence.
+	@type SUPERFAMILYASSOCIATED: dictionnary
+	@param SUPERFAMILYASSOCIATED: dictionnary containing different superfamily names possible for a given proteine profile.
+
+	@rtype: string
+	@return: Name of the superFamily.
+	"""
+	####	APPROACH : Add the superFamily names associated to the PROTPROFILE. Then Check if the superFamily name associated is uniq or not
+	####	String that will contain the superFamily name
+	name = ""
+	####	List that will contain the superFamily name associated to PROTPROFILE
+	superFamilyAssociated = retrieveSuperFamilyAssociated(PROTPROFILE, SUPERFAMILYASSOCIATED)
+
+	####	If only ONE superFamily name is associated to PROTPROFILE
+	if len(superFamilyAssociated) == 1:
+		name = superFamilyAssociated[0]
+	####	Else MULTIPLE superFamily names are associated to PROTPROFILE, name is undefined with the PROTPROFILE
+	else:
+		name="undefined"
+		for proteine in PROTPROFILE:
+			name += str("_" + proteine)
+
+	return name
+
+def compareMultipleProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED):
+	"""
+	Comparison between the blast and the proteines profiles keywords to check if it's in accordance with Wicker classification.
+	This classification is implemented in the SUPERFAMILYASSOCIATED dictionnary. Key = blast keyword : Value = protProfile keywords possible
+
+	Keyword arguments:
+	@type PROTPROFILES: dictionnary
+	@param PROTPROFILES: All the proteines profiles keywords found and their proportion for a given sequence.
+	@type SUPERFAMILYASSOCIATED: dictionnary
+	@param SUPERFAMILYASSOCIATED: dictionnary containing different superfamily names possible for a given proteine profile.
+
+	@rtype: string
+	@return: Name of the superFamily.
+	"""
+	####	APPROACH : Proceed in 2 steps,
+	####	First creates a list were all the PROTPROFILES founded that are not uniq, are added (allow to check if the proteines profiles are associated to a common superFamily)
+	####	Then check if the superFamily associated founded is uniq. Finally: Assigns this name as final name else, as undefined with the matches.
+
+	####	String that will contain the superFamily name
+	name = ""
+	####	List that will contain all the superFamily name associated to PROTPROFILES
+	superFamilyAssociated = retrieveSuperFamilyAssociated(PROTPROFILES, SUPERFAMILYASSOCIATED)
+
+	####	Count all the superFamily names associated
+	superFamilyCount = Counter(superFamilyAssociated)
+	####	Remove all the superFamily names founded just once
+	uniqSuperFamilyAssociated = list(set(k for k in superFamilyAssociated if superFamilyCount[k]>1))
+
+	####	If only ONE superFamily name is associated to PROTPROFILES
+	if len(uniqSuperFamilyAssociated) == 1 :
+		name = uniqSuperFamilyAssociated[0]
+	####	Else MULTIPLE superFamily names are associated to PROTPROFILES, name is undefined with all the PROTPROFILES
+	else :
+		name="undefined"
+		for proteine in PROTPROFILES:
+			name += str("_" + proteine)
+	return name
+
+def retrieveSuperFamilyAssociated(PROTPROFILE, SUPERFAMILYASSOCIATED):
+	"""
+	Retrieve all the superFamily names associated to the proteine profile.
+
+	Keyword arguments:
+	@type PROTPROFILE: dictionnary
+	@param PROTPROFILE: Proteine profile keyword found and its proportion for a given sequence.
+	@type SUPERFAMILYASSOCIATED: dictionnary
+	@param SUPERFAMILYASSOCIATED: dictionnary containing different superfamily names possible for a given proteine profile.
+
+	@rtype: list
+	@return: list of all the superFamily names associated to the proteine profile.
+	"""
+	####	List that will contain the superFamily name associated to PROTPROFILE
+	superFamilyAssociated = []
+
+	for proteine in PROTPROFILE:
+		####	Look for the superFamily associated with the PROTPROFILE (check in the SUPERFAMILYASSOCIATED)
+		if proteine in SUPERFAMILYASSOCIATED:
+			####	Add the superFamily names associated to the PROTPROFILE in a list
+			for superFamily in SUPERFAMILYASSOCIATED[proteine]:
+				superFamilyAssociated.append(superFamily)
+	return superFamilyAssociated
+
+def compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
+	"""
+	Comparison between the blast and the proteines profiles keywords to check if it's in accordance with Wicker classification.
+	This classification is implemented in the SUPERFAMILYASSOCIATED dictionnary. Key = blast keyword : Value = protProfile keywords possible
+
+	Keyword arguments:
+	@type BLAST: dictionnary
+	@param BLAST: All the blast keywords found and their proportion for a given sequence.
+	@type PROTPROFILES: dictionnary
+	@param PROTPROFILES: All the proteines profiles keywords found and their proportion for a given sequence.
+	@type SUPERFAMILYASSOCIATED: dictionnary
+	@param SUPERFAMILYASSOCIATED: dictionnary containing different superfamily names possible for a given proteine profile.
+
+	@rtype: string
+	@return: Name of the superFamily with differents matches found.
+	"""
+	####	Check the coherence between specific and non specific keywords
+	name = ""
+	####	Boolean to know if superFamily name matches with BLAST
+	matchBlast = False
+
+	####	List that will contain all the superFamily name associated to PROTPROFILES
+	superFamilyMatches = []
+
+	####	First parse PROTPROFILES keyowrds founded
+	for proteine in PROTPROFILES:
+		####	Look for the superFamily associated with the PROTPROFILES (check in the SUPERFAMILYASSOCIATED)
+		if proteine in SUPERFAMILYASSOCIATED:
+			####	Add the superFamily names associated to the PROTPROFILES in a list
+			for superFamily in SUPERFAMILYASSOCIATED[proteine]:
+				####	If the superFamily names associated is in BLAST
+				if superFamily in BLAST:
+					superFamilyMatches.append(superFamily)
+					matchBlast = True
+	####	Remove the doublons (ex: Copia, Copia, Mariner => Copia, Mariner)
+	superFamilyMatches = list(set(superFamilyMatches))
+
+	####	If the superFamily names associated with PROTPROFILES don't match with the BLAST, name is chimeric
+	if not matchBlast:
+		####	Retrieve the BLAST name
+		for superFamily in BLAST:
+			name += "potentialChimeric_" + str(superFamily)
+		####	Retrieve all the proteines profiles
+		for proteine in PROTPROFILES:
+			name += str("_" + proteine)
+	####	If the superFamily names associated with PROTPROFILES match with the BLAST, name is superFamily
+	else :
+		name += str(superFamilyMatches[0])
+
+	return name
+
 
 def percentageCalculation(KEYWORDFOUND):
 	"""
-	Calculus of the percentage of each keyword (can be either specific or non specific, choose as arg) found for a given sequence.
+	Calculus of the percentage of each keyword (can be either blast or proteines profiles, choose as arg) found for a given sequence.
 
 	Keyword arguments:
 	@type KEYWORDFOUND: dictionnary
-	@param KEYWORDFOUND: All the keywords found (can be either specific or non specific) and their occurrence for a given sequence.
+	@param KEYWORDFOUND: All the keywords found (can be either blast or proteines) and their occurrence for a given sequence.
 
 	@rtype: dictionnary
 	@return: Percentage foud for each superFamily name in a given sequence.
@@ -60,160 +246,3 @@ def percentageCalculation(KEYWORDFOUND):
 		percentage=round(KEYWORDFOUND[key]/tot*100, 1)
 		percent[key]=percentage
 	return percent
-
-def compareKeywordsFounded(BLAST, PROTPROFILES, BASELINE):
-	"""
-	Comparison between the specific and the non specific keywords to check if it's in accordance with Wicker classification.
-	This classification is implemented in the BASELINE dictionnary. Key = specific keyword : Value = non specific keywords possible
-
-	Keyword arguments:
-	@type BLAST: dictionnary
-	@param BLAST: All the specific keywords found and their proportion for a given sequence.
-	@type PROTPROFILES: dictionnary
-	@param PROTPROFILES: All the non specific keywords found and their proportion for a given sequence.
-	@type BASELINE: dictionnary
-	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily.
-
-	@rtype: string
-	@return: Name of the superFamily with different matches found.
-	"""
-	name = ""
-	####	For this part, 7 cases have been identified
-	####	First THREE CASES, Consider NO blast keywords have been founded
-	if len(BLAST) == 0:
-		####	NO type of proteine profiles keyword have been founded
-		if len(PROTPROFILES) == 0:
-			name = "unknown"
-
-		####	ONE or MULTIPLE type of proteine profiles keyword have been founded
-	elif len(PROTPROFILES) >= 1:
-			# name = compareWickerClassification(BLAST, PROTPROFILES, BASELINE)
-			pass
-
-	####	Second THREE CASES, Consider ONE blast keywords have been founded
-	elif len(BLAST) == 1:
-		####	NO type of proteine profiles keyword have been founded
-		if len(PROTPROFILES) == 0:
-			name = "TE_"
-			####	Retrieve the blast superFamily keyword
-			for superFamily in BLAST:
-				name += str(superFamily)
-
-		####	ONE or MULTIPLE type of proteine profiles keyword have been founded
-		elif len(PROTPROFILES) >= 1:
-			name = compareWickerClassification(BLAST, PROTPROFILES, BASELINE)
-			pass
-
-	####	Last case, MULTIPLE blast keyword have been founded
-	elif len(BLAST) > 1:
-		name = "potentialChimeric"
-		for superFamily in BLAST:
-			name += str("_"+superFamily+"_")
-
-	return name
-
-def compareWickerClassification(BLAST, PROTPROFILES, BASELINE):
-	"""
-	Comparison between the specific and the non specific keywords to check if it's in accordance with Wicker classification.
-	Procceed in 2 steps : first check the non spe keyword length
-	This classification is implemented in the BASELINE dictionnary. Key = specific keyword : Value = non specific keywords possible
-
-	Keyword arguments:
-	@type BLAST: dictionnary
-	@param BLAST: All the specific keywords found and their proportion for a given sequence.
-	@type PROTPROFILES: dictionnary
-	@param PROTPROFILES: All the non specific keywords found and their proportion for a given sequence.
-	@type BASELINE: dictionnary
-	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily.
-
-	@rtype: string
-	@return: Name of the superFamily with differents matches found.
-	"""
-	####	Check the coherence between specific and non specific keywords
-	name = ""
-	keywordsCompared = []
-	####	First parse PROTPROFILES keyowrds founded
-	for protProfilesFounded in PROTPROFILES:
-		keywordsCompared.append(BASELINE[protProfilesFounded])
-
-	print(keywordsCompared)
-	####	Second compare the PROTPROFILES keywords founded
-
-
-	return name
-
-
-# def specificComparison(SUPERFAMILYFOUND):
-# 	"""
-# 	Search if there one or multiple specific keyword(s) founded for one sequence.
-#
-# 	Keyword arguments:
-# 	@type SUPERFAMILYFOUND: dictionnary
-# 	@param SUPERFAMILYFOUND: count the names of the superfamily found for one sequence during the superFamilyDetermination.
-#
-# 	@rtype: dictionnary
-# 	@return: dictionnary containing the name of superFamily found and its count.
-# 	{B{Key} = specific : B{I{Values}} = count of this keyword}\n
-# 	3 return possible.
-#
-# 		1. If no keyword => None: 0
-#
-# 		2. If 1 keyword => name of keyword : count of this keyword
-#
-# 		3. If more than 1 keyword => keywords founded : proportion of the keyword
-# 	"""
-# 	resultSpecific={}
-#
-# 	####	If NO specific keyword has been found
-# 	if len(SUPERFAMILYFOUND["specific"]) == 0:
-# 		resultSpecific = {"undefined": 0}
-#
-# 	####	If ONE same specific keyword has been found (ex: Mariner, Mariner)
-# 	elif len(SUPERFAMILYFOUND["specific"]) == 1:
-# 		for superFamilyName in SUPERFAMILYFOUND["specific"].keys():
-# 			resultSpecific = {superFamilyName: SUPERFAMILYFOUND["specific"][superFamilyName]}
-#
-# 	####	If MULTIPLE different specific keywords have been found, considered as potential chimeric (ex: Mariner, Copia)
-# 	elif len(SUPERFAMILYFOUND["specific"]) >= 1:
-# 		####	Convert the counter of keywords founded into a proportion
-# 		percentName = percentageCalculation(SUPERFAMILYFOUND["specific"])
-# 		resultSpecific = percentName
-#
-# 	return resultSpecific
-#
-# def nonSpecificComparison(SUPERFAMILYFOUND):
-# 	"""
-# 	Search if there one or multiple non specific keyword(s) founded for one sequence.
-#
-# 	Keyword arguments:
-# 	@type SUPERFAMILYFOUND: dictionnary
-# 	@param SUPERFAMILYFOUND: count the names of the superfamily found for one sequence during the superFamilyDetermination.
-#
-# 	@rtype: tuple
-# 	@return: name of the superfamily corresponding to the sequence and number of non specific keyword(s) founded for this sequence.
-# 	3 return possible.
-#
-# 		1. If no keyword => None: 0
-#
-# 		2. If 1 keyword => name of keyword : count of this keyword
-#
-# 		3. If more than 1 keyword => keywords founded : proportion of the keyword
-#
-# 	"""
-# 	resultNonSpecific={}
-# 	####	If NO non specific keyword has been found
-# 	if len(SUPERFAMILYFOUND["nonSpecific"]) == 0:
-# 		resultNonSpecific = {"undefined": 0}
-#
-# 	####	If ONE same non specific keyword has been found (ex: Mariner, Mariner)
-# 	elif len(SUPERFAMILYFOUND["nonSpecific"]) == 1:
-# 		for superFamilyName in SUPERFAMILYFOUND["nonSpecific"].keys():
-# 			resultNonSpecific= {superFamilyName: SUPERFAMILYFOUND["nonSpecific"][superFamilyName]}
-#
-# 	####	If MULTIPLE different non specific keywords have been found, considered as potential chimeric (ex: Mariner, Copia)
-# 	elif len(SUPERFAMILYFOUND["nonSpecific"]) >= 1:
-# 			####	Convert the counter of non specific keywords founded into a proportion
-# 			percentName = percentageCalculation(SUPERFAMILYFOUND["nonSpecific"])
-# 			resultNonSpecific= percentName
-#
-# 	return resultNonSpecific
