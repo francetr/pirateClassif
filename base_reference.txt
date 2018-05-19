@@ -46,11 +46,9 @@ tRNA	tRNA
 >RH	Copia:Gypsy:Bel-Pao:Retrovirus:ERV:DIRS:Ngaro:VIPER:I
 >RTRH	Copia:Gypsy:Bel-Pao:Retrovirus:ERV:DIRS:Ngaro:VIPER:I
 >INT	Copia:Gypsy:Bel-Pao:Retrovirus:ERV:DIRS
->POL	Gypsy
 >ENV	Retrovirus:ERV
 >YR	Crypton:DIRS:Ngaro:VIPER
 >EN	Penelope:R2
->LINER2	R2
->LINER1	L1
+>POL	Gypsy
 >APE	RTE:Jockey:L1:I
 >OTHER	undefined
