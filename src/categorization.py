@@ -53,7 +53,6 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
 		elif FEATURES[4] == "II":
 			SEQCLASSIFIED["TE"][FEATURES[0]]={"class":"II"}
 			orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE)
-			# print(FEATURES[0])
 		####	NoCat
 		elif FEATURES[4] == "noCat":
 			SEQCLASSIFIED["noCat"][FEATURES[0]]={"class":"undefined"}

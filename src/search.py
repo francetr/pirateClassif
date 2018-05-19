@@ -37,7 +37,7 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE):
 			searchProfilesName(FEATURES, dr, superFamilyFound, BASELINE)
 		####	if TE_BLRx or TE_BLRtx is found in coding, search for superFamily name using function searchRepBaseName
 		elif dbName=="TE_BLRx" or "TE_BLRtx":
-			searchRepBaseName(FEATURES, dr, superFamilyFound, BASELINE)
+			searchBlastName(FEATURES, dr, superFamilyFound, BASELINE)
 	####	String that will contain the final supefamily name of the sequence
 	finalSuperFamily = ""
 	####	if no keywords have been found, finalSuperFamily will be unknown
@@ -105,7 +105,7 @@ def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 			print('Issue during searching profiles on : '+ substr)
 
 
-def searchRepBaseName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
+def searchBlastName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 	"""
 
 	Search the keywords in the TE_BLRx and TE_BLRtx part of coding. Then check if the keyword is founded into the BASELINE file.
