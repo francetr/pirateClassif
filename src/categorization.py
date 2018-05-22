@@ -115,9 +115,48 @@ def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
 		####	Split the coding part to obtain the different results according to the comparison with different databases (3 possibilties: TEBLRtx, TEBLRx and profiles)
 		databaseRecords = codingRecord.split(';')
 		####	Search if there are different names contained in the codingRecord
-		search.searchDifferentName(FEATURES, SEQCLASSIFIED, databaseRecords, BASELINE)
+		finalSuperFamilyName = search.searchDifferentName(FEATURES, SEQCLASSIFIED, databaseRecords, BASELINE)
+		####	Associate the superFamily name with the corresponding sequence into the right dictionnary
+		associateSuperFamily(FEATURES, SEQCLASSIFIED, finalSuperFamilyName)
+		# if FEATURES[0] in SEQCLASSIFIED["TE"]:
+		# 	print(FEATURES[7], "\n", SEQCLASSIFIED["TE"][FEATURES[0]], "\n")
+		# elif FEATURES[0] in SEQCLASSIFIED["potentialChimeric"]:
+		# 	print(FEATURES[7], "\n", SEQCLASSIFIED["potentialChimeric"][FEATURES[0]], "\n")
+		# elif FEATURES[0] in SEQCLASSIFIED["nonTE"]:
+		# 	print(FEATURES[7], "\n", SEQCLASSIFIED["nonTE"][FEATURES[0]], "\n")
+		# elif FEATURES[0] in SEQCLASSIFIED["noCat"]:
+		# 	print(FEATURES[7], "\n", SEQCLASSIFIED["noCat"][FEATURES[0]], "\n")
 
 	except AttributeError:
 		####	If there is no coding part : declaration of superfamily as undefined
 		SEQCLASSIFIED["TE"][FEATURES[0]]["superfamily"] = "undefined"
 		return
+
+def associateSuperFamily(FEATURES, SEQCLASSIFIED, FINALSUPERFAMILYNAME):
+	"""
+	Associate the superFamily name for the sequence in the corresponding dictionnary (potentialChimeric if find potentialChimeric in FINALSUPERFAMILYNAME or TE else)
+
+	Keyword arguments:
+	@type FEATURES: list
+	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence.
+	@type SEQCLASSIFIED: dictionnary
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 4 dictionnaries (TE, nonTE, potentialChimeric and noCat)
+	@type FINALSUPERFAMILYNAME: string
+	@param FINALSUPERFAMILYNAME: name of the superFamily find according the different keywords founded
+
+	@rtype: None
+	"""
+	####	Regex for serching the name
+	name = re.search(r'([^_]+)', FINALSUPERFAMILYNAME).groups()[0]
+	# if the name searched is potentialChimeric, we had the sequence in the potentialChimeric dictionnary and remove it from the TE ditctionnary
+	if name == "potentialChimeric":
+		####	Add the sequence in the potentialchimeric dictionnary
+		SEQCLASSIFIED["potentialChimeric"][FEATURES[0]] = SEQCLASSIFIED["TE"][FEATURES[0]]
+		####	Define the name of the superFamily sequence as FINALSUPERFAMILYNAME
+		SEQCLASSIFIED["potentialChimeric"][FEATURES[0]]["superFamily"] = FINALSUPERFAMILYNAME
+		####	Remove the sequence from TE dictionnary
+		del SEQCLASSIFIED["TE"][FEATURES[0]]
+	####	Name is not potentialChimeric : can be either undefined or superFamily name (Copia, Gypsy, etc..)
+	else:
+		####	Define the name of the superFamily sequence as FINALSUPERFAMILYNAME
+		SEQCLASSIFIED["TE"][FEATURES[0]]["superFamily"] = FINALSUPERFAMILYNAME

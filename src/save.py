@@ -55,7 +55,11 @@ def savePotentialChimeric(FASTA, POTENTIALCHIMERIC):
 	"""
 	with open("potentialChimeric.fasta", "w") as f:
 		for id in POTENTIALCHIMERIC.keys():
-			f.write(">{id}:{seqClass}\n{seq}\n".format(id=id, seqClass=POTENTIALCHIMERIC[id]["class"], seq=FASTA[id]["seq"]))
+			if not "superFamily" in POTENTIALCHIMERIC[id]:
+				f.write(">{id}:{seqClass}\n{seq}\n".format(id=id, seqClass=POTENTIALCHIMERIC[id]["class"], seq=FASTA[id]["seq"]))
+			else:
+				f.write(">{id}:{seqClass}:{order}:{superFamily}\n{seq}\n".format(id=id, seqClass=POTENTIALCHIMERIC[id]["class"], order=POTENTIALCHIMERIC[id]["order"], superFamily=POTENTIALCHIMERIC[id]["superFamily"], seq=FASTA[id]["seq"]))
+
 
 def saveTE(FASTA, TE):
 	"""

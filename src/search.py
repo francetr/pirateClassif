@@ -21,7 +21,8 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE):
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
-	@rtype: None
+	@rtype: string
+	@return: SuperFamily name of the sequence
 	"""
 	####	Dictionnary that will contains (or not) the different superFamilies find for the concerned sequence
 	####		key = blast : value = { key = blast keyword found : value = number of presence of this keyword},
@@ -39,14 +40,10 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE):
 		elif dbName=="TE_BLRx" or "TE_BLRtx":
 			searchBlastName(FEATURES, dr, superFamilyFound, BASELINE)
 	####	String that will contain the final supefamily name of the sequence
-	finalSuperFamily = ""
-	####	if no keywords have been found, finalSuperFamily will be unknown
-	if len(superFamilyFound["blast"]) == 0 and len(superFamilyFound["protProfiles"]) == 0 :
-		finalSuperFamily = "undefined"
-	####	else, a comparison between the keywords founded is done
-	else:
-		finalSuperFamily = comparison.superFamilyComparison(FEATURES, superFamilyFound, BASELINE)
-	SEQCLASSIFIED["TE"][FEATURES[0]]["superFamily"]=finalSuperFamily
+	finalSuperFamilyName = ""
+	####	Do a comparison between the keywords founded
+	finalSuperFamilyName = comparison.superFamilyComparison(superFamilyFound, BASELINE)
+	return finalSuperFamilyName
 
 def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 	"""
@@ -100,7 +97,6 @@ def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 			if not keywordFound:
 				print("/!\	Sequence : %s No match in the string %s with BASELINE"%(FEATURES[0], substr))
 
-			# print(FEATURES[0], SUPERFAMILYFOUND)
 		except AttributeError:
 			print('Issue during searching profiles on : '+ substr)
 

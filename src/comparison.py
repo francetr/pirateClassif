@@ -4,13 +4,11 @@ from collections import Counter
 
 """ @author: Tristan Frances """
 
-def superFamilyComparison(FEATURES, SUPERFAMILYFOUND, SUPERFAMILYASSOCIATED):
+def superFamilyComparison(SUPERFAMILYFOUND, SUPERFAMILYASSOCIATED):
 	"""
 	Compare the different superFamilies found for one sequence. For this uses the method combinations of the package itertools allowing to combine 2 by 2 the different elements of a list.
 
 	Keyword arguments:
-	@type FEATURES: list
-	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence.
 	@type SUPERFAMILYFOUND: dictionnary
 	@param SUPERFAMILYFOUND: count the names of the superfamily found for one sequence during the superFamilyDetermination.
 	@type SUPERFAMILYASSOCIATED: dictionnary
@@ -70,7 +68,6 @@ def compareKeywordsFounded(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
 		for superFamily in BLAST:
 			name += str("_"+superFamily)
 
-	# print(name, BLAST, PROTPROFILES)
 	return name
 
 def compareProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED):
@@ -149,11 +146,10 @@ def compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
 	else :
 		####	Retrieve the BLAST name
 		for superFamily in BLAST:
-			name += "potentialChimeric_" + str(superFamily)
+			name = "potentialChimeric_" + str(superFamily)
 		####	Retrieve all the proteines profiles
 		for proteine in PROTPROFILES:
 			name += str("_" + proteine)
-	# print (BLAST, PROTPROFILES, superFamilyMatches, name)
 	return name
 
 def retrieveSuperFamilyAssociated(PROTPROFILE, SUPERFAMILYASSOCIATED):
@@ -206,34 +202,3 @@ def percentageCalculation(KEYWORDFOUND):
 		percentage=round(KEYWORDFOUND[key]/tot*100, 1)
 		percent[key]=percentage
 	return percent
-
-# def compareSingleProtProfiles(PROTPROFILE, SUPERFAMILYASSOCIATED):
-# 	"""
-# 	Comparison between the blast and the proteines profiles keywords to check if it's in accordance with Wicker classification.
-# 	This classification is implemented in the SUPERFAMILYASSOCIATED dictionnary. Key = blast keyword : Value = protProfile keywords possible
-#
-# 	Keyword arguments:
-# 	@type PROTPROFILE: dictionnary
-# 	@param PROTPROFILE: Proteine profile keyword found and its proportion for a given sequence.
-# 	@type SUPERFAMILYASSOCIATED: dictionnary
-# 	@param SUPERFAMILYASSOCIATED: dictionnary containing the different superfamily names possible for a given proteine profile.
-#
-# 	@rtype: string
-# 	@return: Name of the superFamily.
-# 	"""
-# 	####	APPROACH : Add the superFamily names associated to the PROTPROFILE. Then Check if the superFamily name associated is uniq or not
-# 	####	String that will contain the superFamily name
-# 	name = ""
-# 	####	List that will contain the superFamily name associated to PROTPROFILE
-# 	superFamilyAssociated = retrieveSuperFamilyAssociated(PROTPROFILE, SUPERFAMILYASSOCIATED)
-#
-# 	####	If only ONE superFamily name is associated to PROTPROFILE
-# 	if len(superFamilyAssociated) == 1:
-# 		name = superFamilyAssociated[0]
-# 	####	Else MULTIPLE superFamily names are associated to PROTPROFILE, name is undefined with the PROTPROFILE
-# 	else:
-# 		name="undefined"
-# 		for proteine in PROTPROFILE:
-# 			name += str("_" + proteine)
-#
-# 	return name
