@@ -49,6 +49,6 @@ tRNA	tRNA
 >ENV	Retrovirus:ERV
 >YR	Crypton:DIRS:Ngaro:VIPER
 >EN	Penelope:R2
->POL	Gypsy
+>POL	Copia:Gypsy:Bel-Pao:Retrovirus:ERV
 >APE	RTE:Jockey:L1:I
 >OTHER	undefined
