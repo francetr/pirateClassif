@@ -21,7 +21,7 @@ def retrieveArguments():
 	parser = argparse.ArgumentParser(prog="scriptClassif.py", description="This program is a part of the PiRATE project. It aims to automatized the step of TE classification")
 	parser.add_argument("classif", type=str, help="classif file that comes from PASTEC")
 	parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
-	parser.add_argument("baseline", type=str, help="baseline file giving the different names possible for a superfamily")
+	parser.add_argument("baseline", type=str, nargs="?", default="base_reference.txt", help="baseline file giving the different names possible for a superfamily")
 	args = parser.parse_args()
 	# checkArguments(args.classif, args.fasta)
 	return args
@@ -109,10 +109,12 @@ def readBaseline(BASELINE):
 				####	For nonSpecific keyword
 				else:
 					readProtProfilesBaselineKeywords(keywords.groups()[0], baselineDictionnary)
+		return baselineDictionnary
 
 	except FileNotFoundError:
 		print("/!\	Error: No such file as {}\n####	Classification aborted".format(BASELINE))
-	return baselineDictionnary
+		sys.exit(1)
+
 
 def readBlastBaselineKeywords(SPECIFICKEYWORDS, BASELINEDICTIONNARY):
 	"""

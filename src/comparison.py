@@ -130,7 +130,7 @@ def compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
 	####	String that will contain the superFamily name
 	name = ""
 
-	####	List that will contain all the matches between the BLAST and the superFamily associated
+	####	List that will contain all the matches between the BLAST and the superFamily associated. ex: could be ["Copia", "Copia"] if blast is "Copia"
 	superFamilyMatches = []
 	####	List that will contain all the superFamily name associated to PROTPROFILES
 	superFamilyAssociated = retrieveSuperFamilyAssociated(PROTPROFILES, SUPERFAMILYASSOCIATED)
