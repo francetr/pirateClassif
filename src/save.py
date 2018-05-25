@@ -35,7 +35,9 @@ def saveNoCat(FASTA, NOCAT):
 
 	@rtype: None
 	"""
-	with open("noCat.fasta", "w") as f:
+	saveFileName = "noCat.fasta"
+	print("Save uncategorized sequences into \"%s\" file"%(saveFileName))
+	with open(saveFileName, "w") as f:
 		for id in NOCAT.keys():
 			f.write(">{id}:{seqClass}\n{seq}\n".format(id=id, seqClass=NOCAT[id]["class"], seq=FASTA[id]["seq"]))
 
@@ -53,7 +55,9 @@ def savePotentialChimeric(FASTA, POTENTIALCHIMERIC):
 
 	@rtype: None
 	"""
-	with open("potentialChimeric.fasta", "w") as f:
+	saveFileName = "potentialChimeric.fasta"
+	print("Save potential chimeric sequences into \"%s\" file"%(saveFileName))
+	with open(saveFileName, "w") as f:
 		for id in POTENTIALCHIMERIC.keys():
 			if not "superFamily" in POTENTIALCHIMERIC[id]:
 				f.write(">{id}:{seqClass}\n{seq}\n".format(id=id, seqClass=POTENTIALCHIMERIC[id]["class"], seq=FASTA[id]["seq"]))
@@ -74,7 +78,9 @@ def saveTE(FASTA, TE):
 
 	@rtype: None
 	"""
-	with open("TE.fasta", "w") as f:
+	saveFileName = "TE.fasta"
+	print("Save Transposable Elements sequences into \"%s\" file"%(saveFileName))
+	with open(saveFileName, "w") as f:
 		for id in TE.keys():
 			if not "superFamily" in TE[id]:
 				f.write(">{id}:{seqClass}:{order}\n{seq}\n".format(id=id, seqClass=TE[id]["class"], order=TE[id]["order"], seq=FASTA[id]["seq"]))
@@ -94,6 +100,8 @@ def saveNonTE(FASTA, NONTE):
 
 	@rtype: None
 	"""
-	with open("nonTE.fasta", "w") as f:
+	saveFileName = "nonTE.fasta"
+	print("Save non Transposable Elements sequences into \"%s\" file"%(saveFileName))
+	with open(saveFileName, "w") as f:
 		for id in NONTE.keys():
 			f.write(">{id}:{seqClass}\n{seq}\n".format(id=id, seqClass=NONTE[id]["class"], seq=FASTA[id]["seq"]))

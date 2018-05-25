@@ -118,10 +118,10 @@ def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
 		finalSuperFamilyName = search.searchDifferentName(FEATURES, SEQCLASSIFIED, databaseRecords, BASELINE)
 		####	Associate the superFamily name with the corresponding sequence into the right dictionnary
 		associateSuperFamily(FEATURES, SEQCLASSIFIED, finalSuperFamilyName)
-		if FEATURES[0] in SEQCLASSIFIED["TE"]:
-			print(FEATURES[7], "\n", SEQCLASSIFIED["TE"][FEATURES[0]], "\n")
-		elif FEATURES[0] in SEQCLASSIFIED["potentialChimeric"]:
-			print(FEATURES[7], "\n", SEQCLASSIFIED["potentialChimeric"][FEATURES[0]], "\n")
+		# if FEATURES[0] in SEQCLASSIFIED["TE"]:
+		# 	print(FEATURES[7], "\n", SEQCLASSIFIED["TE"][FEATURES[0]], "\n")
+		# elif FEATURES[0] in SEQCLASSIFIED["potentialChimeric"]:
+		# 	print(FEATURES[7], "\n", SEQCLASSIFIED["potentialChimeric"][FEATURES[0]], "\n")
 		# elif FEATURES[0] in SEQCLASSIFIED["nonTE"]:
 		# 	print(FEATURES[7], "\n", SEQCLASSIFIED["nonTE"][FEATURES[0]], "\n")
 		# elif FEATURES[0] in SEQCLASSIFIED["noCat"]:
