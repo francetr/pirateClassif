@@ -44,7 +44,7 @@ def compareKeywordsFounded(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
 	if len(BLAST) == 0:
 		####	NO type of PROPROFILES keyword have been founded
 		if len(PROTPROFILES) == 0:
-			name = "unknown"
+			name = "undefined"
 
 		####	ONE or MULTIPLE type of PROPROFILES keyword have been founded
 		elif len(PROTPROFILES) >= 1:
@@ -67,7 +67,7 @@ def compareKeywordsFounded(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
 		name = "potentialChimeric"
 		for superFamily in BLAST:
 			name += str("_"+superFamily)
-
+	print(name)
 	return name
 
 def compareProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED):
@@ -84,25 +84,24 @@ def compareProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED):
 	@rtype: string
 	@return: Name of the superFamily.
 	"""
-	####	APPROACH : Proceed in 2 steps,
-	####	First creates a list were all the PROTPROFILES founded that are not uniq, are added (allow to check if the proteines profiles are associated to a common superFamily)
-	####	Then check if the number of superFamily associated founded is equal to the number of PROTPROFILES . Finally: Assigns this name as final name else, as undefined with the matches.
+	####	APPROACH : Proceed in 2 main steps,
+	####	First creates a dictionnary were all the superFamily associated founded for PROTPROFILES are added, with their percentage.
+	####	Then add to a list only the superFamily with a percentage >= 75%. Finally: Assigns this name as final name else, as undefined with the matches.
 
 	####	String that will contain the superFamily name
 	name = ""
-	####	List that will contain all the superFamily name associated to PROTPROFILES
+	####	Dictionnary that will contain all the superFamily name associated to PROTPROFILES and their percentage for the sequence
 	superFamilyAssociated = retrieveSuperFamilyAssociated(PROTPROFILES, SUPERFAMILYASSOCIATED)
 
-	####	Count all the superFamily names associated
-	superFamilyCount = Counter(superFamilyAssociated)
-	####	Remove all the superFamily names founded with a different count of PROTPROFILES
-	uniqSuperFamilyAssociated = list(set([k for k in superFamilyAssociated if superFamilyCount[k] == len(PROTPROFILES)]))
+	####	Remove all the superFamily names founded with a percentage lesser than 75 %
+	uniqSuperFamilyAssociated = list([k for k in superFamilyAssociated if superFamilyAssociated[k] >= 75])
+
 	####	If only ONE superFamily name is associated to PROTPROFILES
-	if len(uniqSuperFamilyAssociated) == 1 :
+	if len(uniqSuperFamilyAssociated) == 1:
 		name = uniqSuperFamilyAssociated[0]
 	####	Else MULTIPLE superFamily names are associated to PROTPROFILES, name is undefined with all the PROTPROFILES
-	else :
-		name="undefined"
+	else:
+		name = "undefined"
 		for proteine in PROTPROFILES:
 			name += str("_" + proteine)
 	return name
@@ -123,30 +122,32 @@ def compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
 	@rtype: string
 	@return: Name of the superFamily with differents matches found.
 	"""
-	####	APPROACH : Proceed in 2 steps,
-	####	First creates a list containing all the superFamily associated withe PROTPROFILES. Then add to a new list all the superFamily
-	####	associated which have a match with the BLAST. Check if the number of match is equal to the number of PROTPROFILES
+	####	APPROACH : Proceed in 2 main steps,
+	####	First creates a dictionnary were all the superFamily associated founded for PROTPROFILES are added, with their percentage.
+	####	Then add to a list only the superFamily that match with the BLAST and with a percentage >= 75%.
+	####	Finally: Assigns this name as final name (if only ONE superFamily have matched); else, as potentialChimeric with the matches (BLAST and PROTPROFILES).
 
 	####	String that will contain the superFamily name
 	name = ""
 
-	####	List that will contain all the matches between the BLAST and the superFamily associated. ex: could be ["Copia", "Copia"] if blast is "Copia"
+	####	List that will contain all the matches between the BLAST and the superFamily associated.
 	superFamilyMatches = []
 	####	List that will contain all the superFamily name associated to PROTPROFILES
 	superFamilyAssociated = retrieveSuperFamilyAssociated(PROTPROFILES, SUPERFAMILYASSOCIATED)
-	for superFamily in superFamilyAssociated:
-		####	check if the superFamily associated match with the BLAST
-		if superFamily in BLAST:
+	for superFamily in superFamilyAssociated.keys():
+		####	check if the superFamily associated match with the BLAST AND its percentage is greater than 75%
+		if superFamily in BLAST and superFamilyAssociated[superFamily] >= 75:
 			superFamilyMatches.append(superFamily)
 
-	####	If the number of matches is equal to the number of PROTPROFILES, name is superFamily
-	if len(superFamilyMatches) == len(PROTPROFILES):
+	####	If the number of matches is 1, name is superFamily
+	if len(superFamilyMatches) == 1:
 		name += str(superFamilyMatches[0])
-	####	If the number of match = 0 or the number of matches =/= number of PROTPROFILES, name is chimeric
+	####	If the number of match = 0, name is chimeric
 	else :
+		name = "potentialChimeric_"
 		####	Retrieve the BLAST name
 		for superFamily in BLAST:
-			name = "potentialChimeric_" + str(superFamily)
+			name += str(superFamily)
 		####	Retrieve all the proteines profiles
 		for proteine in PROTPROFILES:
 			name += str("_" + proteine)
@@ -162,11 +163,11 @@ def retrieveSuperFamilyAssociated(PROTPROFILE, SUPERFAMILYASSOCIATED):
 	@type SUPERFAMILYASSOCIATED: dictionnary
 	@param SUPERFAMILYASSOCIATED: dictionnary containing the different superfamily names possible for a given proteine profile.
 
-	@rtype: list
-	@return: list of all the superFamily names associated to the proteine profile.
+	@rtype: dictionnary
+	@return: dictionnary of all the superFamily names associated to the proteine profile and their percentage.
 	"""
 	####	List that will contain the superFamily name associated to PROTPROFILE
-	superFamilyAssociated = []
+	finalSuperFamilyAssociated = {}
 
 	####	Retrieve all the PROTPROFILES
 	for proteine in PROTPROFILE:
@@ -174,31 +175,11 @@ def retrieveSuperFamilyAssociated(PROTPROFILE, SUPERFAMILYASSOCIATED):
 		if proteine in SUPERFAMILYASSOCIATED:
 			####	Add the superFamily names associated to the PROTPROFILE in a list
 			for superFamily in SUPERFAMILYASSOCIATED[proteine]:
-				superFamilyAssociated.append(superFamily)
-	return superFamilyAssociated
+				####	If the superFamily associated is not in the list of finalSuperFamilyAssociated, add this superFamily in the list with its percentage
+				if not superFamily in finalSuperFamilyAssociated.keys():
+					finalSuperFamilyAssociated[superFamily] = PROTPROFILE[proteine]
+				####	If the superFamily associated is already in the list of finalSuperFamilyAssociated, add this superFamily in the list with its percentage
+				else:
+					finalSuperFamilyAssociated[superFamily] += PROTPROFILE[proteine]
 
-def percentageCalculation(KEYWORDFOUND):
-	"""
-	Calculus of the percentage of each keyword (can be either blast or proteines profiles, choose as arg) found for a given sequence.
-
-	Keyword arguments:
-	@type KEYWORDFOUND: dictionnary
-	@param KEYWORDFOUND: All the keywords found (can be either blast or proteines) and their occurrence for a given sequence.
-
-	@rtype: dictionnary
-	@return: Percentage foud for each superFamily name in a given sequence.
-	"""
-	# TODO Check if usefull
-	####	Calculus of the percentage of each superFamilyName found for this sequence
-	tot = 0
-	####	Dictionnary that will contains the percentage of the superFamilyNames found
-	percent = {}
-	####	Calculus of the total superFamilyName
-	for key in KEYWORDFOUND.keys():
-		tot+=KEYWORDFOUND[key]
-
-	####	Calculus of the percentage for each superFamilyName found
-	for key in KEYWORDFOUND.keys():
-		percentage=round(KEYWORDFOUND[key]/tot*100, 1)
-		percent[key]=percentage
-	return percent
+	return finalSuperFamilyAssociated
