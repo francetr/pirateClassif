@@ -35,17 +35,21 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE):
 		dbName = dr.split(':')[0].strip()
 		####	if profiles is found in coding, search for superFamily name using function searchProfilesName
 		if dbName=='profiles':
-			searchProfilesName(FEATURES, dr, superFamilyFound, BASELINE)
+			searchProfilesName(FEATURES, dr, superFamilyFound["protProfiles"], BASELINE)
 		####	if TE_BLRx or TE_BLRtx is found in coding, search for superFamily name using function searchRepBaseName
 		elif dbName=="TE_BLRx" or "TE_BLRtx":
-			searchBlastName(FEATURES, dr, superFamilyFound, BASELINE)
+			searchBlastName(FEATURES, dr, superFamilyFound["blast"], BASELINE)
+	####	Convert the count of profiles keywords founded into percentage
+	percentageCalculation(superFamilyFound["protProfiles"])
+	####	Convert the count of blast name founded into percentage
+	percentageCalculation(superFamilyFound["blast"])
 	####	String that will contain the final supefamily name of the sequence
 	finalSuperFamilyName = ""
 	####	Do a comparison between the keywords founded
 	finalSuperFamilyName = comparison.superFamilyComparison(superFamilyFound, BASELINE)
 	return finalSuperFamilyName
 
-def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
+def searchProfilesName(FEATURES, DATABASERECORD, PROFILESFOUND, BASELINE):
 	"""
 
 	Search the keywords in the profiles part of coding.
@@ -55,8 +59,8 @@ def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence. Usefull to know the sequence concerned. Usefull to know the sequence concerned.
 	@type DATABASERECORD: string
 	@param DATABASERECORD: profiles that will be parsed to find the keywords.
-	@type SUPERFAMILYFOUND: dictionnary
-	@param SUPERFAMILYFOUND: count the names of the superfamily found for one sequence during the superFamilyDetermination.
+	@type PROFILESFOUND: dictionnary
+	@param PROFILESFOUND: count of the keywords of the proteines profiles found for one sequence during the superFamilyDetermination.
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different profiles keyword possible for a given superfamily (usefull for the function superFamilyComparison).
 
@@ -77,21 +81,21 @@ def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 				####	Check if the keywords in profiles is in the BASELINE (convert string into lower case berfore comparing)
 				if keywordSearch:
 					keywordFound=True
-					####	If the keyword hasn't been found in the SUPERFAMILYFOUND dictionnary, its counter is 1
-					if not protProfilesKeyword in SUPERFAMILYFOUND["protProfiles"]:
+					####	If the keyword hasn't been found in the PROFILESFOUND dictionnary, its counter is 1
+					if not protProfilesKeyword in PROFILESFOUND:
 						####	Consider that keyword Tase and Tase* have the same counter
 						if protProfilesKeyword == "Tase" or protProfilesKeyword == "Tase*":
-							SUPERFAMILYFOUND["protProfiles"]["Tase"]=1
+							PROFILESFOUND["Tase"]=1
 						####	Counter for all the rest of the possibles keywords
 						else:
-							SUPERFAMILYFOUND["protProfiles"][protProfilesKeyword]=1
+							PROFILESFOUND[protProfilesKeyword]=1
 
-					####	If the keyword has already been found in the SUPERFAMILYFOUND dictionnary, its counter is incremented by 1
+					####	If the keyword has already been found in the PROFILESFOUND dictionnary, its counter is incremented by 1
 					else:
 						if protProfilesKeyword == "Tase" or protProfilesKeyword == "Tase*":
-							SUPERFAMILYFOUND["protProfiles"]["Tase"]+=1
+							PROFILESFOUND["Tase"]+=1
 						else:
-							SUPERFAMILYFOUND["protProfiles"][protProfilesKeyword]+=1
+							PROFILESFOUND[protProfilesKeyword]+=1
 
 			####	If there is no matches between the string and the baseline, print the string
 			if not keywordFound:
@@ -101,7 +105,7 @@ def searchProfilesName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 			print('Issue during searching profiles on : '+ substr)
 
 
-def searchBlastName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
+def searchBlastName(FEATURES, DATABASERECORD, BLASTFOUND, BASELINE):
 	"""
 
 	Search the keywords in the TE_BLRx and TE_BLRtx part of coding. Then check if the keyword is founded into the BASELINE file.
@@ -111,8 +115,8 @@ def searchBlastName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence. Usefull to know the sequence concerned. Usefull to know the sequence concerned.
 	@type DATABASERECORD: string
 	@param DATABASERECORD: profiles that will be parsed to find the keywords.
-	@type SUPERFAMILYFOUND: dictionnary
-	@param SUPERFAMILYFOUND: count the names of the superfamily found for one sequence during the superFamilyDetermination.
+	@type BLASTFOUND: dictionnary
+	@param BLASTFOUND: count of the blast name found for one sequence during the superFamilyDetermination.
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
@@ -131,12 +135,12 @@ def searchBlastName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 				####	Check if the keywords in profiles is in the BASELINE
 				if keyword in BASELINE["blast"][blastKeyword]:
 					keywordFound=True
-					####	If the keyword hasn't been found in the SUPERFAMILYFOUND dictionnary, we creates its value in SUPERFAMILYFOUND and define its counter as 1
-					if not blastKeyword in SUPERFAMILYFOUND["blast"]:
-						SUPERFAMILYFOUND["blast"][blastKeyword]=1
-					####	If the keyword has already been found in the SUPERFAMILYFOUND dictionnary, its counter is incremented by 1
+					####	If the keyword hasn't been found in the BLASTFOUND dictionnary, we creates its value in BLASTFOUND and define its counter as 1
+					if not blastKeyword in BLASTFOUND:
+						BLASTFOUND[blastKeyword]=1
+					####	If the keyword has already been found in the BLASTFOUND dictionnary, its counter is incremented by 1
 					else:
-						SUPERFAMILYFOUND["blast"][blastKeyword]+=1
+						BLASTFOUND[blastKeyword]+=1
 
 			####	If there is no matches between the string and the baseline, print the string
 			if not keywordFound:
@@ -144,3 +148,27 @@ def searchBlastName(FEATURES, DATABASERECORD, SUPERFAMILYFOUND, BASELINE):
 
 		except AttributeError:
 			print('Issue during searching RepBase name on : '+ substr)
+
+def percentageCalculation(KEYWORDFOUND):
+	"""
+	Convert the count of each keyword of KEYWORDFOUND (can be either blast or protProfiles) into a percentage.
+
+	Keyword arguments:
+	@type KEYWORDFOUND: dictionnary
+	@param KEYWORDFOUND: All the keywords found (can be either blast or proteines) and their occurrence for a given sequence.
+
+	@rtype: None
+	"""
+	# TODO Check if usefull
+	####	Calculus of the percentage of each superFamilyName found for this sequence
+	tot = 0
+	####	Dictionnary that will contains the percentage of the superFamilyNames found
+	percent = {}
+	####	Calculus of the total superFamilyName
+	for key in KEYWORDFOUND.keys():
+		tot+=KEYWORDFOUND[key]
+
+	####	Calculus of the percentage for each superFamilyName found
+	for key in KEYWORDFOUND.keys():
+		percentage=round(KEYWORDFOUND[key]/tot*100, 1)
+		KEYWORDFOUND[key]=percentage
