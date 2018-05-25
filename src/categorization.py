@@ -6,7 +6,7 @@
 import re
 import search
 
-def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE):
+def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	"""
 	Categorize the Transposable Element from the input argument.
 
@@ -26,10 +26,10 @@ def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE):
 	@rtype: None
 	"""
 	features=SEQUENCE.split("\t")
-	classDetermination(features, SEQCLASSIFIED, BASELINE)
+	classDetermination(features, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
 
 
-def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
+def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	"""
 	Determine the class of a sequence.
 	For this, complete four dictionnaries, passed onto arguments, that will contain the different catagories that caracterize the sequence.
@@ -39,6 +39,8 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 4 dictionnaries (TE, nonTE, potentialChimeric and noCat)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
+	@type IDENTITYTHRESHOLD: integer
+	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
 
 	@rtype: None
 	"""
@@ -48,11 +50,11 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
 		if FEATURES[4] == "I" :
 			SEQCLASSIFIED["TE"][FEATURES[0]]={"class":"I"}
 			# print(FEATURES[0])
-			orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE)
+			orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
 		####	classII
 		elif FEATURES[4] == "II":
 			SEQCLASSIFIED["TE"][FEATURES[0]]={"class":"II"}
-			orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE)
+			orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
 		####	NoCat
 		elif FEATURES[4] == "noCat":
 			SEQCLASSIFIED["noCat"][FEATURES[0]]={"class":"undefined"}
@@ -66,7 +68,7 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
 		SEQCLASSIFIED["potentialChimeric"][FEATURES[0]]={"class":"potentialChimeric"}
 		# print("chimere : %s %s %s" % (FEATURES[0], FEATURES[4], FEATURES[5]))
 
-def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
+def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	"""
 	Determine the order of a sequence. Doing so it complete a dictionnary containing the transposable element.
 	If the order wasn't found, the order's sequence is considered as unknown.
@@ -78,6 +80,8 @@ def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 4 dictionnaries (TE, nonTE, potentialChimeric and noCat)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
+	@type IDENTITYTHRESHOLD: integer
+	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
 
 	@rtype: None
 	"""
@@ -90,9 +94,9 @@ def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
 	####	 The order of the TE is determined : the superfamily of the TE will be determined
 	else:
 		SEQCLASSIFIED["TE"][FEATURES[0]]["order"]=FEATURES[5]
-		superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE)
+		superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
 
-def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
+def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	"""
 	Determine the superfamily of one sequence. Doing so it complete a dictionnary containing the transposable element.
 	If the superFamily can't be defined, it will be unknown.
@@ -104,6 +108,8 @@ def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 4 dictionnaries (TE, nonTE, potentialChimeric and noCat)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
+	@type IDENTITYTHRESHOLD: integer
+	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
 
 	@todo: Consider if POTENTIALCHIMERIC and NOCAT arguments are mandatory
 
@@ -115,7 +121,7 @@ def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
 		####	Split the coding part to obtain the different results according to the comparison with different databases (3 possibilties: TEBLRtx, TEBLRx and profiles)
 		databaseRecords = codingRecord.split(';')
 		####	Search if there are different names contained in the codingRecord
-		finalSuperFamilyName = search.searchDifferentName(FEATURES, SEQCLASSIFIED, databaseRecords, BASELINE)
+		finalSuperFamilyName = search.searchDifferentName(FEATURES, SEQCLASSIFIED, databaseRecords, BASELINE, IDENTITYTHRESHOLD)
 		####	Associate the superFamily name with the corresponding sequence into the right dictionnary
 		associateSuperFamily(FEATURES, SEQCLASSIFIED, finalSuperFamilyName)
 		# if FEATURES[0] in SEQCLASSIFIED["TE"]:
@@ -134,7 +140,7 @@ def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE):
 
 def associateSuperFamily(FEATURES, SEQCLASSIFIED, FINALSUPERFAMILYNAME):
 	"""
-	Associate the superFamily name for the sequence in the corresponding dictionnary (potentialChimeric if find potentialChimeric in FINALSUPERFAMILYNAME or TE else)
+	Associate the superFamily name for the sequence in the corresponding dictionnary (potentialChimeric if find potentialChimeric in FINALSUPERFAMILYNAME; else it will be TE)
 
 	Keyword arguments:
 	@type FEATURES: list

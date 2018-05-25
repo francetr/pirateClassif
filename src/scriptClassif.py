@@ -26,6 +26,7 @@ def main():
 	# print("####	Valid extension of the files\n")
 	pastecFile=args.classif
 	fastaFile=args.fasta
+	identityThreshold=args.identity
 	baselineFile=args.baseline
 	####	Reading of the baseline file ####
 	try:
@@ -39,7 +40,7 @@ def main():
 	####	Reading of the classif file ####
 	try:
 		print("####	Read of the classif file")
-		pastec=readInput.readPastec(pastecFile, seqClassified, baseline)
+		pastec=readInput.readPastec(pastecFile, seqClassified, baseline, identityThreshold)
 		print("####	End of reading of the classif file\n")
 	except IndexError:
 		print("/!\	Error: Error with the PASTEC file provided {}\n####	Classification aborted".format(pastecFile))
@@ -49,7 +50,7 @@ def main():
 	# 	print(seq, seqClassified["TE"][seq])
 	#
 	# print("TE : %s, noCat : %s, nonTE : %s, chimeric: %s" %(seqClassified["TE"], seqClassified["noCat"], seqClassified["nonTE"], seqClassified["potentialChimeric"]))
-	# print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(seqClassified["TE"]), len(sequencesCategorizednoCat), len(seqClassified["nonTE"]), len(seqClassified["potentialChimeric"]), (len(seqClassified["TE"])+len(seqClassified["noCat"])+len(seqClassified["nonTE"])+len(seqClassified["potentialChimeric"]))))
+	print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(seqClassified["TE"]), len(seqClassified["noCat"]), len(seqClassified["nonTE"]), len(seqClassified["potentialChimeric"]), (len(seqClassified["TE"])+len(seqClassified["noCat"])+len(seqClassified["nonTE"])+len(seqClassified["potentialChimeric"]))))
 	#
 	# print(seqClassified["TE"], len(seqClassified["TE"]))
 	# print(seqClassified["noCat"])

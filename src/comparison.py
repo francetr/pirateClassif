@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 # coding: utf8
-from collections import Counter
 
 """ @author: Tristan Frances """
 
-def superFamilyComparison(SUPERFAMILYFOUND, SUPERFAMILYASSOCIATED):
+def superFamilyComparison(SUPERFAMILYFOUND, SUPERFAMILYASSOCIATED, IDENTITYTHRESHOLD):
 	"""
 	Compare the different superFamilies found for one sequence. For this uses the method combinations of the package itertools allowing to combine 2 by 2 the different elements of a list.
 
@@ -13,16 +12,18 @@ def superFamilyComparison(SUPERFAMILYFOUND, SUPERFAMILYASSOCIATED):
 	@param SUPERFAMILYFOUND: count the names of the superfamily found for one sequence during the superFamilyDetermination.
 	@type SUPERFAMILYASSOCIATED: dictionnary
 	@param SUPERFAMILYASSOCIATED: dictionnary containing different superfamily names possible for a given superfamily.
+	@type IDENTITYTHRESHOLD: integer
+	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
 
 	@rtype: string
 	@return: name of the superfamily corresponding to the sequence.
 	"""
 	####	Compare all the keywords founded for one sequence (providing from blast or protProfiles) . Then the result is assigned to a string
-	name = compareKeywordsFounded(SUPERFAMILYFOUND["blast"], SUPERFAMILYFOUND["protProfiles"], SUPERFAMILYASSOCIATED["protProfiles"])
+	name = compareKeywordsFounded(SUPERFAMILYFOUND["blast"], SUPERFAMILYFOUND["protProfiles"], SUPERFAMILYASSOCIATED["protProfiles"], IDENTITYTHRESHOLD)
 	####	String for the final superFamily name
 	return name
 
-def compareKeywordsFounded(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
+def compareKeywordsFounded(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYTHRESHOLD):
 	"""
 	Comparison between the blast and the proteines profiles keywords to check if it's in accordance with Wicker classification.
 	This classification is implemented in the SUPERFAMILYASSOCIATED dictionnary. Key = blast keyword : Value = protProfile keywords possible
@@ -34,6 +35,8 @@ def compareKeywordsFounded(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
 	@param PROTPROFILES: All the proteines profiles keywords found and their count for a given sequence.
 	@type SUPERFAMILYASSOCIATED: dictionnary
 	@param SUPERFAMILYASSOCIATED: dictionnary containing the different superfamily names possible for a given proteine profile.
+	@type IDENTITYTHRESHOLD: integer
+	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
 
 	@rtype: string
 	@return: Name of the superFamily with different matches found.
@@ -48,7 +51,7 @@ def compareKeywordsFounded(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
 
 		####	ONE or MULTIPLE type of PROPROFILES keyword have been founded
 		elif len(PROTPROFILES) >= 1:
-			name = compareProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED)
+			name = compareProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYTHRESHOLD)
 
 	####	Second THREE CASES, Consider ONE blast keywords have been founded
 	elif len(BLAST) == 1:
@@ -60,17 +63,17 @@ def compareKeywordsFounded(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
 
 		####	ONE or MULTIPLE type of PROPROFILES keyword have been founded
 		elif len(PROTPROFILES) >= 1:
-			name = compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED)
+			name = compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYTHRESHOLD)
 
 	####	Last case, MULTIPLE BLAST keywords have been founded
 	elif len(BLAST) > 1:
 		name = "potentialChimeric"
 		for superFamily in BLAST:
 			name += str("_"+superFamily)
-	print(name)
+	# print(name, BLAST, PROTPROFILES)
 	return name
 
-def compareProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED):
+def compareProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYTHRESHOLD):
 	"""
 	Comparison between the blast and the proteines profiles keywords to check if it's in accordance with Wicker classification.
 	This classification is implemented in the SUPERFAMILYASSOCIATED dictionnary. Key = blast keyword : Value = protProfile keywords possible
@@ -80,6 +83,8 @@ def compareProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED):
 	@param PROTPROFILES: All the proteines profiles keywords found and their proportion for a given sequence.
 	@type SUPERFAMILYASSOCIATED: dictionnary
 	@param SUPERFAMILYASSOCIATED: dictionnary containing the different superfamily names possible for a given proteine profile.
+	@type IDENTITYTHRESHOLD: integer
+	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
 
 	@rtype: string
 	@return: Name of the superFamily.
@@ -93,8 +98,8 @@ def compareProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED):
 	####	Dictionnary that will contain all the superFamily name associated to PROTPROFILES and their percentage for the sequence
 	superFamilyAssociated = retrieveSuperFamilyAssociated(PROTPROFILES, SUPERFAMILYASSOCIATED)
 
-	####	Remove all the superFamily names founded with a percentage lesser than 75 %
-	uniqSuperFamilyAssociated = list([k for k in superFamilyAssociated if superFamilyAssociated[k] >= 75])
+	####	Remove all the superFamily names founded with a percentage lesser than IDENTITYTHRESHOLD (default is 100%):
+	uniqSuperFamilyAssociated = list([k for k in superFamilyAssociated if superFamilyAssociated[k] >= IDENTITYTHRESHOLD])
 
 	####	If only ONE superFamily name is associated to PROTPROFILES
 	if len(uniqSuperFamilyAssociated) == 1:
@@ -106,7 +111,7 @@ def compareProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED):
 			name += str("_" + proteine)
 	return name
 
-def compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
+def compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYTHRESHOLD):
 	"""
 	Comparison between the blast and the proteines profiles keywords to check if it's in accordance with Wicker classification.
 	This classification is implemented in the SUPERFAMILYASSOCIATED dictionnary with Key = blast keyword : Value = protProfile keywords possible
@@ -118,6 +123,8 @@ def compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
 	@param PROTPROFILES: All the proteines profiles keywords found and their proportion for a given sequence.
 	@type SUPERFAMILYASSOCIATED: dictionnary
 	@param SUPERFAMILYASSOCIATED: dictionnary containing the different superfamily names possible for a given proteine profile.
+	@type IDENTITYTHRESHOLD: integer
+	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
 
 	@rtype: string
 	@return: Name of the superFamily with differents matches found.
@@ -135,8 +142,8 @@ def compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED):
 	####	List that will contain all the superFamily name associated to PROTPROFILES
 	superFamilyAssociated = retrieveSuperFamilyAssociated(PROTPROFILES, SUPERFAMILYASSOCIATED)
 	for superFamily in superFamilyAssociated.keys():
-		####	check if the superFamily associated match with the BLAST AND its percentage is greater than 75%
-		if superFamily in BLAST and superFamilyAssociated[superFamily] >= 75:
+		####	check if the superFamily associated match with the BLAST AND its percentage is greater than IDENTITYTHRESHOLD (default is 100%)
+		if superFamily in BLAST and superFamilyAssociated[superFamily] >= IDENTITYTHRESHOLD:
 			superFamilyMatches.append(superFamily)
 
 	####	If the number of matches is 1, name is superFamily

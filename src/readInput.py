@@ -21,35 +21,14 @@ def retrieveArguments():
 	parser = argparse.ArgumentParser(prog="scriptClassif.py", description="This program is a part of the PiRATE project. It aims to automatized the step of TE classification")
 	parser.add_argument("classif", type=str, help="classif file that comes from PASTEC")
 	parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
-	parser.add_argument("baseline", type=str, nargs="?", default="base_reference.txt", help="baseline file giving the different names possible for a superfamily")
+	parser.add_argument("identity", type=int, nargs="?", default=100, help="Threshold for considering two sequences as identical")
+	parser.add_argument("--baseline", type=str, nargs="?", default="base_reference.txt", help="baseline file giving the different names possible for a superfamily")
 	args = parser.parse_args()
 	# checkArguments(args.classif, args.fasta)
 	return args
 
-# def checkArguments(CLASSIFNAME, FASTANAME):
-# 	"""
-# 	Check the extension of the two arguments of command line. If it is not correct, stop the programm.
-#
-# 	Keyword argument
-# 	@param CLASSIFNAME: name of the argument for the CLASSIF file
-# 	@param FASTANAME: name of the argument for the FASTA file
-#
-# 	@return: None
-#
-# 	"""
-# 	try:
-# 		classifName=re.match(r'[\S]*[/]?[\w\-.]+(classif)$',CLASSIFNAME).groups()[0] ####	regex checking is classif file as good extension
-# 	except AttributeError as e:
-# 		print("####	Wrong extension for the classif file\n####	 Classification aborted")
-# 		sys.exit(1)
-#
-# 	try:
-# 		fastaName=re.match(r'[\S]*[/]?[\w\-.]+(fasta)$', FASTANAME).groups()[0] ####	regex checking is fasta file as good extension
-# 	except AttributeError as e:
-# 		print("####	Wrong extension for the fasta file\n####	Classification aborted")
-# 		sys.exit(1)
 
-def readPastec(PASTEC, SEQCLASSIFIED, BASELINE):
+def readPastec(PASTEC, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	"""
 	Read a PASTEC file as input line by line, and then proceed to the categorization of each sequence.
 
@@ -60,6 +39,8 @@ def readPastec(PASTEC, SEQCLASSIFIED, BASELINE):
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 4 dictionnaries (TE, nonTE, potentialChimeric and noCat)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
+	@type IDENTITYTHRESHOLD: integer
+	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
 
 	@rtype: None
 	"""
@@ -70,7 +51,7 @@ def readPastec(PASTEC, SEQCLASSIFIED, BASELINE):
 			####	Parse every line/sequence of the file
 			for line in f:
 				sequence=line.replace("\t\t", "\t").strip() # remove the first column double tab and carriage return of the line
-				categorization.initCategorization(sequence, SEQCLASSIFIED, BASELINE)
+				categorization.initCategorization(sequence, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
 				# print("Summary, sequences find by type :\nTE : {}\nnonTE : {}\nnoCat : {}\npotentialChimeric : {}\nTotal : {}".format(len(TE),\
 				# len(nonTE), len(noCat), len(potentialChimeric), (len(TE)+len(nonTE)+len(noCat)+len(potentialChimeric))))
 			print("End of the categorization\n")
@@ -126,7 +107,6 @@ def readBlastBaselineKeywords(SPECIFICKEYWORDS, BASELINEDICTIONNARY):
 	@type BASELINEDICTIONNARY: dictionnary
 	@param BASELINEDICTIONNARY: Dictionnary containing all the keywords founded in the BASELINE fileself.
 	It contains 2 key, one for the storage of specific keywords and the other for the storage of specific keywords.
-
 
 	@rtype: None
 	"""
@@ -199,3 +179,26 @@ def readFasta(FASTA):
 		####	prevent the opening if the file name is incorrect
 		print("/!\	Error: No such file as {}\n####	Classification aborted".format(FASTA))
 		sys.exit(1)
+
+# def checkArguments(CLASSIFNAME, FASTANAME):
+# 	"""
+# 	Check the extension of the two arguments of command line. If it is not correct, stop the programm.
+#
+# 	Keyword argument
+# 	@param CLASSIFNAME: name of the argument for the CLASSIF file
+# 	@param FASTANAME: name of the argument for the FASTA file
+#
+# 	@return: None
+#
+# 	"""
+# 	try:
+# 		classifName=re.match(r'[\S]*[/]?[\w\-.]+(classif)$',CLASSIFNAME).groups()[0] ####	regex checking is classif file as good extension
+# 	except AttributeError as e:
+# 		print("####	Wrong extension for the classif file\n####	 Classification aborted")
+# 		sys.exit(1)
+#
+# 	try:
+# 		fastaName=re.match(r'[\S]*[/]?[\w\-.]+(fasta)$', FASTANAME).groups()[0] ####	regex checking is fasta file as good extension
+# 	except AttributeError as e:
+# 		print("####	Wrong extension for the fasta file\n####	Classification aborted")
+# 		sys.exit(1)

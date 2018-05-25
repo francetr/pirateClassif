@@ -6,7 +6,7 @@
 import re
 import comparison
 
-def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE):
+def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDENTITYTHRESHOLD):
 	"""
 	If the superFamily can't be defined, it will be unknown.
 	The name is recovered from two : the hmm profiles (profiles part) and REPET (TE_BLRx and TE_BLRtx part).
@@ -20,6 +20,8 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE):
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 4 dictionnaries (TE, nonTE, potentialChimeric and noCat)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
+	@type IDENTITYTHRESHOLD: integer
+	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
 
 	@rtype: string
 	@return: SuperFamily name of the sequence
@@ -46,7 +48,8 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE):
 	####	String that will contain the final supefamily name of the sequence
 	finalSuperFamilyName = ""
 	####	Do a comparison between the keywords founded
-	finalSuperFamilyName = comparison.superFamilyComparison(superFamilyFound, BASELINE)
+	finalSuperFamilyName = comparison.superFamilyComparison(superFamilyFound, BASELINE, IDENTITYTHRESHOLD)
+	print("id: %s; BLAST : %s; PROTPROFILES : %s; FINALNAME : %s "%(FEATURES[0], superFamilyFound["blast"], superFamilyFound["protProfiles"], finalSuperFamilyName))
 	return finalSuperFamilyName
 
 def searchProfilesName(FEATURES, DATABASERECORD, PROFILESFOUND, BASELINE):
