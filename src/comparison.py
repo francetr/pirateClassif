@@ -99,7 +99,7 @@ def compareProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYTHRESHOLD):
 	superFamilyAssociated = retrieveSuperFamilyAssociated(PROTPROFILES, SUPERFAMILYASSOCIATED)
 
 	####	Remove all the superFamily names founded with a percentage lesser than IDENTITYTHRESHOLD (default is 100%):
-	uniqSuperFamilyAssociated = list([k for k in superFamilyAssociated if superFamilyAssociated[k] >= IDENTITYTHRESHOLD])
+	uniqSuperFamilyAssociated = list([k for k in superFamilyAssociated if superFamilyAssociated[k][1] >= IDENTITYTHRESHOLD])
 
 	####	If only ONE superFamily name is associated to PROTPROFILES
 	if len(uniqSuperFamilyAssociated) == 1:
@@ -143,9 +143,8 @@ def compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED, IDEN
 	superFamilyAssociated = retrieveSuperFamilyAssociated(PROTPROFILES, SUPERFAMILYASSOCIATED)
 	for superFamily in superFamilyAssociated.keys():
 		####	check if the superFamily associated match with the BLAST AND its percentage is greater than IDENTITYTHRESHOLD (default is 100%)
-		if superFamily in BLAST and superFamilyAssociated[superFamily] >= IDENTITYTHRESHOLD:
+		if superFamily in BLAST and superFamilyAssociated[superFamily][1] >= IDENTITYTHRESHOLD:
 			superFamilyMatches.append(superFamily)
-
 	####	If the number of matches is 1, name is superFamily
 	if len(superFamilyMatches) == 1:
 		name += str(superFamilyMatches[0])
@@ -171,7 +170,8 @@ def retrieveSuperFamilyAssociated(PROTPROFILE, SUPERFAMILYASSOCIATED):
 	@param SUPERFAMILYASSOCIATED: dictionnary containing the different superfamily names possible for a given proteine profile.
 
 	@rtype: dictionnary
-	@return: dictionnary of all the superFamily names associated to the proteine profile and their percentage.
+	@return: dictionnary of all the superFamily names associated to the proteine profile as key.
+	And a list of their count [0] and their percentage [1] in the sequence as value.
 	"""
 	####	List that will contain the superFamily name associated to PROTPROFILE
 	finalSuperFamilyAssociated = {}
@@ -184,9 +184,11 @@ def retrieveSuperFamilyAssociated(PROTPROFILE, SUPERFAMILYASSOCIATED):
 			for superFamily in SUPERFAMILYASSOCIATED[proteine]:
 				####	If the superFamily associated is not in the list of finalSuperFamilyAssociated, add this superFamily in the list with its percentage
 				if not superFamily in finalSuperFamilyAssociated.keys():
-					finalSuperFamilyAssociated[superFamily] = PROTPROFILE[proteine]
+					finalSuperFamilyAssociated[superFamily] = list(PROTPROFILE[proteine])
 				####	If the superFamily associated is already in the list of finalSuperFamilyAssociated, add this superFamily in the list with its percentage
 				else:
-					finalSuperFamilyAssociated[superFamily] += PROTPROFILE[proteine]
-
+					####	Increment the counter of the superFamily name
+					finalSuperFamilyAssociated[superFamily][0] += list(PROTPROFILE[proteine])[0]
+					####	Increment the percentage of the superFamily name
+					finalSuperFamilyAssociated[superFamily][1] += list(PROTPROFILE[proteine])[1]
 	return finalSuperFamilyAssociated

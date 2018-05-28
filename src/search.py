@@ -88,17 +88,17 @@ def searchProfilesName(FEATURES, DATABASERECORD, PROFILESFOUND, BASELINE):
 					if not protProfilesKeyword in PROFILESFOUND:
 						####	Consider that keyword Tase and Tase* have the same counter
 						if protProfilesKeyword == "Tase" or protProfilesKeyword == "Tase*":
-							PROFILESFOUND["Tase"]=1
+							PROFILESFOUND["Tase"]=[1]
 						####	Counter for all the rest of the possibles keywords
 						else:
-							PROFILESFOUND[protProfilesKeyword]=1
+							PROFILESFOUND[protProfilesKeyword]=[1]
 
 					####	If the keyword has already been found in the PROFILESFOUND dictionnary, its counter is incremented by 1
 					else:
 						if protProfilesKeyword == "Tase" or protProfilesKeyword == "Tase*":
-							PROFILESFOUND["Tase"]+=1
+							PROFILESFOUND["Tase"][0]+=1
 						else:
-							PROFILESFOUND[protProfilesKeyword]+=1
+							PROFILESFOUND[protProfilesKeyword][0]+=1
 
 			####	If there is no matches between the string and the baseline, print the string
 			if not keywordFound:
@@ -106,7 +106,6 @@ def searchProfilesName(FEATURES, DATABASERECORD, PROFILESFOUND, BASELINE):
 
 		except AttributeError:
 			print('Issue during searching profiles on : '+ substr)
-
 
 def searchBlastName(FEATURES, DATABASERECORD, BLASTFOUND, BASELINE):
 	"""
@@ -140,10 +139,10 @@ def searchBlastName(FEATURES, DATABASERECORD, BLASTFOUND, BASELINE):
 					keywordFound=True
 					####	If the keyword hasn't been found in the BLASTFOUND dictionnary, we creates its value in BLASTFOUND and define its counter as 1
 					if not blastKeyword in BLASTFOUND:
-						BLASTFOUND[blastKeyword]=1
+						BLASTFOUND[blastKeyword]=[1]
 					####	If the keyword has already been found in the BLASTFOUND dictionnary, its counter is incremented by 1
 					else:
-						BLASTFOUND[blastKeyword]+=1
+						BLASTFOUND[blastKeyword][0]+=1
 
 			####	If there is no matches between the string and the baseline, print the string
 			if not keywordFound:
@@ -162,16 +161,15 @@ def percentageCalculation(KEYWORDFOUND):
 
 	@rtype: None
 	"""
-	# TODO Check if usefull
 	####	Calculus of the percentage of each superFamilyName found for this sequence
-	tot = 0
-	####	Dictionnary that will contains the percentage of the superFamilyNames found
-	percent = {}
-	####	Calculus of the total superFamilyName
-	for key in KEYWORDFOUND.keys():
-		tot+=KEYWORDFOUND[key]
+	tot = 0.0
 
-	####	Calculus of the percentage for each superFamilyName found
+	####	Calculus of the total keywords found in KEYWORDFOUND (can be BLAST or PROTPROFILES)
 	for key in KEYWORDFOUND.keys():
-		percentage=round(KEYWORDFOUND[key]/tot*100, 1)
-		KEYWORDFOUND[key]=percentage
+		tot+=KEYWORDFOUND[key][0]
+
+	####	Calculus of the percentage (round to 1 digit after the comma) for each superFamilyName found
+	for key in KEYWORDFOUND.keys():
+		percentage=round(KEYWORDFOUND[key][0]/tot*100, 1)
+		####	Add the value of percentage in a list where index [0] = counter of keyword and index [1] = percentage of this keyword
+		KEYWORDFOUND[key].append(percentage)
