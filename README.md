@@ -13,13 +13,13 @@ _http://www.seanoe.org/data/00406/51795/_
 The script will retrieve the class, order and superfamily for each sequence in this file.
 
 * ***baselineFile*** : File containing the baseline of the superFamilies names (multiple names can define the same superFamily). This is useful to determine if a sequence can be classified as multiple families or if its superFamily is not defined yet. By default it is ***base&#95;reference.txt*** which is used.  
-For the classification step, we used _specific_ and _non specific_ keywords. The first concerned keywords that can be find in the ***TE&#95;BLRx*** or ***TE&#95;BLRtx*** part of coding, and the last can be found in the ***profiles*** part.  
+For the classification step, we used ***blast*** and ***protProfiles*** keywords. The first concerned keywords that can be find in the ***TE&#95;BLRx*** or ***TE&#95;BLRtx*** part of coding, and the last can be found in the ***profiles*** part.  
 This file can be completed, for this, you just need to enter the new family name in a new line followed by a _tabulation_ and the different names (separated by _:_ ) that can design this superfamily.  
 Example :
 > Mariner&nbsp;&nbsp;&nbsp;&nbsp;Tc1-mariner:mariner:TASE  
 > &gt;TASE&nbsp;&nbsp;&nbsp;&nbsp;Mariner:hAT:PIF-Harbinger:PiggyBac:Merlin:Transib:CACTA:P
 
-* ***fastaFile*** : Original file containing the sequences used. Usefull to retrieve the sequences after the classification has be done
+* ***fastaFile*** : File containing the fasta sequences used to run PASTEC tool. Usefull to retrieve the sequences after the classification has be done.
 
 
 ## Command line to launch the script:
@@ -34,11 +34,15 @@ Hence multiple command line can be used to launch the script
 
 >example:
 
-~~~ python
+
+~~~{bash}
 python3 src/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta
 python3 src/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta 75
-python3 src/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta --basline new_base_reference.txt
+python3 src/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta --baseline new_base_reference.txt
+python3 src/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta 75 --baseline new_base_reference.txt
 ~~~
+
+
 
 </br>
 It can also be launched by executing itself (be sure the permission for execution are granted for the script)
@@ -46,13 +50,13 @@ It can also be launched by executing itself (be sure the permission for executio
 
 >example:
 
-~~~ python
+~~~{bash}
 ./src/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta
 ~~~
 
 </br>
 For help, type the command
-~~~ python
+~~~{bash}
 python3 src/scriptClassif.py -h
 ~~~
 
@@ -68,5 +72,5 @@ Before these informations are determined, the type of the sequence is first esta
 According the type of the sequence, the script will determine the class, order, and superFamily of the pastec output.
 
 ## How the superFamily determination work:
-
+The diagram above show the diffent possibilities which can be founded during the keywords comparison used for the superFamily determination.
 ![Comparison](./diagrammes/Diagramme_comparaison_superfamille.jpeg)
