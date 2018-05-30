@@ -15,7 +15,7 @@ The script will retrieve the class, order and superfamily for each sequence in t
 * ***baselineFile*** : File containing the baseline of the superFamilies names (multiple names can define the same superFamily). This is useful to determine if a sequence can be classified as multiple families or if its superFamily is not defined yet. By default it is ***base&#95;reference.txt*** which is used.  
 For the classification step, we used ***blast*** and ***protProfiles*** keywords. The first concerned keywords that can be find in the ***TE&#95;BLRx*** or ***TE&#95;BLRtx*** part of coding, and the last can be found in the ***profiles*** part.  
 This file can be completed, for this, you just need to enter the new family name in a new line followed by a _tabulation_ and the different names (separated by _:_ ) that can design this superfamily.  
-Example :
+> Example :  
 > Mariner&nbsp;&nbsp;&nbsp;&nbsp;Tc1-mariner:mariner:TASE  
 > &gt;TASE&nbsp;&nbsp;&nbsp;&nbsp;Mariner:hAT:PIF-Harbinger:PiggyBac:Merlin:Transib:CACTA:P
 
@@ -26,7 +26,7 @@ Example :
 Four arguments can be passed onto the command line but two arguments are mandatory, the third and the fourth are optionnal.
 1. The first is the **output** file of PASTEC, usually with an extension ***.txt***
 2. The second is the **fasta** file used for PASTEC, usually with an extension ***.fasta***
-3. The third is the identity threshold (in percentage) by which the superFamily name will be determined for a sequence, by default it will be ***100%***.
+3. The third is the identity threshold (in percentage) by which the superFamily name will be determined for a sequence. By default it will be ***100&#37;*** but it can be changed with the argument -e.
 4. The third is the **baseline** file, by default it will be ***base&#95;reference.txt*** but it can be changed with the argument ***--baseline*** followed by the name of the new baseline file to use.
 
 Hence multiple command line can be used to launch the script
@@ -37,9 +37,9 @@ Hence multiple command line can be used to launch the script
 
 ~~~{bash}
 python3 src/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta
-python3 src/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta 75
+python3 src/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta -e 75
 python3 src/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta --baseline new_base_reference.txt
-python3 src/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta 75 --baseline new_base_reference.txt
+python3 src/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta -e 75 --baseline new_base_reference.txt
 ~~~
 
 
@@ -55,9 +55,10 @@ It can also be launched by executing itself (be sure the permission for executio
 ~~~
 
 </br>
-For help, type the command
+For help, you can type the command
+
 ~~~{bash}
-python3 src/scriptClassif.py -h
+python3 scriptClassif.py -h
 ~~~
 
 
@@ -73,4 +74,4 @@ According the type of the sequence, the script will determine the class, order, 
 
 ## How the superFamily determination work:
 The diagram above show the diffent possibilities which can be founded during the keywords comparison used for the superFamily determination.
-![Comparison](./diagrammes/Diagramme_comparaison_superfamille.jpeg)
+![Comparison](./diagrammes/Diagramme_comparaison_superfamille_en.jpeg)
