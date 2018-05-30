@@ -17,16 +17,17 @@ import save
 
 def main():
 	print("Start of the classification\n")
-	####	 Instanciation of a dictionnary that will contain 4 dictionnaries (4 keys, one for each categories: nonTE, TE, potentialChimeric and noCat) that will contain the results
-	seqClassified = {"nonTE" : {}, "potentialChimeric" : {},  "noCat" : {}, "TE" : {}}
+	####	Instanciation of a dictionnary that will contain 5 dictionnaries (5 keys, one for each categories: nonTE, TE, potentialChimeric and noCat)
+	####	that will contain the results and a log
+	seqClassified = {"nonTE" : {}, "potentialChimeric" : {},  "noCat" : {}, "TE" : {}, "log":{}}
 
-	####	 retrieve and check the arguments used in command line
+	####	 retrieve the arguments used in command line
 	print("####	Recovery of the arguments\n")
 	args = readInput.retrieveArguments();
-	# print("####	Valid extension of the files\n")
+	####	store the arguments into different variables
 	pastecFile=args.classif
 	fastaFile=args.fasta
-	identityThreshold=args.identity
+	identityThreshold=args.i
 	baselineFile=args.baseline
 	####	Reading of the baseline file ####
 	try:
@@ -56,19 +57,14 @@ def main():
 	# print(seqClassified["noCat"])
 	#
 	####	Reading of the fasta file ####
-	# try:
-	# 	print("####	Read of the FASTA file")
-	# 	fasta=readInput.readFasta(fastaFile)
-	# 	print("####	End of reading of the FASTA file\n")
-	# 	# for key in fasta.keys():
-	# 	# 	print(">%s :\n%s\n" %(key, fasta[key]["seq"]))
-	# except IndexError:
-	# 	print("/!\ Error: Error with the Fasta file provided {}\n####	Classification aborted".format(fastaFile))
-	# 	sys.exit(1)
-	# save.save(fasta, seqClassified)
-
-
-
+	try:
+		print("####	Read of the FASTA file")
+		fasta=readInput.readFasta(fastaFile)
+		print("####	End of reading of the FASTA file\n")
+	except IndexError:
+		print("/!\ Error: Error with the Fasta file provided {}\n####	Classification aborted".format(fastaFile))
+		sys.exit(1)
+	save.save(fasta, seqClassified)
 
 
 ####################

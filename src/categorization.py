@@ -27,6 +27,7 @@ def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	"""
 	features=SEQUENCE.split("\t")
 	classDetermination(features, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
+	SEQCLASSIFIED["log"][features[0]]+="\n"
 
 
 def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
@@ -44,12 +45,13 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 
 	@rtype: None
 	"""
+	####	Initialize a log for concerned sequences that will be put into a log file
+	SEQCLASSIFIED["log"][FEATURES[0]]=str(FEATURES[0] + "\t" + FEATURES[4] + "\t")
 	####	Check first if the sequence is chimeric
 	if FEATURES[3] != "PotentialChimeric":
 		####	Check the class of the sequence if it is not chimeric : class I
 		if FEATURES[4] == "I" :
 			SEQCLASSIFIED["TE"][FEATURES[0]]={"class":"I"}
-			# print(FEATURES[0])
 			orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
 		####	classII
 		elif FEATURES[4] == "II":
@@ -58,15 +60,11 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 		####	NoCat
 		elif FEATURES[4] == "noCat":
 			SEQCLASSIFIED["noCat"][FEATURES[0]]={"class":"undefined"}
-			# print("NoCat : %s %s" % (FEATURES[4], FEATURES[5]))
-			# pass
 		####	 NonTE
 		else:
 			SEQCLASSIFIED["nonTE"][FEATURES[0]]={"class":"nonTE"}
-			# print("NA : %s %s" % (FEATURES[4], FEATURES[5]))
 	else:
 		SEQCLASSIFIED["potentialChimeric"][FEATURES[0]]={"class":"potentialChimeric"}
-		# print("chimere : %s %s %s" % (FEATURES[0], FEATURES[4], FEATURES[5]))
 
 def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	"""
@@ -85,9 +83,10 @@ def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 
 	@rtype: None
 	"""
+	SEQCLASSIFIED["log"][FEATURES[0]] += str("\t" + FEATURES[5] + "\t")
 	####	 The order of the TE is not determined, the superfamily of the TE will not be determined
 	if FEATURES[5] == "noCat" :
-		SEQCLASSIFIED["TE"][FEATURES[0]]["order"]="unknown"
+		SEQCLASSIFIED["TE"][FEATURES[0]]["order"]="undefined"
 	####	 The order of the TE is a MITE, a LARD or a TRIM : the superfamily of the TE will not be determined
 	elif FEATURES[5] == "MITE" or FEATURES[5] == "LARD" or FEATURES[5] == "TRIM" :
 		SEQCLASSIFIED["TE"][FEATURES[0]]["order"]=FEATURES[5]
@@ -124,14 +123,6 @@ def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOL
 		finalSuperFamilyName = search.searchDifferentName(FEATURES, SEQCLASSIFIED, databaseRecords, BASELINE, IDENTITYTHRESHOLD)
 		####	Associate the superFamily name with the corresponding sequence into the right dictionnary
 		associateSuperFamily(FEATURES, SEQCLASSIFIED, finalSuperFamilyName)
-		# if FEATURES[0] in SEQCLASSIFIED["TE"]:
-		# 	print(FEATURES[7], "\n", SEQCLASSIFIED["TE"][FEATURES[0]], "\n")
-		# elif FEATURES[0] in SEQCLASSIFIED["potentialChimeric"]:
-		# 	print(FEATURES[7], "\n", SEQCLASSIFIED["potentialChimeric"][FEATURES[0]], "\n")
-		# elif FEATURES[0] in SEQCLASSIFIED["nonTE"]:
-		# 	print(FEATURES[7], "\n", SEQCLASSIFIED["nonTE"][FEATURES[0]], "\n")
-		# elif FEATURES[0] in SEQCLASSIFIED["noCat"]:
-		# 	print(FEATURES[7], "\n", SEQCLASSIFIED["noCat"][FEATURES[0]], "\n")
 
 	except AttributeError:
 		####	If there is no coding part : declaration of superfamily as undefined

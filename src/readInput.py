@@ -21,7 +21,7 @@ def retrieveArguments():
 	parser = argparse.ArgumentParser(prog="scriptClassif.py", description="This program is a part of the PiRATE project. It aims to automatized the step of TE classification")
 	parser.add_argument("classif", type=str, help="classif file that comes from PASTEC")
 	parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
-	parser.add_argument("identity", type=int, nargs="?", default=100, help="Threshold for considering two sequences as identical")
+	parser.add_argument("-i", metavar="IDENTITY", type=int, nargs="?", default=100, help="Threshold for considering two sequences as identical, enter an integer from 0 to 100, default is 100.")
 	parser.add_argument("--baseline", type=str, nargs="?", default="base_reference.txt", help="baseline file giving the different names possible for a superfamily")
 	args = parser.parse_args()
 	# checkArguments(args.classif, args.fasta)
@@ -52,8 +52,6 @@ def readPastec(PASTEC, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 			for line in f:
 				sequence=line.replace("\t\t", "\t").strip() # remove the first column double tab and carriage return of the line
 				categorization.initCategorization(sequence, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
-				# print("Summary, sequences find by type :\nTE : {}\nnonTE : {}\nnoCat : {}\npotentialChimeric : {}\nTotal : {}".format(len(TE),\
-				# len(nonTE), len(noCat), len(potentialChimeric), (len(TE)+len(nonTE)+len(noCat)+len(potentialChimeric))))
 			print("End of the categorization\n")
 
 	except FileNotFoundError:

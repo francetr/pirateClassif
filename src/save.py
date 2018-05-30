@@ -3,7 +3,7 @@
 
 """ @author: Tristan Frances """
 
-def save(FASTA, SEQUENCESCLASSIFIED):
+def save(FASTA, SEQCLASSIFIED):
 	"""
 
 	Save the categorized sequences in different FASTA files.
@@ -11,16 +11,17 @@ def save(FASTA, SEQUENCESCLASSIFIED):
 	Keyword arguments:
 	@type FASTA: dictionnary
 	@param FASTA: dictionnary with the nucleotide sequence which has been categorized
-	@type SEQUENCESCLASSIFIED: dictionnary
-	@param SEQUENCESCLASSIFIED: dictionnary storing the result of the classification into 4 dictionnaries (TE, nonTE, potentialChimeric and noCat)
+	@type SEQCLASSIFIED: dictionnary
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 4 dictionnaries (TE, nonTE, potentialChimeric and noCat)
 
 	@rtype: None
 	"""
 	#TODO: Organize the way TE are saved
-	saveNoCat(FASTA, SEQUENCESCLASSIFIED["noCat"])
-	savePotentialChimeric(FASTA, SEQUENCESCLASSIFIED["potentialChimeric"])
-	saveTE(FASTA, SEQUENCESCLASSIFIED["TE"])
-	saveNonTE(FASTA, SEQUENCESCLASSIFIED["nonTE"])
+	saveNoCat(FASTA, SEQCLASSIFIED["noCat"])
+	savePotentialChimeric(FASTA, SEQCLASSIFIED["potentialChimeric"])
+	saveTE(FASTA, SEQCLASSIFIED["TE"])
+	saveNonTE(FASTA, SEQCLASSIFIED["nonTE"])
+	saveLog(SEQCLASSIFIED["log"])
 
 def saveNoCat(FASTA, NOCAT):
 	"""
@@ -105,3 +106,21 @@ def saveNonTE(FASTA, NONTE):
 	with open(saveFileName, "w") as f:
 		for id in NONTE.keys():
 			f.write(">{id}:{seqClass}\n{seq}\n".format(id=id, seqClass=NONTE[id]["class"], seq=FASTA[id]["seq"]))
+
+def saveLog(LOG):
+	"""
+
+	Save the log of the classification steps.
+
+	Keyword arguments:
+	@type LOG: string
+	@param LOG: Proofs used during the classification step
+
+	@rtype: None
+	"""
+	saveFileName = "log.txt"
+	print("Save log of proofs used for classification of the sequences into \"%s\" file"%(saveFileName))
+	with open(saveFileName, "w") as f:
+		f.write("Sequence name\tClass Found\tOrder found\tProofs for superFamily classification\tSuperFamily found\n")
+		for sequence in LOG:
+			f.write(LOG[sequence])
