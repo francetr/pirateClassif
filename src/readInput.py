@@ -21,9 +21,13 @@ def retrieveArguments():
 	parser = argparse.ArgumentParser(prog="scriptClassif.py", description="This program is a part of the PiRATE project. It aims to automatized the step of TE classification")
 	parser.add_argument("classif", type=str, help="classif file that comes from PASTEC")
 	parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
-	parser.add_argument("-i", metavar="IDENTITY", type=int, nargs="?", default=100, help="Threshold for considering two sequences as identical, enter an integer from 0 to 100, default is 100.")
+	parser.add_argument("-e", metavar="IDENTITY", type=int, nargs="?", default=100, help="Threshold for considering two sequences as identical, enter an integer from 0 to 100, default is 100.")
 	parser.add_argument("--baseline", type=str, nargs="?", default="base_reference.txt", help="baseline file giving the different names possible for a superfamily")
 	args = parser.parse_args()
+	if args.e >= 100:
+		args.e = 100
+	elif args.e <= 0:
+		args.e = 0
 	# checkArguments(args.classif, args.fasta)
 	return args
 

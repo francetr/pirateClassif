@@ -27,7 +27,7 @@ def main():
 	####	store the arguments into different variables
 	pastecFile=args.classif
 	fastaFile=args.fasta
-	identityThreshold=args.i
+	identityThreshold=args.e
 	baselineFile=args.baseline
 	####	Reading of the baseline file ####
 	try:

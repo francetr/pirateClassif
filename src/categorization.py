@@ -49,13 +49,9 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	SEQCLASSIFIED["log"][FEATURES[0]]=str(FEATURES[0] + "\t" + FEATURES[4] + "\t")
 	####	Check first if the sequence is chimeric
 	if FEATURES[3] != "PotentialChimeric":
-		####	Check the class of the sequence if it is not chimeric : class I
-		if FEATURES[4] == "I" :
-			SEQCLASSIFIED["TE"][FEATURES[0]]={"class":"I"}
-			orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
-		####	classII
-		elif FEATURES[4] == "II":
-			SEQCLASSIFIED["TE"][FEATURES[0]]={"class":"II"}
+		####	Check the class of the sequence if it is not chimeric : class I or II
+		if FEATURES[4] == "I" or FEATURES[4] == "II" :
+			SEQCLASSIFIED["TE"][FEATURES[0]]={"class":FEATURES[4]}
 			orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
 		####	NoCat
 		elif FEATURES[4] == "noCat":
