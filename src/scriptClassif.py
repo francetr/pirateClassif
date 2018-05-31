@@ -17,18 +17,22 @@ import save
 
 def main():
 	print("Start of the classification\n")
-	####	Instanciation of a dictionnary that will contain 5 dictionnaries (5 keys, one for each categories: nonTE, TE, potentialChimeric and noCat)
-	####	that will contain the results and a log
-	seqClassified = {"nonTE" : {}, "potentialChimeric" : {},  "noCat" : {}, "TE" : {}, "log":{}}
+	####	Instanciation of a dictionnary with the id of the sequence as key and the values will contain 6 dictionnaries
+	####	(5 keys, one for each categories: nonTE, TE, potentialChimeric and noCat and one for the log)
+	seqClassified = {}
 
 	####	 retrieve the arguments used in command line
 	print("####	Recovery of the arguments\n")
 	args = readInput.retrieveArguments();
 	####	store the arguments into different variables
 	pastecFile=args.classif
+	print("The pastec file used is %s"%(pastecFile))
 	fastaFile=args.fasta
+	print("The FASTA file used is %s"%(fastaFile))
 	identityThreshold=args.e
+	print("The identity threshold used is {identity} %".format(identity=identityThreshold))
 	baselineFile=args.baseline
+	print("The baseline file used is %s"%(baselineFile))
 	####	Reading of the baseline file ####
 	try:
 		print("####	Import of the Baseline file")
@@ -47,14 +51,10 @@ def main():
 		print("/!\	Error: Error with the PASTEC file provided {}\n####	Classification aborted".format(pastecFile))
 		sys.exit(1)
 
-	# for seq in seqClassified["TE"].keys():
-	# 	print(seq, seqClassified["TE"][seq])
-	#
+	# for seq in seqClassified:
+	# 	print(seqClassified[seq])
 	# print("TE : %s, noCat : %s, nonTE : %s, chimeric: %s" %(seqClassified["TE"], seqClassified["noCat"], seqClassified["nonTE"], seqClassified["potentialChimeric"]))
-	print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(seqClassified["TE"]), len(seqClassified["noCat"]), len(seqClassified["nonTE"]), len(seqClassified["potentialChimeric"]), (len(seqClassified["TE"])+len(seqClassified["noCat"])+len(seqClassified["nonTE"])+len(seqClassified["potentialChimeric"]))))
-	#
-	# print(seqClassified["TE"], len(seqClassified["TE"]))
-	# print(seqClassified["noCat"])
+	# print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(len(seqClassified["TE"]), len(seqClassified["noCat"]), len(seqClassified["nonTE"]), len(seqClassified["potentialChimeric"]), (len(seqClassified["TE"])+len(seqClassified["noCat"])+len(seqClassified["nonTE"])+len(seqClassified["potentialChimeric"]))))
 	#
 	####	Reading of the fasta file ####
 	try:

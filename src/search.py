@@ -17,7 +17,10 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDEN
 	@type DATABASERECORDS: list
 	@param DATABASERECORDS: list of string in which there are the superFamily name to search.
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 4 dictionnaries (TE, nonTE, potentialChimeric and noCat)
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 5 dictionnaries :
+		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
+		- 3 : for the results (class, order and superFamily)
+		- 1 : for the log (log)	@type BASELINE: dictionnary
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 	@type IDENTITYTHRESHOLD: integer
@@ -50,8 +53,7 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDEN
 	####	Do a comparison between the keywords founded
 	finalSuperFamilyName = comparison.superFamilyComparison(superFamilyFound, BASELINE, IDENTITYTHRESHOLD)
 	####	 save the different proofs found for the name determination of the sequence
-	SEQCLASSIFIED["log"][FEATURES[0]]+=str("BLAST : %s; PROTPROFILES : %s; FINALNAME : %s \t"%(superFamilyFound["blast"], superFamilyFound["protProfiles"], finalSuperFamilyName))
-
+	SEQCLASSIFIED[FEATURES[0]]["log"]+=str("BLAST : %s\tPROTPROFILES : %s\tFINALNAME : %s"%(superFamilyFound["blast"], superFamilyFound["protProfiles"], finalSuperFamilyName))
 	return finalSuperFamilyName
 
 def searchProfilesName(FEATURES, DATABASERECORD, PROFILESFOUND, BASELINE):
@@ -105,7 +107,7 @@ def searchProfilesName(FEATURES, DATABASERECORD, PROFILESFOUND, BASELINE):
 			####	If there is no matches between the string and the baseline, print the string
 			if not keywordFound:
 				print("/!\	Sequence : %s No match in the string %s with BASELINE"%(FEATURES[0], substr))
-				SEQCLASSIFIED["log"][FEATURES[0]] += str("\t /!\ Don't find any keyword for profile search in {} \t").format(substr)
+				SEQCLASSIFIED[FEATURES[0]]["log"] += str("\t /!\ Don't find any keyword for profile search in {} \t").format(substr)
 
 		except AttributeError:
 			print('Issue during searching profiles on : '+ substr)
@@ -150,7 +152,7 @@ def searchBlastName(FEATURES, DATABASERECORD, BLASTFOUND, BASELINE):
 			####	If there is no matches between the string and the baseline, print the string
 			if not keywordFound:
 				print("/!\	Sequence : %s No match in the string %s with BASELINE"%(FEATURES[0], substr))
-				SEQCLASSIFIED["log"][FEATURES[0]] += str("\t /!\ Don't find any keyword for blast search in {} \t").format(substr)
+				SEQCLASSIFIED[FEATURES[0]]["log"] += str("\t /!\ Don't find any keyword for blast search in {} \t").format(substr)
 
 		except AttributeError:
 			print('Issue during searching RepBase name on : '+ substr)

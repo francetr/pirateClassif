@@ -21,11 +21,13 @@ def retrieveArguments():
 	parser = argparse.ArgumentParser(prog="scriptClassif.py", description="This program is a part of the PiRATE project. It aims to automatized the step of TE classification")
 	parser.add_argument("classif", type=str, help="classif file that comes from PASTEC")
 	parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
-	parser.add_argument("-e", metavar="IDENTITY", type=int, nargs="?", default=100, help="Threshold for considering two sequences as identical, enter an integer from 0 to 100, default is 100.")
+	parser.add_argument("-e", metavar="IDENTITY", type=float, nargs="?", default=100, help="Threshold for considering two sequences as identical, enter an integer from 0 to 100, default is 100.")
 	parser.add_argument("--baseline", type=str, nargs="?", default="base_reference.txt", help="baseline file giving the different names possible for a superfamily")
 	args = parser.parse_args()
+	####	If identity threshold > 100 convert it to the value 100
 	if args.e >= 100:
 		args.e = 100
+	####	If identity threshold =< 0 convert it to the value 0
 	elif args.e <= 0:
 		args.e = 0
 	# checkArguments(args.classif, args.fasta)
@@ -40,7 +42,10 @@ def readPastec(PASTEC, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	@type PASTEC: string
 	@param PASTEC: name of the classif file that will be opened.
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 4 dictionnaries (TE, nonTE, potentialChimeric and noCat)
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 5 dictionnaries :
+		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
+		- 3 : for the results (class, order and superFamily)
+		- 1 : for the log (log)	@type BASELINE: dictionnary
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 	@type IDENTITYTHRESHOLD: integer
@@ -133,7 +138,7 @@ def readProtProfilesBaselineKeywords(NONSPECIFICKEYWORDS, BASELINEDICTIONNARY):
 	@param NONSPECIFICKEYWORDS: One line read of the BASELINE file (here doesn't have the > character), which contains the proteines profiles keywords..
 	@type BASELINEDICTIONNARY: dictionnary
 	@param BASELINEDICTIONNARY: Dictionnary containing all the keywords founded in the BASELINE file.
-	It contains 2 key, one for the storage of blast keywords and the other for the storage of proteines profiles keywords.
+	It contains 2 keys, one for the storage of blast keywords and the other for the storage of proteines profiles keywords.
 
 
 	@rtype: None
