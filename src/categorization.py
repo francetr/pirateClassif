@@ -70,7 +70,7 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	else:
 		SEQCLASSIFIED[FEATURES[0]]={"saveType":"potentialChimeric","class":"potentialChimeric"}
 	####	Initialize a log for concerned sequences that will be put into a log file and add the class of the sequence
-	SEQCLASSIFIED[FEATURES[0]]["log"]=str("{name}\t{seqClass}\t".format(name=FEATURES[0], seqClass=FEATURES[4]))
+	SEQCLASSIFIED[FEATURES[0]]["log"]=str("{name}\t{saveType}\t{seqClass}\t".format(name=FEATURES[0], saveType=SEQCLASSIFIED[FEATURES[0]]["saveType"], seqClass=SEQCLASSIFIED[FEATURES[0]]["class"]))
 
 	####	The sequence is a TE so order need to be determined
 	if searchOrder:
@@ -110,7 +110,7 @@ def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 		SEQCLASSIFIED[FEATURES[0]]["order"]=FEATURES[5]
 		searchSuperFamily=True
 	####	Add the order of the sequence onto the log file
-	SEQCLASSIFIED[FEATURES[0]]["log"]+=str("{order}\t".format(order=FEATURES[5]))
+	SEQCLASSIFIED[FEATURES[0]]["log"]+=str("{order}\t".format(order=SEQCLASSIFIED[FEATURES[0]]["order"]))
 
 	####	The superFamily need to be determined
 	if searchSuperFamily:
@@ -165,7 +165,6 @@ def associateSuperFamily(FEATURES, SEQCLASSIFIED, FINALSUPERFAMILYNAME):
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
-	@type BASELINE: dictionnary
 	@type FINALSUPERFAMILYNAME: string
 	@param FINALSUPERFAMILYNAME: name of the superFamily find according the different keywords founded
 
@@ -173,10 +172,13 @@ def associateSuperFamily(FEATURES, SEQCLASSIFIED, FINALSUPERFAMILYNAME):
 	"""
 	####	Regex for serching the name
 	name = re.search(r'([^_]+)', FINALSUPERFAMILYNAME).groups()[0]
+
 	# if the name searched is potentialChimeric, we convert the saveType (type of file onto which the sequence will be saved)
 	if name == "potentialChimeric":
 		####	Pass the saveType from TE in potnetialChimeric
 		SEQCLASSIFIED[FEATURES[0]]["saveType"] = "potentialChimeric"
+		####	Rewrite the correct saveType of the sequence in the log
+		SEQCLASSIFIED[FEATURES[0]]["log"]=SEQCLASSIFIED[FEATURES[0]]["log"].replace("\tTE\t", "\tpotentialChimeric\t")
 
 	####	Define the name of the superFamily sequence as FINALSUPERFAMILYNAME
 	SEQCLASSIFIED[FEATURES[0]]["superFamily"] = FINALSUPERFAMILYNAME

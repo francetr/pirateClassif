@@ -149,8 +149,8 @@ def saveLog(FILELOG, LOG):
 	Save the log of the classification steps.
 
 	Keyword arguments:
-	@type FILENONTE: TextIOWrapper
-	@param FILENONTE: File onto which the log of the sequences will be written
+	@type FILELOG: TextIOWrapper
+	@param FILELOG: File onto which the log of the sequences will be written
 	@type LOG: string
 	@param LOG: Proofs used during the classification step
 
