@@ -51,18 +51,19 @@ def main():
 		print("/!\	Error: Error with the PASTEC file provided {}\n####	Classification aborted".format(pastecFile))
 		sys.exit(1)
 
-	# cptTE, cptnonTE, cptChimeric, cptnoCat = 0, 0, 0, 0
-	# for seq in seqClassified:
-	# 	print(seqClassified[seq])
-	# 	if "TE" in seqClassified[seq]["saveType"]:
-	# 		cptTE+=1
-	# 	if "nonTE" in seqClassified[seq]["saveType"]:
-	# 		cptnonTE+=1
-	# 	if "potentialChimeric" in seqClassified[seq]["saveType"]:
-	# 		cptChimeric+=1
-	# 	if "noCat" in seqClassified[seq]["saveType"]:
-	# 		cptnoCat+=1
-	# print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(cptTE, cptnonTE, cptnoCat, cptChimeric, (cptTE + cptnonTE + cptnoCat + cptChimeric)))
+	####	print the number sequences by saveType found
+	cptTE, cptnonTE, cptChimeric, cptnoCat = 0, 0, 0, 0
+	for seq in seqClassified:
+		# print(seqClassified[seq])
+		if seqClassified[seq]["saveType"] == "TE":
+			cptTE+=1
+		if seqClassified[seq]["saveType"] == "nonTE":
+			cptnonTE+=1
+		if seqClassified[seq]["saveType"] == "potentialChimeric":
+			cptChimeric+=1
+		if seqClassified[seq]["saveType"] == "noCat":
+			cptnoCat+=1
+	print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(cptTE, cptnoCat, cptnonTE, cptChimeric, (cptTE + cptnonTE + cptnoCat + cptChimeric)))
 
 	####	Reading of the fasta file ####
 	try:
