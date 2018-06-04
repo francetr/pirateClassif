@@ -8,6 +8,10 @@ The purpose of this code is to automatize the step of classification of PiRATE.
 For more information, you can go read the research paper that lead to the creation of PiRATE :
 _http://www.seanoe.org/data/00406/51795/_
 
+## Requirements
+This script is written in python, it can be launched either with python2.7 or python3.5.
+However, it requires the ***biopython*** modules (usefull to write the sequences onto fasta files). For more information about biopython check its official website : _https://biopython.org/wiki/Download_
+
 ## Files used for this script:
 * ***pastecFile*** : Output file of the pastec tool. This file must be correctly written, meaning all columns are separated by one or two tabulation characters.  
 The script will retrieve the class, order and superfamily for each sequence in this file.
@@ -69,7 +73,10 @@ Before these informations are determined, the type of the sequence is first esta
 3. **PotentialChimeric** : the sequence can be categorized as 2 or more superFamilies
 4. **TE** : the superFamily's sequence has been established
 
-According the type of the sequence, the script will determine the class, order, and superFamily of the pastec output.
+According the type of the sequence, the script will determine the class, order, and superFamily of the pastec output, and saves the sequence in accordance with th its outcome corresponding (names of the outcomes possibles are cited above).  
+In addition with these four outcomes, two additionnals files are available:
+* **log.txt** : contains for every sequences the proofs founded to classifie the class, order and superFamily of this sequence.
+* **error.txt** : contains the string which doens't contains keywords that matches with the baseline (during the superFamily determination).
 
 ## How the superFamily determination work:
 The diagram above show the diffent possibilities which can be founded during the keywords comparison used for the superFamily determination.

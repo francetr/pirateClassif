@@ -19,10 +19,12 @@ def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 		- [5] : order of the sequence
 		- [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 5 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
+		- 1 : for the error(error)
+	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
 	@rtype: None
@@ -33,6 +35,7 @@ def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	classDetermination(features, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
 	####	Add a carriage return at the end of the sequence log
 	SEQCLASSIFIED[features[0]]["log"]+="\n"
+	SEQCLASSIFIED[features[0]]["error"]+="\n"
 
 
 def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
@@ -42,10 +45,11 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 
 	Keyword arguments:
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 5 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
+		- 1 : for the error(error)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 	@type IDENTITYTHRESHOLD: integer
@@ -71,10 +75,11 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 		SEQCLASSIFIED[FEATURES[0]]={"saveType":"potentialChimeric","class":"potentialChimeric"}
 	####	Initialize a log for concerned sequences that will be put into a log file and add the class of the sequence
 	SEQCLASSIFIED[FEATURES[0]]["log"]=str("{name}\t{saveType}\t{seqClass}\t".format(name=FEATURES[0], saveType=SEQCLASSIFIED[FEATURES[0]]["saveType"], seqClass=SEQCLASSIFIED[FEATURES[0]]["class"]))
-
+	SEQCLASSIFIED[FEATURES[0]]["error"]=str("")
 	####	The sequence is a TE so order need to be determined
 	if searchOrder:
 		orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
+		# print(SEQCLASSIFIED[FEATURES[0]]["error"])
 
 
 def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
@@ -86,10 +91,11 @@ def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	@type FEATURES: list
 	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence.
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 5 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
+		- 1 : for the error(error)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 	@type IDENTITYTHRESHOLD: integer
@@ -125,16 +131,15 @@ def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOL
 	@type FEATURES: list
 	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence.
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 5 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
+		- 1 : for the error(error)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 	@type IDENTITYTHRESHOLD: integer
 	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
-
-	@todo: Consider if POTENTIALCHIMERIC and NOCAT arguments are mandatory
 
 	@rtype: None
 	"""
@@ -161,10 +166,11 @@ def associateSuperFamily(FEATURES, SEQCLASSIFIED, FINALSUPERFAMILYNAME):
 	@type FEATURES: list
 	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence.
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 5 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
+		- 1 : for the error(error)
 	@type FINALSUPERFAMILYNAME: string
 	@param FINALSUPERFAMILYNAME: name of the superFamily find according the different keywords founded
 

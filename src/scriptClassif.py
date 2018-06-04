@@ -6,19 +6,22 @@
 import sys
 import readInput
 import save
+from timeit import default_timer as timer
 
 ############
 #	Help command : scriptClassif -h
 #   Commandes to launch this script :
-#	   python3 <path/toward/this/script> <path/toward/the/classif/file> <path/toward/the/baseline/file> <path/toward/the/fasta/file>
-# example	   python3 code/scriptClassif.py sortie_pastec/TisoRepet1.classif base_reference.txt hat.fasta
-#	   or  ./<path/toward/the>/scriptClassif.py <path/toward/the/classif/file> <path/toward/the/baseline/file> <path/toward/the/fasta/file>
+#	   python3 <path/toward/this/script> <path/toward/the/classif/file> <path/toward/the/fasta/file>
+# example	   python3 code/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta
+#	   or  ./<path/toward/the>/scriptClassif.py <path/toward/the/classif/file> <path/toward/the/fasta/file>
 ############
 
 def main():
+	start = timer()
 	print("Start of the classification\n")
 	####	Instanciation of a dictionnary with the id of the sequence as key and the values will contain 6 dictionnaries
-	####	(5 keys, one for each categories: nonTE, TE, potentialChimeric and noCat and one for the log)
+	####	(6 keys, 1 for each categories: class, order, superFamily; 1 for the type of file in which the sequence will be saved (e.g. nonTE, TE,
+	####	potentialChimeric and noCat); 1 for the log and 1 for the errors founded during the search for superFamily name)
 	seqClassified = {}
 
 	####	 retrieve the arguments used in command line
@@ -32,7 +35,8 @@ def main():
 	identityThreshold=args.e
 	print("The identity threshold used is {identity} %".format(identity=identityThreshold))
 	baselineFile=args.baseline
-	print("The baseline file used is %s"%(baselineFile))
+	print("The baseline file used is %s\n"%(baselineFile))
+
 	####	Reading of the baseline file ####
 	try:
 		print("####	Import of the Baseline file")
@@ -51,8 +55,8 @@ def main():
 		print("/!\	Error: Error with the PASTEC file provided {}\n####	Classification aborted".format(pastecFile))
 		sys.exit(1)
 
-	####	print the number sequences by saveType found
-	cptTE, cptnonTE, cptChimeric, cptnoCat = 0, 0, 0, 0
+	####	print the number sequences by saveType found and the number of errors if founded
+	cptTE, cptnonTE, cptChimeric, cptnoCat, cptError = 0, 0, 0, 0, 0
 	for seq in seqClassified:
 		# print(seqClassified[seq])
 		if seqClassified[seq]["saveType"] == "TE":
@@ -63,7 +67,10 @@ def main():
 			cptChimeric+=1
 		if seqClassified[seq]["saveType"] == "noCat":
 			cptnoCat+=1
-	print("TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(cptTE, cptnoCat, cptnonTE, cptChimeric, (cptTE + cptnonTE + cptnoCat + cptChimeric)))
+		if seqClassified[seq]["error"] != "\n":
+			cptError+=1
+	print("Number of sequences found for TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(cptTE, cptnoCat, cptnonTE, cptChimeric, (cptTE + cptnonTE + cptnoCat + cptChimeric)))
+	print("Number of sequence with errors found: %s\n"%(cptError))
 
 	####	Reading of the fasta file ####
 	try:
@@ -75,6 +82,8 @@ def main():
 		sys.exit(1)
 	save.save(fasta, seqClassified)
 
+	end = timer()
+	print("\nThe execution of the script has taken %s sec"%(end - start))
 
 ####################
 #	   MAIN

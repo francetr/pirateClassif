@@ -5,17 +5,17 @@
 
 def save(FASTA, SEQCLASSIFIED):
 	"""
-
 	Save the categorized sequences in different FASTA files.
 
 	Keyword arguments:
 	@type FASTA: dictionnary
 	@param FASTA: dictionnary with the nucleotide sequence which has been categorized
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 5 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
-		- 1 : for the log (log)	@type BASELINE: dictionnary
+		- 1 : for the log (log)
+		- 1 : for the error(error)
 
 	@rtype: None
 	"""
@@ -36,6 +36,8 @@ def save(FASTA, SEQCLASSIFIED):
 	fileLog = open("log.txt", "w")
 	print("Save log of the sequences into \"%s\" file"%(fileLog.name))
 
+	fileError = open("error.txt", "w")
+
 	for seqName in SEQCLASSIFIED:
 		####	Save uncategorized sequences
 		if SEQCLASSIFIED[seqName]["saveType"] == "noCat":
@@ -46,22 +48,28 @@ def save(FASTA, SEQCLASSIFIED):
 		####	Save TE sequences
 		elif SEQCLASSIFIED[seqName]["saveType"] == "TE":
 			saveTE(fileTE, FASTA, seqName, SEQCLASSIFIED[seqName])
-			####	Save nonTE sequences
+		####	Save nonTE sequences
 		elif SEQCLASSIFIED[seqName]["saveType"] == "nonTE":
 			saveNonTE(fileNonTE, FASTA, seqName, SEQCLASSIFIED[seqName])
+
+		####	Save the errors (keywords unknown in a sequence), just if errors have been found
+		if SEQCLASSIFIED[seqName]["error"] != "\n":
+			print("Write unknown keywords for sequence %s in the file %s"%(seqName, fileError.name))
+			saveError(fileError, SEQCLASSIFIED[seqName])
 		####	Save log of the sequences
 		saveLog(fileLog, SEQCLASSIFIED[seqName])
 
 	####	Close all the saving files
+	fileError.close()
 	fileLog.close()
 	fileNonTE.close()
 	fileTE.close()
 	filePotentialChimeric.close()
 	fileNoCat.close()
 
+
 def saveNoCat(FILENOCAT, FASTA, SEQNAME, NOCAT):
 	"""
-
 	Save the sequences considered as noCat in a FASTA file.
 
 	Keyword arguments:
@@ -71,8 +79,8 @@ def saveNoCat(FILENOCAT, FASTA, SEQNAME, NOCAT):
 	@param FASTA: dictionnary with the nucleotide sequence which has been classified
 	@type SEQNAME: string
 	@param SEQNAME: name of the saved sequence
-	@type NOCAT: string
-	@param NOCAT: name of the FASTA file containing the sequence that will be opened.
+	@type NOCAT: dictionnary
+	@param NOCAT: dictionnary for uncategorized sequences.
 
 	@rtype: None
 	"""
@@ -81,7 +89,6 @@ def saveNoCat(FILENOCAT, FASTA, SEQNAME, NOCAT):
 
 def savePotentialChimeric(FILECHIMERIC, FASTA, SEQNAME, POTENTIALCHIMERIC):
 	"""
-
 	Save the sequences considered as potentialChimeric in a FASTA file.
 
 	Keyword arguments:
@@ -104,7 +111,6 @@ def savePotentialChimeric(FILECHIMERIC, FASTA, SEQNAME, POTENTIALCHIMERIC):
 
 def saveTE(FILETE, FASTA, SEQNAME, TE):
 	"""
-
 	Save the sequences considered as TE in a FASTA file.
 
 	Keyword arguments:
@@ -126,7 +132,6 @@ def saveTE(FILETE, FASTA, SEQNAME, TE):
 
 def saveNonTE(FILENONTE, FASTA, SEQNAME, NONTE):
 	"""
-
 	Save the sequences considered as NONTE in a FASTA file.
 
 	Keyword arguments:
@@ -145,7 +150,6 @@ def saveNonTE(FILENONTE, FASTA, SEQNAME, NONTE):
 
 def saveLog(FILELOG, LOG):
 	"""
-
 	Save the log of the classification steps.
 
 	Keyword arguments:
@@ -157,3 +161,19 @@ def saveLog(FILELOG, LOG):
 	@rtype: None
 	"""
 	FILELOG.write(LOG["log"])
+
+
+def saveError(FILEERROR, ERROR):
+	"""
+	Save the error if keywords hasn't be found in sequences in an error file.
+
+	Keyword arguments:
+	@type FILEERROR: TextIOWrapper
+	@param FILEERROR: File onto which the unknown keywords for a sequence, during search superFamily name, will be written
+	@type ERROR: string
+	@param ERROR: name of the FASTA file containing the sequence that will be opened.
+
+	@rtype: None
+	"""
+	if ERROR["error"] != "":
+		FILEERROR.write("{error}".format(error=ERROR["error"]))

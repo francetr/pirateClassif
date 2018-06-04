@@ -17,10 +17,11 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDEN
 	@type DATABASERECORDS: list
 	@param DATABASERECORDS: list of string in which there are the superFamily name to search.
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 5 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
+		- 1 : for the error(error)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 	@type IDENTITYTHRESHOLD: integer
@@ -40,10 +41,10 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDEN
 		dbName = dr.split(':')[0].strip()
 		####	if profiles is found in coding, search for superFamily name using function searchProfilesName
 		if dbName=='profiles':
-			searchProfilesName(FEATURES, dr, superFamilyFound["protProfiles"], BASELINE)
+			searchProfilesName(FEATURES, SEQCLASSIFIED, dr, superFamilyFound["protProfiles"], BASELINE)
 		####	if TE_BLRx or TE_BLRtx is found in coding, search for superFamily name using function searchRepBaseName
 		elif dbName=="TE_BLRx" or "TE_BLRtx":
-			searchBlastName(FEATURES, dr, superFamilyFound["blast"], BASELINE)
+			searchBlastName(FEATURES, SEQCLASSIFIED, dr, superFamilyFound["blast"], BASELINE)
 	####	Convert the count of profiles keywords founded into percentage
 	percentageCalculation(superFamilyFound["protProfiles"])
 	####	Convert the count of blast name founded into percentage
@@ -53,17 +54,22 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDEN
 	####	Do a comparison between the keywords founded
 	finalSuperFamilyName = comparison.superFamilyComparison(superFamilyFound, BASELINE, IDENTITYTHRESHOLD)
 	####	 save the different proofs found for the name determination of the sequence
-	SEQCLASSIFIED[FEATURES[0]]["log"]+=str("BLAST : %s\tPROTPROFILES : %s\tFINALNAME : %s"%(superFamilyFound["blast"], superFamilyFound["protProfiles"], finalSuperFamilyName))
+	SEQCLASSIFIED[FEATURES[0]]["log"] += str("BLAST : %s\tPROTPROFILES : %s\tFINALNAME : %s"%(superFamilyFound["blast"], superFamilyFound["protProfiles"], finalSuperFamilyName))
 	return finalSuperFamilyName
 
-def searchProfilesName(FEATURES, DATABASERECORD, PROFILESFOUND, BASELINE):
+def searchProfilesName(FEATURES, SEQCLASSIFIED, DATABASERECORD, PROFILESFOUND, BASELINE):
 	"""
-
 	Search the keywords in the profiles part of coding.
 
 	Keyword arguments:
 	@type FEATURES: list
 	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence. Usefull to know the sequence concerned. Usefull to know the sequence concerned.
+	@type SEQCLASSIFIED: dictionnary
+	@param SEQCLASSIFIED: Used in case a keyword hasn't be found. dictionnary storing the result of the classification into 6 dictionnaries :
+		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
+		- 3 : for the results (class, order and superFamily)
+		- 1 : for the log (log)
+		- 1 : for the error(error)
 	@type DATABASERECORD: string
 	@param DATABASERECORD: profiles that will be parsed to find the keywords.
 	@type PROFILESFOUND: dictionnary
@@ -107,19 +113,24 @@ def searchProfilesName(FEATURES, DATABASERECORD, PROFILESFOUND, BASELINE):
 			####	If there is no matches between the string and the baseline, print the string
 			if not keywordFound:
 				print("/!\	Sequence : %s No match in the string %s with BASELINE"%(FEATURES[0], substr))
-				SEQCLASSIFIED[FEATURES[0]]["log"] += str("\t /!\ Don't find any keyword for profile search in {} \t").format(substr)
+				SEQCLASSIFIED[FEATURES[0]]["error"] += str("/!\ Profile search for sequence : %s, no match in the string %s with BASELINE\n"%(FEATURES[0], substr))
 
 		except AttributeError:
 			print('Issue during searching profiles on : '+ substr)
 
-def searchBlastName(FEATURES, DATABASERECORD, BLASTFOUND, BASELINE):
+def searchBlastName(FEATURES, SEQCLASSIFIED, DATABASERECORD, BLASTFOUND, BASELINE):
 	"""
-
 	Search the keywords in the TE_BLRx and TE_BLRtx part of coding. Then check if the keyword is founded into the BASELINE file.
 
 	Keyword arguments:
 	@type FEATURES: list
 	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence. Usefull to know the sequence concerned. Usefull to know the sequence concerned.
+	@type SEQCLASSIFIED: dictionnary
+	@param SEQCLASSIFIED: Used in case a keyword hasn't be found. dictionnary storing the result of the classification into 6 dictionnaries :
+		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
+		- 3 : for the results (class, order and superFamily)
+		- 1 : for the log (log)
+		- 1 : for the error(error)
 	@type DATABASERECORD: string
 	@param DATABASERECORD: profiles that will be parsed to find the keywords.
 	@type BLASTFOUND: dictionnary
@@ -152,7 +163,7 @@ def searchBlastName(FEATURES, DATABASERECORD, BLASTFOUND, BASELINE):
 			####	If there is no matches between the string and the baseline, print the string
 			if not keywordFound:
 				print("/!\	Sequence : %s No match in the string %s with BASELINE"%(FEATURES[0], substr))
-				SEQCLASSIFIED[FEATURES[0]]["log"] += str("\t /!\ Don't find any keyword for blast search in {} \t").format(substr)
+				SEQCLASSIFIED[FEATURES[0]]["error"] += str("/!\ BLAST search for sequence : %s, no match in the string %s with BASELINE\n"%(FEATURES[0], substr))
 
 		except AttributeError:
 			print('Issue during searching RepBase name on : '+ substr)
