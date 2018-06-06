@@ -5,6 +5,7 @@
 
 import re
 import comparison
+import math
 
 def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDENTITYTHRESHOLD):
 	"""
@@ -54,7 +55,8 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDEN
 	####	Do a comparison between the keywords founded
 	finalSuperFamilyName = comparison.superFamilyComparison(superFamilyFound, BASELINE, IDENTITYTHRESHOLD)
 	####	 save the different proofs found for the name determination of the sequence
-	SEQCLASSIFIED[FEATURES[0]]["log"] += str("BLAST : %s\tPROTPROFILES : %s\tFINALNAME : %s"%(superFamilyFound["blast"], superFamilyFound["protProfiles"], finalSuperFamilyName))
+	SEQCLASSIFIED[FEATURES[0]]["log"] += str("BLAST : %s\tPROTPROFILES : %s\tFINALNAME : %s"%(superFamilyFound["blast"], superFamilyFound["protProfiles"], \
+	 finalSuperFamilyName))
 	return finalSuperFamilyName
 
 def searchProfilesName(FEATURES, SEQCLASSIFIED, DATABASERECORD, PROFILESFOUND, BASELINE):
@@ -146,8 +148,8 @@ def searchBlastName(FEATURES, SEQCLASSIFIED, DATABASERECORD, BLASTFOUND, BASELIN
 			####	regex split into groups. Group's number correspondance : 0 : name of the sequence; 1 : type of class; 2 : type of order; 3 : superFamily name
 			keywordSearch = re.search(r' ?([^:]+):(?:Class)?(I+|\?):([^:]+):([^:]+): ([0-9\.]+)%', substr)
 			keyword = keywordSearch.groups()[3]
-			####	Boolean allowing to know if the keyword is in the baseline
 			keywordFound=False
+			####	Boolean allowing to know if the keyword is in the baseline
 			####	Parse the key of the specific keywords in the BASELINE file
 			for blastKeyword in BASELINE["blast"]:
 				####	Check if the keywords in profiles is in the BASELINE
@@ -179,14 +181,15 @@ def percentageCalculation(KEYWORDFOUND):
 	@rtype: None
 	"""
 	####	Calculus of the percentage of each superFamilyName found for this sequence
-	tot = 0.0
+	tot = float(0.0)
 
 	####	Calculus of the total keywords found in KEYWORDFOUND (can be BLAST or PROTPROFILES)
 	for key in KEYWORDFOUND.keys():
 		tot+=KEYWORDFOUND[key][0]
 
-	####	Calculus of the percentage (round to 1 digit after the comma) for each superFamilyName found
+	####	Calculus of the percentage (round to 2 digits after the comma) for each superFamilyName found
 	for key in KEYWORDFOUND.keys():
-		percentage=round(KEYWORDFOUND[key][0]/tot*100, 1)
+		percentage=round(float(KEYWORDFOUND[key][0]/tot*100), 2)
 		####	Add the value of percentage in a list where index [0] = counter of keyword and index [1] = percentage of this keyword
+		####	/!\ It is possible that the percentage is != 100% because we round up to the last digit
 		KEYWORDFOUND[key].append(percentage)

@@ -18,7 +18,7 @@ def superFamilyComparison(SUPERFAMILYFOUND, SUPERFAMILYASSOCIATED, IDENTITYTHRES
 	@rtype: string
 	@return: name of the superfamily corresponding to the sequence.
 	"""
-	####	Compare all the keywords founded for one sequence (providing from blast or protProfiles) . Then the result is assigned to a string
+	####	Compare all the keywords founded for one sequence (providing from blast or protProfiles). Then the result is assigned to a string
 	name = compareKeywordsFounded(SUPERFAMILYFOUND["blast"], SUPERFAMILYFOUND["protProfiles"], SUPERFAMILYASSOCIATED["protProfiles"], IDENTITYTHRESHOLD)
 	####	String for the final superFamily name
 	return name
@@ -98,8 +98,9 @@ def compareProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYTHRESHOLD):
 	####	Dictionnary that will contain all the superFamily name associated to PROTPROFILES and their percentage for the sequence
 	superFamilyAssociated = retrieveSuperFamilyAssociated(PROTPROFILES, SUPERFAMILYASSOCIATED)
 
-	####	Remove all the superFamily names founded with a percentage lesser than IDENTITYTHRESHOLD (default is 100%):
-	uniqSuperFamilyAssociated = list([k for k in superFamilyAssociated if superFamilyAssociated[k][1] >= IDENTITYTHRESHOLD])
+	####	Remove all the superFamily names founded with a percentage lesser than IDENTITYTHRESHOLD (default is 100%).
+	####	/!\ the round part allows to round up the percentage to its higher number. ex: 9.998 => 100. This is due to the fact some cumulation of percentages can't reach 100%
+	uniqSuperFamilyAssociated = list([k for k in superFamilyAssociated if round(superFamilyAssociated[k][1], 1) >= IDENTITYTHRESHOLD])
 
 	####	If only ONE superFamily name is associated to PROTPROFILES
 	if len(uniqSuperFamilyAssociated) == 1:
@@ -142,10 +143,12 @@ def compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED, IDEN
 	####	List that will contain all the superFamily name associated to PROTPROFILES
 	superFamilyAssociated = retrieveSuperFamilyAssociated(PROTPROFILES, SUPERFAMILYASSOCIATED)
 	for superFamily in superFamilyAssociated.keys():
-		####	check if the superFamily associated match with the BLAST AND its percentage is greater than IDENTITYTHRESHOLD (default is 100%)
-		if superFamily in BLAST and superFamilyAssociated[superFamily][1] >= IDENTITYTHRESHOLD:
+		####	Check if the superFamily associated match with the BLAST AND its percentage is greater than IDENTITYTHRESHOLD (default is 100%).
+		####	/!\ the round part allows to round up the percentage to its higher number. ex: 9.998 => 100. This is due to the fact some cumulation of percentages can't reach 100%
+		if superFamily in BLAST and round(superFamilyAssociated[superFamily][1], 1) >= IDENTITYTHRESHOLD:
 			superFamilyMatches.append(superFamily)
-	####	If the number of matches is 1, name is superFamily
+
+	####	If the number of matches is 1 (i.e. the associated superFamily of PROTPROFILE is the same than BLAST), name is superFamily
 	if len(superFamilyMatches) == 1:
 		name += str(superFamilyMatches[0])
 	####	If the number of match = 0, name is chimeric

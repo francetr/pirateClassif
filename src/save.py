@@ -37,6 +37,7 @@ def save(FASTA, SEQCLASSIFIED):
 	print("Save log of the sequences into \"%s\" file"%(fileLog.name))
 
 	fileError = open("error.txt", "w")
+	print("Save the errors into \"%s\" file"%(fileError.name))
 
 	for seqName in SEQCLASSIFIED:
 		####	Save uncategorized sequences
@@ -175,5 +176,4 @@ def saveError(FILEERROR, ERROR):
 
 	@rtype: None
 	"""
-	if ERROR["error"] != "":
-		FILEERROR.write("{error}".format(error=ERROR["error"]))
+	FILEERROR.write("{error}".format(error=ERROR["error"]))
