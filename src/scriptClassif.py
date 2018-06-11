@@ -21,7 +21,7 @@ def main():
 	print("Start of the classification\n")
 	####	Instanciation of a dictionnary with the id of the sequence as key and the values will contain 6 dictionnaries
 	####	(6 keys, 1 for each categories: class, order, superFamily; 1 for the type of file in which the sequence will be saved (e.g. nonTE, TE,
-	####	potentialChimeric and noCat); 1 for the log and 1 for the errors founded during the search for superFamily name)
+	####	potentialChimeric and noCat); 1 for the log and 1 for the unknown_keywords founded during the search for superFamily name)
 	seqClassified = {}
 
 	####	 retrieve the arguments used in command line
@@ -55,7 +55,7 @@ def main():
 		print("/!\	Error: Error with the PASTEC file provided {}\n####	Classification aborted".format(pastecFile))
 		sys.exit(1)
 
-	####	print the number sequences by saveType found and the number of errors if founded
+	####	print the number sequences by saveType found and the number of unknown_keywords if founded
 	cptTE, cptnonTE, cptChimeric, cptnoCat, cptError = 0, 0, 0, 0, 0
 	for seq in seqClassified:
 		# print(seqClassified[seq])
@@ -67,10 +67,10 @@ def main():
 			cptChimeric+=1
 		if seqClassified[seq]["saveType"] == "noCat":
 			cptnoCat+=1
-		if seqClassified[seq]["error"] != "\n":
+		if seqClassified[seq]["unknown_keyword"] != "\n":
 			cptError+=1
 	print("Number of sequences found for TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(cptTE, cptnoCat, cptnonTE, cptChimeric, (cptTE + cptnonTE + cptnoCat + cptChimeric)))
-	print("Number of sequence with errors found: %s\n"%(cptError))
+	print("Number of sequence with unknown_keywords found: %s\n"%(cptError))
 
 	####	Reading of the fasta file ####
 	try:

@@ -15,11 +15,10 @@ def save(FASTA, SEQCLASSIFIED):
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
-		- 1 : for the error(error)
+		- 1 : for the unknown_keyword(unknown_keyword)
 
 	@rtype: None
 	"""
-	#TODO: Organize the way TE are saved
 	####	First create the files in which the sequences and log will be written
 	fileNoCat = open("noCat.fasta", "w")
 	print("Save uncategorized sequences into \"%s\" file"%(fileNoCat.name))
@@ -36,8 +35,8 @@ def save(FASTA, SEQCLASSIFIED):
 	fileLog = open("Classification_summary.txt", "w")
 	print("Save log of the sequences into \"%s\" file"%(fileLog.name))
 
-	fileError = open("error.txt", "w")
-	print("Save the errors into \"%s\" file"%(fileError.name))
+	fileUnknownKeyword = open("unknown_keyword.txt", "w")
+	print("Save the unknown keywords into \"%s\" file"%(fileUnknownKeyword.name))
 
 	for seqName in SEQCLASSIFIED:
 		####	Save uncategorized sequences
@@ -53,15 +52,15 @@ def save(FASTA, SEQCLASSIFIED):
 		elif SEQCLASSIFIED[seqName]["saveType"] == "nonTE":
 			saveNonTE(fileNonTE, FASTA, seqName, SEQCLASSIFIED[seqName])
 
-		####	Save the errors (keywords unknown in a sequence), just if errors have been found
-		if SEQCLASSIFIED[seqName]["error"] != "\n" :
-			print("Write unknown keywords for sequence %s in the file %s"%(seqName, fileError.name))
-			saveError(fileError, SEQCLASSIFIED[seqName])
+		####	Save the unknown keywords (keywords unknown, founded during search process in a sequence), just if unknown keywords have been found
+		if SEQCLASSIFIED[seqName]["unknown_keyword"] != "\n" :
+			print("Write unknown keywords for sequence %s in the file %s"%(seqName, fileUnknownKeyword.name))
+			saveUnknownKeyword(fileUnknownKeyword, SEQCLASSIFIED[seqName])
 		####	Save log of the sequences
 		saveLog(fileLog, SEQCLASSIFIED[seqName])
 
 	####	Close all the saving files
-	fileError.close()
+	fileUnknownKeyword.close()
 	fileLog.close()
 	fileNonTE.close()
 	fileTE.close()
@@ -164,16 +163,16 @@ def saveLog(FILELOG, LOG):
 	FILELOG.write(LOG["log"])
 
 
-def saveError(FILEERROR, ERROR):
+def saveUnknownKeyword(FILEUNKNOWNKEYWORD, UNKNOWNKEYWORD):
 	"""
-	Save the error if keywords hasn't be found in sequences in an error file.
+	Save the unknown_keyword if keywords hasn't be found in sequences in an unknown_keyword file.
 
 	Keyword arguments:
-	@type FILEERROR: TextIOWrapper
-	@param FILEERROR: File onto which the unknown keywords for a sequence, during search superFamily name, will be written
-	@type ERROR: string
-	@param ERROR: name of the FASTA file containing the sequence that will be opened.
+	@type FILEUNKNOWNKEYWORD: TextIOWrapper
+	@param FILEUNKNOWNKEYWORD: File onto which the unknown keywords for a sequence, during search superFamily name, will be written
+	@type UNKNOWNKEYWORD: string
+	@param UNKNOWNKEYWORD: name of the FASTA file containing the sequence that will be opened.
 
 	@rtype: None
 	"""
-	FILEERROR.write("{error}".format(error=ERROR["error"]))
+	FILEUNKNOWNKEYWORD.write("{unknown_keyword}".format(unknown_keyword=UNKNOWNKEYWORD["unknown_keyword"]))

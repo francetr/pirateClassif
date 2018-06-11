@@ -23,7 +23,7 @@ def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
-		- 1 : for the error(error)
+		- 1 : for the unknown_keyword(unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 
@@ -35,7 +35,7 @@ def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	classDetermination(features, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
 	####	Add a carriage return at the end of the sequence log
 	SEQCLASSIFIED[features[0]]["log"]+="\n"
-	SEQCLASSIFIED[features[0]]["error"]+="\n"
+	SEQCLASSIFIED[features[0]]["unknown_keyword"]+="\n"
 
 
 def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
@@ -49,7 +49,7 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
-		- 1 : for the error(error)
+		- 1 : for the unknown_keyword(unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 	@type IDENTITYTHRESHOLD: integer
@@ -73,13 +73,14 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 			SEQCLASSIFIED[FEATURES[0]]={"saveType":"nonTE","class":"nonTE"}
 	else:
 		SEQCLASSIFIED[FEATURES[0]]={"saveType":"potentialChimeric","class":"potentialChimeric"}
-	####	Initialize a log for concerned sequences that will be put into a log file and add the class of the sequence
+	####	Initialize a log for concerned sequences that will be put into a log file and add the length, the type and the class of the sequence
 	SEQCLASSIFIED[FEATURES[0]]["log"]=str("{name}\t{length}\t{saveType}\t{seqClass}\t".format(name=FEATURES[0], length=FEATURES[1], saveType=SEQCLASSIFIED[FEATURES[0]]["saveType"], seqClass=SEQCLASSIFIED[FEATURES[0]]["class"]))
-	SEQCLASSIFIED[FEATURES[0]]["error"]=str("")
+	####	Initialize a unknown_keyword for concerned sequences that will be put into an unknown_keyword file. It concerned unknown_keywords found during search of BLAST and PROTPROFILES keywords
+	SEQCLASSIFIED[FEATURES[0]]["unknown_keyword"]=str("")
 	####	The sequence is a TE so order need to be determined
 	if searchOrder:
 		orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
-		# print(SEQCLASSIFIED[FEATURES[0]]["error"])
+		# print(SEQCLASSIFIED[FEATURES[0]]["unknown_keyword"])
 
 
 def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
@@ -95,7 +96,7 @@ def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
-		- 1 : for the error(error)
+		- 1 : for the unknown_keyword(unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 	@type IDENTITYTHRESHOLD: integer
@@ -135,7 +136,7 @@ def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOL
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
-		- 1 : for the error(error)
+		- 1 : for the unknown_keyword(unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 	@type IDENTITYTHRESHOLD: integer
@@ -170,7 +171,7 @@ def associateSuperFamily(FEATURES, SEQCLASSIFIED, FINALSUPERFAMILYNAME):
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
-		- 1 : for the error(error)
+		- 1 : for the unknown_keyword(unknown_keyword)
 	@type FINALSUPERFAMILYNAME: string
 	@param FINALSUPERFAMILYNAME: name of the superFamily find according the different keywords founded
 

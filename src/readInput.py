@@ -46,7 +46,7 @@ def readPastec(PASTEC, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
-		- 1 : for the error(error)
+		- 1 : for the unknown_keyword(unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 	@type IDENTITYTHRESHOLD: integer

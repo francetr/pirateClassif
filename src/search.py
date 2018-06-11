@@ -22,7 +22,7 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDEN
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
-		- 1 : for the error(error)
+		- 1 : for the unknown_keyword(unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
 	@type IDENTITYTHRESHOLD: integer
@@ -71,7 +71,7 @@ def searchProfilesName(FEATURES, SEQCLASSIFIED, DATABASERECORD, PROFILESFOUND, B
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
-		- 1 : for the error(error)
+		- 1 : for the unknown_keyword(unknown_keyword)
 	@type DATABASERECORD: string
 	@param DATABASERECORD: profiles that will be parsed to find the keywords.
 	@type PROFILESFOUND: dictionnary
@@ -115,7 +115,12 @@ def searchProfilesName(FEATURES, SEQCLASSIFIED, DATABASERECORD, PROFILESFOUND, B
 			####	If there is no matches between the string and the baseline, print the string
 			if not keywordFound:
 				print("/!\	Sequence : %s No match in the string %s with BASELINE"%(FEATURES[0], substr))
-				SEQCLASSIFIED[FEATURES[0]]["error"] += str("/!\ Profile search for sequence : %s, no match in the string %s with BASELINE\n"%(FEATURES[0], substr))
+				SEQCLASSIFIED[FEATURES[0]]["unknown_keyword"] += str("/!\ Profile search for sequence : %s, no match in the string %s with BASELINE. Counting it as undefined\n"%(FEATURES[0], substr))
+				####	Add an undefined keywords for PROFILESFOUND
+				if not "undefined" in PROFILESFOUND:
+					PROFILESFOUND["undefined"]=[1]
+				else:
+					PROFILESFOUND["undefined"][0]+=1
 
 		except AttributeError:
 			print('Issue during searching profiles on : '+ substr)
@@ -132,7 +137,7 @@ def searchBlastName(FEATURES, SEQCLASSIFIED, DATABASERECORD, BLASTFOUND, BASELIN
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
 		- 1 : for the log (log)
-		- 1 : for the error(error)
+		- 1 : for the unknown_keyword(unknown_keyword)
 	@type DATABASERECORD: string
 	@param DATABASERECORD: profiles that will be parsed to find the keywords.
 	@type BLASTFOUND: dictionnary
@@ -165,7 +170,12 @@ def searchBlastName(FEATURES, SEQCLASSIFIED, DATABASERECORD, BLASTFOUND, BASELIN
 			####	If there is no matches between the string and the baseline, print the string
 			if not keywordFound:
 				print("/!\	Sequence : %s No match in the string %s with BASELINE"%(FEATURES[0], substr))
-				SEQCLASSIFIED[FEATURES[0]]["error"] += str("/!\ BLAST search for sequence : %s, no match in the string %s with BASELINE\n"%(FEATURES[0], substr))
+				SEQCLASSIFIED[FEATURES[0]]["unknown_keyword"] += str("/!\ BLAST search for sequence : %s, no match in the string %s with BASELINE\n"%(FEATURES[0], substr))
+				####	Add an undefined keywords for BLASTFOUND
+				if not "undefined" in BLASTFOUND:
+					BLASTFOUND["undefined"]=[1]
+				else:
+					BLASTFOUND["undefined"][0]+=1
 
 		except AttributeError:
 			print('Issue during searching RepBase name on : '+ substr)

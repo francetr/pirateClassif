@@ -66,6 +66,7 @@ def compareKeywordsFounded(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYT
 			name = compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYTHRESHOLD)
 
 	####	Last case, MULTIPLE BLAST keywords have been founded
+	#TODO : Is it needed to define an identityThreshold for BLAST keywords?
 	elif len(BLAST) > 1:
 		name = "potentialChimeric"
 		for superFamily in BLAST:
