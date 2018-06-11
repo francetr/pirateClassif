@@ -55,8 +55,8 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDEN
 	####	Do a comparison between the keywords founded
 	finalSuperFamilyName = comparison.superFamilyComparison(superFamilyFound, BASELINE, IDENTITYTHRESHOLD)
 	####	 save the different proofs found for the name determination of the sequence
-	SEQCLASSIFIED[FEATURES[0]]["log"] += str("BLAST : %s\tPROTPROFILES : %s\tFINALNAME : %s"%(superFamilyFound["blast"], superFamilyFound["protProfiles"], \
-	 finalSuperFamilyName))
+	SEQCLASSIFIED[FEATURES[0]]["log"] += str("BLAST : %s\tPROTPROFILES : %s\tPREDICTED_SUPERFAMILY: %s"%(superFamilyFound["blast"], \
+	superFamilyFound["protProfiles"], finalSuperFamilyName))
 	return finalSuperFamilyName
 
 def searchProfilesName(FEATURES, SEQCLASSIFIED, DATABASERECORD, PROFILESFOUND, BASELINE):

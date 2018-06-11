@@ -33,7 +33,7 @@ def save(FASTA, SEQCLASSIFIED):
 	fileNonTE = open("nonTE.fasta", "w")
 	print("Save nonTE sequences into \"%s\" file"%(fileNonTE.name))
 
-	fileLog = open("log.txt", "w")
+	fileLog = open("Classification_summary.txt", "w")
 	print("Save log of the sequences into \"%s\" file"%(fileLog.name))
 
 	fileError = open("error.txt", "w")
@@ -54,7 +54,7 @@ def save(FASTA, SEQCLASSIFIED):
 			saveNonTE(fileNonTE, FASTA, seqName, SEQCLASSIFIED[seqName])
 
 		####	Save the errors (keywords unknown in a sequence), just if errors have been found
-		if SEQCLASSIFIED[seqName]["error"] != "\n":
+		if SEQCLASSIFIED[seqName]["error"] != "\n" :
 			print("Write unknown keywords for sequence %s in the file %s"%(seqName, fileError.name))
 			saveError(fileError, SEQCLASSIFIED[seqName])
 		####	Save log of the sequences

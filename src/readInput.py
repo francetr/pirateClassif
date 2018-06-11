@@ -64,7 +64,7 @@ def readPastec(PASTEC, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 				categorization.initCategorization(sequence, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
 			print("End of the categorization\n")
 
-	except FileNotFoundError:
+	except (FileNotFoundError, NameError):
 		####	Prevent the opening if the file name is incorrect
 		print("/!\	Error: No such file as {}\n####	Classification aborted".format(PASTEC))
 		sys.exit(1)
@@ -100,7 +100,7 @@ def readBaseline(BASELINE):
 					readProtProfilesBaselineKeywords(keywords.groups()[0], baselineDictionnary)
 		return baselineDictionnary
 
-	except FileNotFoundError:
+	except (FileNotFoundError, NameError):
 		print("/!\	Error: No such file as {}\n####	Classification aborted".format(BASELINE))
 		sys.exit(1)
 

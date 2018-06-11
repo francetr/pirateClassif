@@ -74,7 +74,7 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	else:
 		SEQCLASSIFIED[FEATURES[0]]={"saveType":"potentialChimeric","class":"potentialChimeric"}
 	####	Initialize a log for concerned sequences that will be put into a log file and add the class of the sequence
-	SEQCLASSIFIED[FEATURES[0]]["log"]=str("{name}\t{saveType}\t{seqClass}\t".format(name=FEATURES[0], saveType=SEQCLASSIFIED[FEATURES[0]]["saveType"], seqClass=SEQCLASSIFIED[FEATURES[0]]["class"]))
+	SEQCLASSIFIED[FEATURES[0]]["log"]=str("{name}\t{length}\t{saveType}\t{seqClass}\t".format(name=FEATURES[0], length=FEATURES[1], saveType=SEQCLASSIFIED[FEATURES[0]]["saveType"], seqClass=SEQCLASSIFIED[FEATURES[0]]["class"]))
 	SEQCLASSIFIED[FEATURES[0]]["error"]=str("")
 	####	The sequence is a TE so order need to be determined
 	if searchOrder:
