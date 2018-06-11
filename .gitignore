@@ -1,9 +1,12 @@
 # Ignore ~, fasta, classif, dia files and pycache folder
 *.fasta
+*.fa
 *.classif
+**/Classifiication_summary.txt
 diagrammes/*.dia
 jeu_simple/
 jeu_chimere/
 *~
 **/__pycache__
 **/*.pyc
+jeu_repbase/
