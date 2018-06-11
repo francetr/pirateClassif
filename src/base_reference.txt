@@ -38,7 +38,7 @@ tRNA	tRNA
 >HEL	Helitron
 >C-INT	Maverick
 >CYP	Maverick
->POLB	Maverick
+>PY	Maverick
 >ATP	Maverick
 >GAG	Copia:Gypsy:Bel-Pao:Retrovirus:ERV:DIRS:Ngaro:VIPER
 >AP	Copia:Gypsy:Bel-Pao:Retrovirus:ERV:DIRS:Ngaro:VIPER
@@ -46,7 +46,7 @@ tRNA	tRNA
 >RH	Copia:Gypsy:Bel-Pao:Retrovirus:ERV:DIRS:Ngaro:VIPER:I
 >RTRH	Copia:Gypsy:Bel-Pao:Retrovirus:ERV:DIRS:Ngaro:VIPER:I
 >INT	Copia:Gypsy:Bel-Pao:Retrovirus:ERV:DIRS
->ENV	Retrovirus:ERV
+>ENV	Retrovirus:ERV:Gypsy
 >YR	Crypton:DIRS:Ngaro:VIPER
 >EN	Penelope:R2
 >POL	Copia:Gypsy:Bel-Pao:Retrovirus:ERV
