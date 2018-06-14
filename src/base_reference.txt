@@ -29,6 +29,7 @@ Jockey	Jockey
 L1	L1
 I	I
 tRNA	tRNA
+7SL	7SL
 5S	5S
 >Tase	Mariner:hAT:PIF-Harbinger:PiggyBac:Merlin:Transib:CACTA:P
 >Tase*	Mariner:hAT:PIF-Harbinger:PiggyBac:Merlin:Transib:CACTA:P
