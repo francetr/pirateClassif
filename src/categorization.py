@@ -71,6 +71,7 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 		####	 NonTE
 		else:
 			SEQCLASSIFIED[FEATURES[0]]={"saveType":"nonTE","class":"nonTE"}
+			searchOrder=True
 	else:
 		SEQCLASSIFIED[FEATURES[0]]={"saveType":"potentialChimeric","class":"potentialChimeric"}
 	####	Initialize a log for concerned sequences that will be put into a log file and add the length, the type and the class of the sequence
@@ -110,7 +111,7 @@ def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	if FEATURES[5] == "noCat" :
 		SEQCLASSIFIED[FEATURES[0]]["order"]="undefined"
 	####	 The order of the TE is a MITE, a LARD or a TRIM : the superfamily of the TE will not be determined
-	elif FEATURES[5] == "MITE" or FEATURES[5] == "LARD" or FEATURES[5] == "TRIM" :
+	elif FEATURES[5] == "MITE" or FEATURES[5] == "LARD" or FEATURES[5] == "TRIM" or FEATURES[5] == "PotentialHostGene" or FEATURES[5] == "SSR" :
 		SEQCLASSIFIED[FEATURES[0]]["order"]=FEATURES[5]
 	####	 The order of the TE is determined : the superfamily of the TE will be determined
 	else:

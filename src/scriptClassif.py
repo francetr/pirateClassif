@@ -69,8 +69,10 @@ def main():
 			cptnoCat+=1
 		if seqClassified[seq]["unknown_keyword"] != "\n":
 			cptError+=1
-	print("Number of sequences found for TE : %d, noCat : %d, nonTE : %d, chimeric: %d, total: %d" %(cptTE, cptnoCat, cptnonTE, cptChimeric, (cptTE + cptnonTE + cptnoCat + cptChimeric)))
-	print("Number of sequence with unknown_keywords found: %s\n"%(cptError))
+
+	print("Number total of sequences found : %d" %((cptTE + cptnonTE + cptnoCat + cptChimeric)))
+	print("Number of sequences found for TE recognized : %d, noCat : %d, nonTE : %d, chimeric: %d" %(cptTE, cptnoCat, cptnonTE, cptChimeric))
+	print("Number of sequence with unknown keywords found: %s\n"%(cptError))
 
 	####	Reading of the fasta file ####
 	try:

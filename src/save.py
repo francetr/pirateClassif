@@ -33,7 +33,7 @@ def save(FASTA, SEQCLASSIFIED):
 	print("Save nonTE sequences into \"%s\" file"%(fileNonTE.name))
 
 	fileLog = open("Classification_summary.txt", "w")
-	print("Save log of the sequences into \"%s\" file"%(fileLog.name))
+	print("Save classification summary of the sequences into \"%s\" file"%(fileLog.name))
 
 	fileUnknownKeyword = open("unknown_keyword.txt", "w")
 	print("Save the unknown keywords into \"%s\" file"%(fileUnknownKeyword.name))
