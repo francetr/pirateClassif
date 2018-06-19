@@ -14,8 +14,8 @@ def save(FASTA, SEQCLASSIFIED):
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
-		- 1 : for the log (log)
-		- 1 : for the unknown_keyword(unknown_keyword)
+		- 1 : for the classification summary (classification_summary)
+		- 1 : for the unknown keyword (unknown_keyword)
 
 	@rtype: None
 	"""
@@ -103,8 +103,10 @@ def savePotentialChimeric(FILECHIMERIC, FASTA, SEQNAME, POTENTIALCHIMERIC):
 
 	@rtype: None
 	"""
+	####	Case chimeric have been found first
 	if not "superFamily" in POTENTIALCHIMERIC:
 		FILECHIMERIC.write(">{seqName}:{seqClass}\n{seq}\n".format(seqName=SEQNAME, seqClass=POTENTIALCHIMERIC["class"], seq=FASTA[SEQNAME]["seq"]))
+	####	Case chimeric have been found during superFamily determination
 	else:
 		FILECHIMERIC.write(">{seqName}:{seqClass}:{order}:{superFamily}\n{seq}\n".format(seqName=SEQNAME, seqClass=POTENTIALCHIMERIC["class"], order=POTENTIALCHIMERIC["order"], superFamily=POTENTIALCHIMERIC["superFamily"], seq=FASTA[SEQNAME]["seq"]))
 

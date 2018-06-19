@@ -22,10 +22,12 @@ def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
-		- 1 : for the log (log)
-		- 1 : for the unknown_keyword(unknown_keyword)
+		- 1 : for the classification summary (classification_summary)
+		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
+	@type IDENTITYTHRESHOLD: float
+	@param IDENTITYTHRESHOLD: threshold for which the superFamily of a sequence will be named, if its frequency in the sequence is greater or equal to this threshold.
 
 	@rtype: None
 	"""
@@ -34,9 +36,55 @@ def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	SEQCLASSIFIED[features[0]]={}
 	classDetermination(features, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
 	####	Add a carriage return at the end of the sequence log
-	SEQCLASSIFIED[features[0]]["log"]+="\n"
+	finalDegreeClassification(features, SEQCLASSIFIED)
 	SEQCLASSIFIED[features[0]]["unknown_keyword"]+="\n"
 
+def finalDegreeClassification(FEATURES, SEQCLASSIFIED):
+	"""
+	Write a final degree of classification for a sequence in the Classification summary.
+
+	Keyword arguments:
+	@type SEQUENCE: list
+	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
+		- [0] : id of the sequence
+		- [3] : potentiel chimeric
+		- [4] : class of the sequence
+		- [5] : order of the sequence
+		- [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
+	@type SEQCLASSIFIED: dictionnary
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
+		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
+		- 3 : for the results (class, order and superFamily)
+		- 1 : for the classification summary (classification_summary)
+		- 1 : for the unknown keyword (unknown_keyword)
+
+	@rtype: None
+	"""
+	finalDegree=""
+	####	Case potentialChimeric
+	if SEQCLASSIFIED[FEATURES[0]]["saveType"] == "potentialChimeric":
+		####	Case the sequence has been found as chimeric in the beginning
+		if not "order" in SEQCLASSIFIED[FEATURES[0]]:
+			finalDegree = SEQCLASSIFIED[FEATURES[0]]["class"]
+		####	Case the sequence has been found as chimeric in the beginning
+		else:
+			finalDegree = SEQCLASSIFIED[FEATURES[0]]["class"]
+
+	####	Case uncategorized
+	elif SEQCLASSIFIED[FEATURES[0]]["saveType"] == "noCat":
+		finalDegree = SEQCLASSIFIED[FEATURES[0]]["class"]
+	####	Case non TE
+	elif SEQCLASSIFIED[FEATURES[0]]["saveType"] == "nonTE":
+		finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
+	####	Case TE
+	else:
+		####	No superFamily have been found
+		if not "superFamily" in SEQCLASSIFIED[FEATURES[0]]:
+			finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
+		####	A superFamily has been found
+		else:
+			finalDegree = SEQCLASSIFIED[FEATURES[0]]["superFamily"]
+	SEQCLASSIFIED[FEATURES[0]]["log"] += "\tFINALDEGREE:\t%s\n"%(finalDegree)
 
 def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	"""
@@ -48,12 +96,12 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
-		- 1 : for the log (log)
-		- 1 : for the unknown_keyword(unknown_keyword)
+		- 1 : for the classification summary (classification_summary)
+		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
-	@type IDENTITYTHRESHOLD: integer
-	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
+	@type IDENTITYTHRESHOLD: float
+	@param IDENTITYTHRESHOLD: threshold for which the superFamily of a sequence will be named, if its frequency in the sequence is greater or equal to this threshold.
 
 	@rtype: None
 	"""
@@ -96,12 +144,12 @@ def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
-		- 1 : for the log (log)
-		- 1 : for the unknown_keyword(unknown_keyword)
+		- 1 : for the classification summary (classification_summary)
+		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
-	@type IDENTITYTHRESHOLD: integer
-	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
+	@type IDENTITYTHRESHOLD: float
+	@param IDENTITYTHRESHOLD: threshold for which the superFamily of a sequence will be named, if its frequency in the sequence is greater or equal to this threshold.
 
 	@rtype: None
 	"""
@@ -136,12 +184,12 @@ def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOL
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
-		- 1 : for the log (log)
-		- 1 : for the unknown_keyword(unknown_keyword)
+		- 1 : for the classification summary (classification_summary)
+		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
-	@type IDENTITYTHRESHOLD: integer
-	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
+	@type IDENTITYTHRESHOLD: float
+	@param IDENTITYTHRESHOLD: threshold for which the superFamily of a sequence will be named, if its frequency in the sequence is greater or equal to this threshold.
 
 	@rtype: None
 	"""
@@ -171,8 +219,8 @@ def associateSuperFamily(FEATURES, SEQCLASSIFIED, FINALSUPERFAMILYNAME):
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
-		- 1 : for the log (log)
-		- 1 : for the unknown_keyword(unknown_keyword)
+		- 1 : for the classification summary (classification_summary)
+		- 1 : for the unknown keyword (unknown_keyword)
 	@type FINALSUPERFAMILYNAME: string
 	@param FINALSUPERFAMILYNAME: name of the superFamily find according the different keywords founded
 

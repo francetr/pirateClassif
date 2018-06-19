@@ -71,7 +71,8 @@ def main():
 			cptError+=1
 
 	print("Number total of sequences found : %d" %((cptTE + cptnonTE + cptnoCat + cptChimeric)))
-	print("Number of sequences found for TE recognized : %d, noCat : %d, nonTE : %d, chimeric: %d" %(cptTE, cptnoCat, cptnonTE, cptChimeric))
+	print("Number total of TE : %d; with recognized TE : %d, uncategorized : %d, potentialChimeric : %d"%((cptTE + cptnoCat + cptChimeric), cptTE, cptnoCat, cptChimeric))
+	print("Number of sequences found for nonTE : %d" %(cptnonTE))
 	print("Number of sequence with unknown keywords found: %s\n"%(cptError))
 
 	####	Reading of the fasta file ####

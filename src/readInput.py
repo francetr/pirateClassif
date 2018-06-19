@@ -21,7 +21,7 @@ def retrieveArguments():
 	parser = argparse.ArgumentParser(prog="scriptClassif.py", description="This program is a part of the PiRATE project. It aims to automatized the step of TE classification")
 	parser.add_argument("classif", type=str, help="classif file that comes from PASTEC")
 	parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
-	parser.add_argument("-e", metavar="IDENTITY", type=float, nargs="?", default=100, help="Threshold for considering two sequences as identical, enter an integer from 0 to 100, default is 100.")
+	parser.add_argument("-e", metavar="IDENTITY", type=float, nargs="?", default=100.0, help="Threshold for considering two sequences as identical, enter an integer from 0 to 100, default is 100.")
 	parser.add_argument("--baseline", type=str, nargs="?", default="base_reference.txt", help="baseline file giving the different names possible for a superfamily")
 	args = parser.parse_args()
 	####	If identity threshold > 100 convert it to the value 100
@@ -45,12 +45,12 @@ def readPastec(PASTEC, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 5 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
-		- 1 : for the log (log)
-		- 1 : for the unknown_keyword(unknown_keyword)
+		- 1 : for the classification summary (classification_summary)
+		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
-	@type IDENTITYTHRESHOLD: integer
-	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
+	@type IDENTITYTHRESHOLD: float
+	@param IDENTITYTHRESHOLD: threshold for which the superFamily of a sequence will be named, if its frequency in the sequence is greater or equal to this threshold.
 
 	@rtype: None
 	"""
@@ -186,26 +186,3 @@ def readFasta(FASTA):
 		####	prevent the opening if the file name is incorrect
 		print("/!\	Error: No such file as {}\n####	Classification aborted".format(FASTA))
 		sys.exit(1)
-
-# def checkArguments(CLASSIFNAME, FASTANAME):
-# 	"""
-# 	Check the extension of the two arguments of command line. If it is not correct, stop the programm.
-#
-# 	Keyword argument
-# 	@param CLASSIFNAME: name of the argument for the CLASSIF file
-# 	@param FASTANAME: name of the argument for the FASTA file
-#
-# 	@return: None
-#
-# 	"""
-# 	try:
-# 		classifName=re.match(r'[\S]*[/]?[\w\-.]+(classif)$',CLASSIFNAME).groups()[0] ####	regex checking is classif file as good extension
-# 	except AttributeError as e:
-# 		print("####	Wrong extension for the classif file\n####	 Classification aborted")
-# 		sys.exit(1)
-#
-# 	try:
-# 		fastaName=re.match(r'[\S]*[/]?[\w\-.]+(fasta)$', FASTANAME).groups()[0] ####	regex checking is fasta file as good extension
-# 	except AttributeError as e:
-# 		print("####	Wrong extension for the fasta file\n####	Classification aborted")
-# 		sys.exit(1)

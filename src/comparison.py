@@ -12,8 +12,8 @@ def superFamilyComparison(SUPERFAMILYFOUND, SUPERFAMILYASSOCIATED, IDENTITYTHRES
 	@param SUPERFAMILYFOUND: count the names of the superfamily found for one sequence during the superFamilyDetermination.
 	@type SUPERFAMILYASSOCIATED: dictionnary
 	@param SUPERFAMILYASSOCIATED: dictionnary containing different superfamily names possible for a given superfamily.
-	@type IDENTITYTHRESHOLD: integer
-	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
+	@type IDENTITYTHRESHOLD: float
+	@param IDENTITYTHRESHOLD: threshold for which the superFamily of a sequence will be named, if its frequency in the sequence is greater or equal to this threshold.
 
 	@rtype: string
 	@return: name of the superfamily corresponding to the sequence.
@@ -35,8 +35,8 @@ def compareKeywordsFounded(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYT
 	@param PROTPROFILES: All the proteines profiles keywords found and their count for a given sequence.
 	@type SUPERFAMILYASSOCIATED: dictionnary
 	@param SUPERFAMILYASSOCIATED: dictionnary containing the different superfamily names possible for a given proteine profile.
-	@type IDENTITYTHRESHOLD: integer
-	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
+	@type IDENTITYTHRESHOLD: float
+	@param IDENTITYTHRESHOLD: threshold for which the superFamily of a sequence will be named, if its frequency in the sequence is greater or equal to this threshold.
 
 	@rtype: string
 	@return: Name of the superFamily with different matches found.
@@ -84,8 +84,8 @@ def compareProtProfiles(PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYTHRESHOLD):
 	@param PROTPROFILES: All the proteines profiles keywords found and their proportion for a given sequence.
 	@type SUPERFAMILYASSOCIATED: dictionnary
 	@param SUPERFAMILYASSOCIATED: dictionnary containing the different superfamily names possible for a given proteine profile.
-	@type IDENTITYTHRESHOLD: integer
-	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
+	@type IDENTITYTHRESHOLD: float
+	@param IDENTITYTHRESHOLD: threshold for which the superFamily of a sequence will be named, if its frequency in the sequence is greater or equal to this threshold.
 
 	@rtype: string
 	@return: Name of the superFamily.
@@ -125,8 +125,8 @@ def compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED, IDEN
 	@param PROTPROFILES: All the proteines profiles keywords found and their proportion for a given sequence.
 	@type SUPERFAMILYASSOCIATED: dictionnary
 	@param SUPERFAMILYASSOCIATED: dictionnary containing the different superfamily names possible for a given proteine profile.
-	@type IDENTITYTHRESHOLD: integer
-	@param IDENTITYTHRESHOLD: percentage for which the superFamily name of a sequence will be choosen.
+	@type IDENTITYTHRESHOLD: float
+	@param IDENTITYTHRESHOLD: threshold for which the superFamily of a sequence will be named, if its frequency in the sequence is greater or equal to this threshold.
 
 	@rtype: string
 	@return: Name of the superFamily with differents matches found.
