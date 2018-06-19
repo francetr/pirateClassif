@@ -96,11 +96,11 @@ According the type of the sequence, the script will determine the class, order, 
 In addition with these four outcomes, two additionnals files are available:
 * **Classification_summary.txt** : contains for every sequences the proofs founded to classifie the class, order and superFamily of this sequence.  
 Here is an example of a line that can be found in this file :  
-> ltrharvest_941	10243	TE	I	LTR	BLAST : {'Gypsy': [6, 100.0]}	PROTPROFILES : {'RH': [1, 20.0], 'AP': [1, 20.0], 'RT': [2, 40.0], 'GAG': [1, 20.0]}	PREDICTED_SUPERFAMILY: Gypsy  
+> ltrharvest_941 &emsp; 10243 &emsp; TE &emsp; I &emsp; LTR &emsp; BLAST : {'Gypsy': &nbsp; [6, 100.0]} &emsp; PROTPROFILES : &nbsp; {'RH': &nbsp; [1, 20.0], 'AP': &nbsp; [1, 20.0], 'RT': &nbsp; [2, 40.0], 'GAG': &nbsp; [1, 20.0]} &emsp; PREDICTED_SUPERFAMILY: &emsp; Gypsy  
 > From right to left we got :  
-name of the sequence; length; type of the sequence(TE, nonTE, potentialChimeric or noCat); class; order; Blast keywords: name: [nb of occurrence, percentage], Proteine Profile keywords: name:[nb of occurrence, percentage]; name predicted of the superFamily
+name of the sequence &emsp; length &emsp; type of the sequence(TE, nonTE, potentialChimeric or noCat) &emsp; class &emsp; order &emsp; Blast keywords: &nbsp; name: [nb of occurrence, &nbsp; percentage], &nbsp; Proteine Profile keywords: name:[nb of occurrence, percentage] &emsp; name predicted of the superFamily
 
-* **error.txt** : contains the string which doens't contains keywords that matches with the baseline (during the superFamily determination).
+* **unknown_keywords.txt** : contains the string which doens't contains keywords that matches with the baseline (during the superFamily determination).
 
 ## How the superFamily determination work:
 The diagram above show the diffent possibilities which can be founded during the keywords comparison used for the superFamily determination.
