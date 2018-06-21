@@ -2,25 +2,41 @@
 
 ## Aim of this project :
 
-This script is a part of the PiRATE project (that aim to analyze the Transposable Element in sequences).
-The purpose of this code is to automatize the step of classification of PiRATE.
+This script is a part of the PiRATE (**Pi**peline to **R**etrieve and **A**nnotate **T**ransposable **E**lements) project (that aim to analyze the Transposable Elements in sequenced genomes). The purpose of this code is to automatize the step of classification of PiRATE.  
+You can have acces to the VM of PiRATE to the page:  _http://www.seanoe.org/data/00406/51795/_
 
 For more information, you can read the research paper that lead to the creation of PiRATE :  
-_http://www.seanoe.org/data/00406/51795/_  
-or _https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-4763-1_
+_https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-4763-1_
 
 ## Requirements
 This script is written in python, it can be launched either with python2.7 or python3.5. See the official site of Python for more informations about it : _https://www.python.org/_  
-However, it requires the ***biopython*** modules (usefull to write the sequences onto fasta files).  
+However, it requires the ***biopython*** modules (usefull to write the sequences onto fasta files), which you can acces with ***pip***.  
 To install Biopython, we invited you to do it via a terminal with the command:
-~~~
+~~~{bash}
+Installation of pip:  
+For python2:  
 sudo apt-get install python-pip  
+
+For python3:  
+sudo apt-get install python3-pip  
+
+Then you can install biopython:  
+For python2:  
 pip install biopython  
+
+For python3:  
+pip3 install biopython  
 ~~~
 
 To be sure biopython is update
 ~~~
-pip install biopython --upgrade
+For python2:  
+pip install biopython --upgrade  
+
+or
+
+For python3:  
+pip3 install biopython --upgrade
 ~~~
 
 If you got troubles with the installation of biopython or if you need to install it with other OS than Linux please check its official website : _https://biopython.org/wiki/Download_  
@@ -33,11 +49,11 @@ The script will retrieve the class, order and superfamily for each sequence in t
 
 
 * ***baselineFile*** : File containing the baseline of the superFamilies names (multiple names can define the same superFamily). This is useful to determine if a sequence can be classified as multiple families or if its superFamily is not defined yet. By default it is ***base&#95;reference.txt*** which is used.  
-For the classification step, we used ***blast*** and ***protProfiles*** keywords. The first concerned keywords that can be find in the ***TE&#95;BLRx*** or ***TE&#95;BLRtx*** part of coding, and the last can be found in the ***profiles*** part.  
+For the classification step, we used ***blast*** and ***protProfiles*** keywords. The first concern keywords that can be find in the ***TE&#95;BLRx*** or ***TE&#95;BLRtx*** part of coding, and the last can be found in the ***profiles*** part.  
 ***NB:&nbsp;*** It is important that the baseline file is located in the same directory than the current working directory where you launched the script. If it is not the case, you still can specify its path with the argument ***--baseline***.  
 This file can be completed, for this, you just need to enter the new family name in a new line followed by a _tabulation_ and the different names (separated by ***:*** ) that can design this superfamily.  
 > Example :  
-> Mariner&nbsp;&nbsp;&nbsp;&nbsp;Tc1-mariner:mariner:TASE  
+> Mariner&nbsp;&nbsp;&nbsp;&nbsp;Tc1-mariner:mariner  
 > &gt;TASE&nbsp;&nbsp;&nbsp;&nbsp;Mariner:hAT:PIF-Harbinger:PiggyBac:Merlin:Transib:CACTA:P
 
 
