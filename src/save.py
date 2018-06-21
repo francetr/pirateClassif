@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 # coding: utf8
 
+import re
+
 """ @author: Tristan Frances """
 
 def save(FASTA, SEQCLASSIFIED):
@@ -19,7 +21,29 @@ def save(FASTA, SEQCLASSIFIED):
 
 	@rtype: None
 	"""
-	####	First create the files in which the sequences and log will be written
+	#TODO : Save sequences according their class, order and their superFamily
+	allOrder = []
+	allSuperFamily = []
+	for sequence in SEQCLASSIFIED.keys():
+		if SEQCLASSIFIED[sequence]["saveType"] == "TE":
+			allOrder.append(SEQCLASSIFIED[sequence]["order"])
+			if "superFamily" in SEQCLASSIFIED[sequence]:
+				####	Search for possible superFamily name
+				name = re.search(r'([^_]+)', SEQCLASSIFIED[sequence]["superFamily"]).groups()[0]
+				####	Define the name of the superFamily sequence as FINALSUPERFAMILYNAME
+				allSuperFamily.append(name)
+
+	allOrder = list(set(allOrder))
+	allSuperFamily = list(set(allSuperFamily))
+
+	for order in allOrder:
+		file=open("{order}.fasta".format(order=order), "w")
+		file.write("test")
+		file.close()
+
+
+
+	####	First create the files in which the sequences, the summary and the unknown keywords will be written
 	fileNoCat = open("noCat.fasta", "w")
 	print("Save uncategorized sequences into \"%s\" file"%(fileNoCat.name))
 
@@ -32,40 +56,109 @@ def save(FASTA, SEQCLASSIFIED):
 	fileNonTE = open("nonTE.fasta", "w")
 	print("Save nonTE sequences into \"%s\" file"%(fileNonTE.name))
 
-	fileLog = open("Classification_summary.txt", "w")
-	print("Save classification summary of the sequences into \"%s\" file"%(fileLog.name))
+	fileSummary = open("Classification_summary.txt", "w")
+	print("Save classification summary of the sequences into \"%s\" file"%(fileSummary.name))
 
 	fileUnknownKeyword = open("unknown_keyword.txt", "w")
 	print("Save the unknown keywords into \"%s\" file"%(fileUnknownKeyword.name))
 
 	for seqName in SEQCLASSIFIED:
-		####	Save uncategorized sequences
-		if SEQCLASSIFIED[seqName]["saveType"] == "noCat":
-			saveNoCat(fileNoCat, FASTA, seqName, SEQCLASSIFIED[seqName])
-		####	Save potentialChimeric sequences
+		SAVETYPE = SEQCLASSIFIED[seqName]["saveType"]
+		####	Case saveType is uncategorized sequences
+		if SAVETYPE == "noCat":
+			fileNoCat.write(">{seqName}:{seqClass}\n{seq}\n".format(seqName=seqName, seqClass=SEQCLASSIFIED[seqName]["class"], seq=FASTA[seqName]["seq"]))
+
+		####	Case saveType is potential Chimeric sequences
 		elif SEQCLASSIFIED[seqName]["saveType"] == "potentialChimeric":
-			savePotentialChimeric(filePotentialChimeric, FASTA, seqName, SEQCLASSIFIED[seqName])
-		####	Save TE sequences
+			####	Case there is not superFamily determined for this sequence
+			if not "superFamily" in SEQCLASSIFIED[seqName]:
+				filePotentialChimeric.write(">{seqName}:{seqClass}\n{seq}\n".format(seqName=seqName, seqClass=SEQCLASSIFIED[seqName]["class"], seq=FASTA[seqName]["seq"]))
+			####	Case a superFamily have been determined for this sequence
+			else:
+				filePotentialChimeric.write(">{seqName}:{seqClass}:{order}:{superFamily}\n{seq}\n".format(seqName=seqName, seqClass=SEQCLASSIFIED[seqName]["class"], order=SEQCLASSIFIED[seqName]["order"], superFamily=SEQCLASSIFIED[seqName]["superFamily"], seq=FASTA[seqName]["seq"]))
+
+		####	Case saveType is TE
 		elif SEQCLASSIFIED[seqName]["saveType"] == "TE":
-			saveTE(fileTE, FASTA, seqName, SEQCLASSIFIED[seqName])
-		####	Save nonTE sequences
+			####	Case there is not superFamily determined for this sequence
+			if not "superFamily" in SEQCLASSIFIED[seqName]:
+				fileTE.write(">{seqName}:{seqClass}\n{seq}\n".format(seqName=seqName, seqClass=SEQCLASSIFIED[seqName]["class"], seq=FASTA[seqName]["seq"]))
+			####	Case a superFamily have been determined for this sequence
+			else:
+				fileTE.write(">{seqName}:{seqClass}:{order}:{superFamily}\n{seq}\n".format(seqName=seqName, seqClass=SEQCLASSIFIED[seqName]["class"], order=SEQCLASSIFIED[seqName]["order"], superFamily=SEQCLASSIFIED[seqName]["superFamily"], seq=FASTA[seqName]["seq"]))
+
+		####	Case saveType is nonTE
 		elif SEQCLASSIFIED[seqName]["saveType"] == "nonTE":
-			saveNonTE(fileNonTE, FASTA, seqName, SEQCLASSIFIED[seqName])
+			fileNonTE.write(">{seqName}:{seqClass}\n{seq}\n".format(seqName=seqName, seqClass=SEQCLASSIFIED[seqName]["class"], seq=FASTA[seqName]["seq"]))
 
 		####	Save the unknown keywords (keywords unknown, founded during search process in a sequence), just if unknown keywords have been found
 		if SEQCLASSIFIED[seqName]["unknown_keyword"] != "\n" :
 			print("Write unknown keywords for sequence %s in the file %s"%(seqName, fileUnknownKeyword.name))
-			saveUnknownKeyword(fileUnknownKeyword, SEQCLASSIFIED[seqName])
+			fileUnknownKeyword.write("{unknown_keyword}".format(unknown_keyword=SEQCLASSIFIED[seqName]["unknown_keyword"]))
 		####	Save log of the sequences
-		saveLog(fileLog, SEQCLASSIFIED[seqName])
+		fileSummary.write(SEQCLASSIFIED[seqName]["log"])
+
+		# ####	Save uncategorized sequences
+		# if SEQCLASSIFIED[seqName]["saveType"] == "noCat":
+		# 	saveNoCat(fileNoCat, FASTA, seqName, SEQCLASSIFIED[seqName])
+		# ####	Save potentialChimeric sequences
+		# elif SEQCLASSIFIED[seqName]["saveType"] == "potentialChimeric":
+		# 	savePotentialChimeric(filePotentialChimeric, FASTA, seqName, SEQCLASSIFIED[seqName])
+		# ####	Save TE sequences
+		# elif SEQCLASSIFIED[seqName]["saveType"] == "TE":
+		# 	saveTE(fileTE, FASTA, seqName, SEQCLASSIFIED[seqName])
+		# ####	Save nonTE sequences
+		# elif SEQCLASSIFIED[seqName]["saveType"] == "nonTE":
+		# 	saveNonTE(fileNonTE, FASTA, seqName, SEQCLASSIFIED[seqName])
+		#
+		# ####	Save the unknown keywords (keywords unknown, founded during search process in a sequence), just if unknown keywords have been found
+		# if SEQCLASSIFIED[seqName]["unknown_keyword"] != "\n" :
+		# 	print("Write unknown keywords for sequence %s in the file %s"%(seqName, fileUnknownKeyword.name))
+		# 	saveUnknownKeyword(fileUnknownKeyword, SEQCLASSIFIED[seqName])
+		# ####	Save ckassification summary of the sequences
+		# saveSummary(fileSummary, SEQCLASSIFIED[seqName])
 
 	####	Close all the saving files
 	fileUnknownKeyword.close()
-	fileLog.close()
+	fileSummary.close()
 	fileNonTE.close()
 	fileTE.close()
 	filePotentialChimeric.close()
 	fileNoCat.close()
+
+# def writeInFile(FILE, FASTA, SEQNAME, SAVETYPE):
+# 	####	Case saveType is uncategorized sequences
+# 	if SAVETYPE == "noCat":
+# 		FILE.write(">{seqName}:{seqClass}\n{seq}\n".format(seqName=SEQNAME, seqClass=SAVETYPE["class"], seq=FASTA[SEQNAME]["seq"]))
+#
+# 	####	Case saveType is potential Chimeric sequences
+# 	elif SEQCLASSIFIED[seqName]["saveType"] == "potentialChimeric":
+# 		####	Case there is not superFamily determined for this sequence
+# 		if not "superFamily" in FILE:
+# 			FILE.write(">{seqName}:{seqClass}\n{seq}\n".format(seqName=SEQNAME, seqClass=SAVETYPE["class"], seq=FASTA[SEQNAME]["seq"]))
+# 		####	Case a superFamily have been determined for this sequence
+# 		else:
+# 			FILE.write(">{seqName}:{seqClass}:{order}:{superFamily}\n{seq}\n".format(seqName=SEQNAME, seqClass=SAVETYPE["class"], order=SAVETYPE["order"], superFamily=SAVETYPE["superFamily"], seq=FASTA[SEQNAME]["seq"]))
+#
+# 	####	Case saveType is TE
+# 	elif SEQCLASSIFIED[seqName]["saveType"] == "TE":
+# 		####	Case there is not superFamily determined for this sequence
+# 		if not "superFamily" in FILE:
+# 			FILE.write(">{seqName}:{seqClass}\n{seq}\n".format(seqName=SEQNAME, seqClass=NOCAT["class"], seq=FASTA[SEQNAME]["seq"]))
+# 		####	Case a superFamily have been determined for this sequence
+# 		else:
+# 			FILE.write(">{seqName}:{seqClass}:{order}:{superFamily}\n{seq}\n".format(seqName=SEQNAME, seqClass=SAVETYPE["class"], order=SAVETYPE["order"], superFamily=SAVETYPE["superFamily"], seq=FASTA[SEQNAME]["seq"]))
+#
+# 	####	Case saveType is nonTE
+# 	elif SEQCLASSIFIED[seqName]["saveType"] == "nonTE":
+# 		FILE.write(">{seqName}:{seqClass}\n{seq}\n".format(seqName=SEQNAME, seqClass=SAVETYPE["class"], seq=FASTA[SEQNAME]["seq"]))
+#
+# 	####	Save the unknown keywords (keywords unknown, founded during search process in a sequence), just if unknown keywords have been found
+# 	if SEQCLASSIFIED[seqName]["unknown_keyword"] != "\n" :
+# 		print("Write unknown keywords for sequence %s in the file %s"%(seqName, fileUnknownKeyword.name))
+# 		saveUnknownKeyword(fileUnknownKeyword, SEQCLASSIFIED[seqName])
+# 	####	Save log of the sequences
+# 	saveSummary(fileLog, SEQCLASSIFIED[seqName])
+
 
 
 def saveNoCat(FILENOCAT, FASTA, SEQNAME, NOCAT):
@@ -150,7 +243,7 @@ def saveNonTE(FILENONTE, FASTA, SEQNAME, NONTE):
 	"""
 	FILENONTE.write(">{seqName}:{seqClass}\n{seq}\n".format(seqName=SEQNAME, seqClass=NONTE["class"], seq=FASTA[SEQNAME]["seq"]))
 
-def saveLog(FILELOG, LOG):
+def saveSummary(FILELOG, LOG):
 	"""
 	Save the log of the classification steps.
 
