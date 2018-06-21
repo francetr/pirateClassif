@@ -14,6 +14,7 @@ def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	@type SEQUENCE: list
 	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
 		- [0] : id of the sequence
+		- [1] : length
 		- [3] : potentiel chimeric
 		- [4] : class of the sequence
 		- [5] : order of the sequence
@@ -44,9 +45,10 @@ def finalDegreeClassification(FEATURES, SEQCLASSIFIED):
 	Write a final degree of classification for a sequence in the Classification summary.
 
 	Keyword arguments:
-	@type SEQUENCE: list
-	@param SEQUENCE: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
+	@type FEATURES: list
+	@param FEATURES: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
 		- [0] : id of the sequence
+		- [1] : length
 		- [3] : potentiel chimeric
 		- [4] : class of the sequence
 		- [5] : order of the sequence
@@ -92,6 +94,8 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	For this, complete four dictionnaries, passed onto arguments, that will contain the different catagories that caracterize the sequence.
 
 	Keyword arguments:
+	@type FEATURES: list
+	@param FEATURES: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
 	@type SEQCLASSIFIED: dictionnary
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
@@ -139,7 +143,13 @@ def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 
 	Keyword arguments:
 	@type FEATURES: list
-	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence.
+	@param FEATURES: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
+		- [0] : id of the sequence
+		- [1] : length
+		- [3] : potentiel chimeric
+		- [4] : class of the sequence
+		- [5] : order of the sequence
+		- [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
 	@type SEQCLASSIFIED: dictionnary
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
@@ -179,7 +189,13 @@ def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOL
 
 	Keyword arguments:
 	@type FEATURES: list
-	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence.
+	@param FEATURES: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
+		- [0] : id of the sequence
+		- [1] : length
+		- [3] : potentiel chimeric
+		- [4] : class of the sequence
+		- [5] : order of the sequence
+		- [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
 	@type SEQCLASSIFIED: dictionnary
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
@@ -214,7 +230,7 @@ def associateSuperFamily(FEATURES, SEQCLASSIFIED, FINALSUPERFAMILYNAME):
 
 	Keyword arguments:
 	@type FEATURES: list
-	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence.
+	@param FEATURES: name of the list of strings, which contain the sequence to categorize, that will be parsed.
 	@type SEQCLASSIFIED: dictionnary
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);

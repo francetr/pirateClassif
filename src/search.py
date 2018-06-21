@@ -14,7 +14,7 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDEN
 
 	Keyword arguments:
 	@type FEATURES: list
-	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence. Usefull to know the sequence concerned.
+	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence.
 	@type DATABASERECORDS: list
 	@param DATABASERECORDS: list of string in which there are the superFamily name to search.
 	@type SEQCLASSIFIED: dictionnary
@@ -65,8 +65,7 @@ def searchProfilesName(FEATURES, SEQCLASSIFIED, DATABASERECORD, PROFILESFOUND, B
 
 	Keyword arguments:
 	@type FEATURES: list
-	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence. Usefull to know the sequence concerned. Usefull to know the sequence concerned.
-	@type SEQCLASSIFIED: dictionnary
+	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence.
 	@param SEQCLASSIFIED: Used in case a keyword hasn't be found. dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
 		- 3 : for the results (class, order and superFamily)
@@ -136,7 +135,7 @@ def searchBlastName(FEATURES, SEQCLASSIFIED, DATABASERECORD, BLASTFOUND, BASELIN
 
 	Keyword arguments:
 	@type FEATURES: list
-	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence. Usefull to know the sequence concerned. Usefull to know the sequence concerned.
+	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence.
 	@type SEQCLASSIFIED: dictionnary
 	@param SEQCLASSIFIED: Used in case a keyword hasn't be found. dictionnary storing the result of the classification into 6 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
