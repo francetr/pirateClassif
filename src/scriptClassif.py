@@ -17,7 +17,7 @@ from timeit import default_timer as timer
 ############
 
 def main():
-	start = timer()
+
 	print("Start of the classification\n")
 	####	Instanciation of a dictionnary with the id of the sequence as key and the values will contain 6 dictionnaries
 	####	(6 keys, 1 for each categories: class, order, superFamily; 1 for the type of file in which the sequence will be saved (e.g. nonTE, TE,
@@ -85,12 +85,12 @@ def main():
 		sys.exit(1)
 	save.save(fasta, seqClassified)
 
-	end = timer()
-	print("\nThe execution of the script has taken %s sec"%(end - start))
-
 ####################
 #	   MAIN
 ####################
 
 if __name__ == "__main__":
+	start = timer()
 	main()
+	end = timer()
+	print("\nThe execution of the script has taken %s sec"%(end - start))

@@ -20,10 +20,10 @@ def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 		- [5] : order of the sequence
 		- [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (class, order and superFamily)
-		- 1 : for the classification summary (classification_summary)
+		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
@@ -33,60 +33,13 @@ def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	@rtype: None
 	"""
 	features=SEQUENCE.split("\t")
-	####	Instanciation of the key for the sequence which will contain 6 dictionnaries: 4 for the results (TE, nonTE, potentialChimeric and noCat), 1 for the type of file save and one for the log
-	SEQCLASSIFIED[features[0]]={}
+	####	Instanciation of the key for the sequence which will contain 6 dictionnaries: 4 for the results (TE, nonTE, potentialChimeric and noCat), 1 for the type of file save and one for the summary
+	SEQCLASSIFIED[features[0]]={"length":features[1]}
 	classDetermination(features, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
-	####	Add a carriage return at the end of the sequence log
+	####	determine the final degree of the sequence
 	finalDegreeClassification(features, SEQCLASSIFIED)
 	SEQCLASSIFIED[features[0]]["unknown_keyword"]+="\n"
 
-def finalDegreeClassification(FEATURES, SEQCLASSIFIED):
-	"""
-	Write a final degree of classification for a sequence in the Classification summary.
-
-	Keyword arguments:
-	@type FEATURES: list
-	@param FEATURES: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
-		- [0] : id of the sequence
-		- [1] : length
-		- [3] : potentiel chimeric
-		- [4] : class of the sequence
-		- [5] : order of the sequence
-		- [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
-	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
-		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (class, order and superFamily)
-		- 1 : for the classification summary (classification_summary)
-		- 1 : for the unknown keyword (unknown_keyword)
-
-	@rtype: None
-	"""
-	finalDegree=""
-	####	Case potentialChimeric
-	if SEQCLASSIFIED[FEATURES[0]]["saveType"] == "potentialChimeric":
-		####	Case the sequence has been found as chimeric in the beginning
-		if not "order" in SEQCLASSIFIED[FEATURES[0]]:
-			finalDegree = SEQCLASSIFIED[FEATURES[0]]["class"]
-		####	Case the sequence has been found as chimeric in the beginning
-		else:
-			finalDegree = SEQCLASSIFIED[FEATURES[0]]["class"]
-
-	####	Case uncategorized
-	elif SEQCLASSIFIED[FEATURES[0]]["saveType"] == "noCat":
-		finalDegree = SEQCLASSIFIED[FEATURES[0]]["class"]
-	####	Case non TE
-	elif SEQCLASSIFIED[FEATURES[0]]["saveType"] == "nonTE":
-		finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
-	####	Case TE
-	else:
-		####	No superFamily have been found
-		if not "superFamily" in SEQCLASSIFIED[FEATURES[0]]:
-			finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
-		####	A superFamily has been found
-		else:
-			finalDegree = SEQCLASSIFIED[FEATURES[0]]["superFamily"]
-	SEQCLASSIFIED[FEATURES[0]]["log"] += "\tFINALDEGREE:\t%s\n"%(finalDegree)
 
 def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	"""
@@ -97,10 +50,10 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	@type FEATURES: list
 	@param FEATURES: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (class, order and superFamily)
-		- 1 : for the classification summary (classification_summary)
+		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
@@ -115,19 +68,23 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	if FEATURES[3] != "PotentialChimeric":
 		####	Check the class of the sequence if it is not chimeric : class I or II
 		if FEATURES[4] == "I" or FEATURES[4] == "II" :
-			SEQCLASSIFIED[FEATURES[0]]={"saveType":"TE","class":FEATURES[4]}
+			SEQCLASSIFIED[FEATURES[0]]["saveType"]="TE"
+			SEQCLASSIFIED[FEATURES[0]]["class"]=FEATURES[4]
 			searchOrder=True
 		####	NoCat
 		elif FEATURES[4] == "noCat":
-			SEQCLASSIFIED[FEATURES[0]]={"saveType":"noCat","class":"undefined"}
+			SEQCLASSIFIED[FEATURES[0]]["saveType"]="noCat"
+			SEQCLASSIFIED[FEATURES[0]]["class"]="undefined"
 		####	 NonTE
 		else:
-			SEQCLASSIFIED[FEATURES[0]]={"saveType":"nonTE","class":"nonTE"}
+			SEQCLASSIFIED[FEATURES[0]]["saveType"]="nonTE"
+			SEQCLASSIFIED[FEATURES[0]]["class"]="nonTE"
 			searchOrder=True
 	else:
-		SEQCLASSIFIED[FEATURES[0]]={"saveType":"potentialChimeric","class":"potentialChimeric"}
-	####	Initialize a log for concerned sequences that will be put into a log file and add the length, the type and the class of the sequence
-	SEQCLASSIFIED[FEATURES[0]]["log"]=str("{name}\t{length}\t{saveType}\t{seqClass}\t".format(name=FEATURES[0], length=FEATURES[1], saveType=SEQCLASSIFIED[FEATURES[0]]["saveType"], seqClass=SEQCLASSIFIED[FEATURES[0]]["class"]))
+		SEQCLASSIFIED[FEATURES[0]]["saveType"]="potentialChimeric"
+		SEQCLASSIFIED[FEATURES[0]]["class"]="potentialChimeric"
+	# ####	Initialize a summary for concerned sequences that will be put into a summary file and add the length, the type and the class of the sequence
+	# SEQCLASSIFIED[FEATURES[0]]["summary"]=str("{name}\t{length}\t{saveType}\t{seqClass}\t".format(name=FEATURES[0], length=FEATURES[1], saveType=SEQCLASSIFIED[FEATURES[0]]["saveType"], seqClass=SEQCLASSIFIED[FEATURES[0]]["class"]))
 	####	Initialize a unknown_keyword for concerned sequences that will be put into an unknown_keyword file. It concerned unknown_keywords found during search of BLAST and PROTPROFILES keywords
 	SEQCLASSIFIED[FEATURES[0]]["unknown_keyword"]=str("")
 	####	The sequence is a TE so order need to be determined
@@ -151,10 +108,10 @@ def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 		- [5] : order of the sequence
 		- [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (class, order and superFamily)
-		- 1 : for the classification summary (classification_summary)
+		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
@@ -175,8 +132,8 @@ def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	else:
 		SEQCLASSIFIED[FEATURES[0]]["order"]=FEATURES[5]
 		searchSuperFamily=True
-	####	Add the order of the sequence onto the log file
-	SEQCLASSIFIED[FEATURES[0]]["log"]+=str("{order}\t".format(order=SEQCLASSIFIED[FEATURES[0]]["order"]))
+	# ####	Add the order of the sequence onto the summary file
+	# SEQCLASSIFIED[FEATURES[0]]["summary"]+=str("{order}\t".format(order=SEQCLASSIFIED[FEATURES[0]]["order"]))
 
 	####	The superFamily need to be determined
 	if searchSuperFamily:
@@ -197,10 +154,10 @@ def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOL
 		- [5] : order of the sequence
 		- [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (class, order and superFamily)
-		- 1 : for the classification summary (classification_summary)
+		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
@@ -232,10 +189,10 @@ def associateSuperFamily(FEATURES, SEQCLASSIFIED, FINALSUPERFAMILYNAME):
 	@type FEATURES: list
 	@param FEATURES: name of the list of strings, which contain the sequence to categorize, that will be parsed.
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (class, order and superFamily)
-		- 1 : for the classification summary (classification_summary)
+		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 	@type FINALSUPERFAMILYNAME: string
 	@param FINALSUPERFAMILYNAME: name of the superFamily find according the different keywords founded
@@ -249,8 +206,59 @@ def associateSuperFamily(FEATURES, SEQCLASSIFIED, FINALSUPERFAMILYNAME):
 	if name == "potentialChimeric":
 		####	Pass the saveType from TE in potnetialChimeric
 		SEQCLASSIFIED[FEATURES[0]]["saveType"] = "potentialChimeric"
-		####	Rewrite the correct saveType of the sequence in the log
-		SEQCLASSIFIED[FEATURES[0]]["log"]=SEQCLASSIFIED[FEATURES[0]]["log"].replace("\tTE\t", "\tpotentialChimeric\t")
+		####	Rewrite the correct saveType of the sequence in the summary
+		# SEQCLASSIFIED[FEATURES[0]]["summary"]=SEQCLASSIFIED[FEATURES[0]]["summary"].replace("\tTE\t", "\tpotentialChimeric\t")
 
 	####	Define the name of the superFamily sequence as FINALSUPERFAMILYNAME
 	SEQCLASSIFIED[FEATURES[0]]["superFamily"] = FINALSUPERFAMILYNAME
+
+
+def finalDegreeClassification(FEATURES, SEQCLASSIFIED):
+	"""
+	Write a final degree of classification for a sequence in the Classification summary.
+
+	Keyword arguments:
+	@type FEATURES: list
+	@param FEATURES: name of the list of strings, which contain the sequence to categorize, that will be parsed. Usefull values of this list :
+		- [0] : id of the sequence
+		- [1] : length
+		- [3] : potentiel chimeric
+		- [4] : class of the sequence
+		- [5] : order of the sequence
+		- [7] : superfamily (if determined) of the sequence. Must be extracted with Regex
+	@type SEQCLASSIFIED: dictionnary
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
+		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
+		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
+		- 1 : for the unknown keyword (unknown_keyword)
+
+	@rtype: None
+	"""
+	finalDegree=""
+	####	Case potentialChimeric
+	if SEQCLASSIFIED[FEATURES[0]]["saveType"] == "potentialChimeric":
+		####	Case the sequence has been found as chimeric in the beginning
+		if not "order" in SEQCLASSIFIED[FEATURES[0]]:
+			finalDegree = SEQCLASSIFIED[FEATURES[0]]["class"]
+		####	Case the sequence has been found as chimeric in the beginning
+		else:
+			finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
+
+	####	Case uncategorized
+	elif SEQCLASSIFIED[FEATURES[0]]["saveType"] == "noCat":
+		finalDegree = SEQCLASSIFIED[FEATURES[0]]["class"]
+	####	Case non TE
+	elif SEQCLASSIFIED[FEATURES[0]]["saveType"] == "nonTE":
+		finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
+	####	Case TE
+	else:
+		####	No superFamily have been found
+		if not "superFamily" in SEQCLASSIFIED[FEATURES[0]]:
+			finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
+		####	A superFamily has been found
+		else:
+			finalDegree = SEQCLASSIFIED[FEATURES[0]]["superFamily"]
+	SEQCLASSIFIED[FEATURES[0]]["finalDegree"] = finalDegree
+
+	# SEQCLASSIFIED[FEATURES[0]]["summary"] += "\tFINALDEGREE:\t%s\n"%(finalDegree)

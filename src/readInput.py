@@ -42,10 +42,10 @@ def readPastec(PASTEC, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	@type PASTEC: string
 	@param PASTEC: name of the classif file that will be opened.
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 5 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (class, order and superFamily)
-		- 1 : for the classification summary (classification_summary)
+		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
@@ -64,9 +64,9 @@ def readPastec(PASTEC, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 				categorization.initCategorization(sequence, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
 			print("End of the categorization\n")
 
-	except (FileNotFoundError, NameError):
+	except (FileNotFoundError, NameError) as e:
 		####	Prevent the opening if the file name is incorrect
-		print("/!\	Error: No such file as {}\n####	Classification aborted".format(PASTEC))
+		print("/!\	Error: {}\n####	Classification aborted".format(e))
 		sys.exit(1)
 
 def readBaseline(BASELINE):
@@ -100,8 +100,8 @@ def readBaseline(BASELINE):
 					readProtProfilesBaselineKeywords(keywords.groups()[0], baselineDictionnary)
 		return baselineDictionnary
 
-	except (FileNotFoundError, NameError):
-		print("/!\	Error: No such file as {}\n####	Classification aborted".format(BASELINE))
+	except (FileNotFoundError, NameError) as e:
+		print("/!\	Error: {}\n####	Classification aborted".format(e))
 		sys.exit(1)
 
 
@@ -182,7 +182,7 @@ def readFasta(FASTA):
 				####	Save the sequence in a dictionnary
 				seqReturned[record.id]={"seq":record.seq}
 		return seqReturned
-	except (FileNotFoundError, NameError):
+	except (FileNotFoundError, NameError) as e:
 		####	prevent the opening if the file name is incorrect
-		print("/!\	Error: No such file as {}\n####	Classification aborted".format(FASTA))
+		print("/!\	Error: {}\n####	Classification aborted".format(e))
 		sys.exit(1)

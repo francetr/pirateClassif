@@ -2,6 +2,7 @@
 # coding: utf8
 
 import re
+import os
 
 """ @author: Tristan Frances """
 
@@ -13,47 +14,65 @@ def save(FASTA, SEQCLASSIFIED):
 	@type FASTA: dictionnary
 	@param FASTA: dictionnary with the nucleotide sequence which has been categorized
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (class, order and superFamily)
-		- 1 : for the classification summary (classification_summary)
+		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 
 	@rtype: None
 	"""
 	#TODO : Save sequences according their class, order and their superFamily
-	allOrder = []
-	allSuperFamily = []
-	for sequence in SEQCLASSIFIED.keys():
-		if SEQCLASSIFIED[sequence]["saveType"] == "TE":
-			allOrder.append(SEQCLASSIFIED[sequence]["order"])
-			if "superFamily" in SEQCLASSIFIED[sequence]:
-				####	Search for possible superFamily name
-				name = re.search(r'([^_]+)', SEQCLASSIFIED[sequence]["superFamily"]).groups()[0]
-				####	Define the name of the superFamily sequence as FINALSUPERFAMILYNAME
-				allSuperFamily.append(name)
+	####	Creat a directory to stor each files
+	try:
+		os.mkdir("libraries")
+		os.mkdir("libraries/class")
+		os.mkdir("libraries/order")
+		os.mkdir("libraries/superFamily")
+	except OSError as e:
+		print(os.strerror(e.errno))
 
-	allOrder = list(set(allOrder))
-	allSuperFamily = list(set(allSuperFamily))
+	#TODO construction automatic of different libraries
+	####	Create files for each superFamily and order
+	# allSaves = {"class":[], "order":[], "superFamily":[]}
+	# for sequence in SEQCLASSIFIED.keys():
+	# 	if SEQCLASSIFIED[sequence]["saveType"] == "TE":
+	# 		allSaves["class"].append(SEQCLASSIFIED[sequence]["class"])
+	# 		allSaves["order"].append(SEQCLASSIFIED[sequence]["order"])
+	# 		if "superFamily" in SEQCLASSIFIED[sequence]:
+	# 			####	Search for possible superFamily name
+	# 			name = re.search(r'([^_]+)', SEQCLASSIFIED[sequence]["superFamily"]).groups()[0]
+	# 			####	Define the name of the superFamily sequence as FINALSUPERFAMILYNAME
+	# 			allSaves["superFamily"].append(name)
+	#
+	# allSaves["class"] = list(set(allSaves["class"]))
+	# allSaves["order"] = list(set(allSaves["order"]))
+	# allSaves["superFamily"] = list(set(allSaves["superFamily"]))
+	#
+	# for seqClass in allSaves["class"]:
+	# 	fileClass=open("libraries/class/{seqClass}.fasta".format(seqClass=seqClass), "w")
+	# 	fileClass.close()
+	#
+	# for order in allSaves["order"]:
+	# 	fileOrder=open("libraries/order/{order}.fasta".format(order=order), "w")
+	# 	fileOrder.close()
+	#
+	# for superFamily in allSaves["superFamily"]:
+	# 	fileSuperFamily=open("libraries/superFamily/{superFamily}.fasta".format(superFamily=superFamily), "w")
+	# 	fileSuperFamily.close()
 
-	for order in allOrder:
-		file=open("{order}.fasta".format(order=order), "w")
-		file.write("test")
-		file.close()
 
-
-
-	####	First create the files in which the sequences, the summary and the unknown keywords will be written
-	fileNoCat = open("noCat.fasta", "w")
+	####	First create the files in which the libraries, the summary and the unknown keywords will be written
+	fileNoCat = open("libraries/noCat.fasta", "w")
 	print("Save uncategorized sequences into \"%s\" file"%(fileNoCat.name))
 
-	filePotentialChimeric=open("potentialChimeric.fasta", "w")
+	filePotentialChimeric=open("libraries/potentialChimeric.fasta", "w")
 	print("Save potentialChimeric sequences into \"%s\" file"%(filePotentialChimeric.name))
 
-	fileTE = open("TE.fasta", "w")
+	fileTE = open("libraries/TE.fasta", "w")
 	print("Save TE sequences into \"%s\" file"%(fileTE.name))
 
-	fileNonTE = open("nonTE.fasta", "w")
+	fileNonTE = open("libraries/nonTE.fasta", "w")
 	print("Save nonTE sequences into \"%s\" file"%(fileNonTE.name))
 
 	fileSummary = open("Classification_summary.txt", "w")
@@ -94,8 +113,9 @@ def save(FASTA, SEQCLASSIFIED):
 		if SEQCLASSIFIED[seqName]["unknown_keyword"] != "\n" :
 			print("Write unknown keywords for sequence %s in the file %s"%(seqName, fileUnknownKeyword.name))
 			fileUnknownKeyword.write("{unknown_keyword}".format(unknown_keyword=SEQCLASSIFIED[seqName]["unknown_keyword"]))
-		####	Save log of the sequences
-		fileSummary.write(SEQCLASSIFIED[seqName]["log"])
+		####	Save summary of the sequences
+		# fileSummary.write(SEQCLASSIFIED[seqName])
+		saveSummary(fileSummary, seqName, SEQCLASSIFIED[seqName])
 
 		# ####	Save uncategorized sequences
 		# if SEQCLASSIFIED[seqName]["saveType"] == "noCat":
@@ -156,7 +176,7 @@ def save(FASTA, SEQCLASSIFIED):
 # 	if SEQCLASSIFIED[seqName]["unknown_keyword"] != "\n" :
 # 		print("Write unknown keywords for sequence %s in the file %s"%(seqName, fileUnknownKeyword.name))
 # 		saveUnknownKeyword(fileUnknownKeyword, SEQCLASSIFIED[seqName])
-# 	####	Save log of the sequences
+# 	####	Save summary of the sequences
 # 	saveSummary(fileLog, SEQCLASSIFIED[seqName])
 
 
@@ -243,21 +263,6 @@ def saveNonTE(FILENONTE, FASTA, SEQNAME, NONTE):
 	"""
 	FILENONTE.write(">{seqName}:{seqClass}\n{seq}\n".format(seqName=SEQNAME, seqClass=NONTE["class"], seq=FASTA[SEQNAME]["seq"]))
 
-def saveSummary(FILELOG, LOG):
-	"""
-	Save the log of the classification steps.
-
-	Keyword arguments:
-	@type FILELOG: TextIOWrapper
-	@param FILELOG: File onto which the log of the sequences will be written
-	@type LOG: string
-	@param LOG: Proofs used during the classification step
-
-	@rtype: None
-	"""
-	FILELOG.write(LOG["log"])
-
-
 def saveUnknownKeyword(FILEUNKNOWNKEYWORD, UNKNOWNKEYWORD):
 	"""
 	Save the unknown_keyword if keywords hasn't be found in sequences in an unknown_keyword file.
@@ -271,3 +276,26 @@ def saveUnknownKeyword(FILEUNKNOWNKEYWORD, UNKNOWNKEYWORD):
 	@rtype: None
 	"""
 	FILEUNKNOWNKEYWORD.write("{unknown_keyword}".format(unknown_keyword=UNKNOWNKEYWORD["unknown_keyword"]))
+
+
+def saveSummary(FILESUMMARY, SEQNAME, SUMMARY):
+	"""
+	Save the summary of the classification steps.
+
+	Keyword arguments:
+	@type FILESUMMARY: TextIOWrapper
+	@param FILESUMMARY: File onto which the summary of the sequences will be written
+	@type SEQNAME: string
+	@param SEQNAME: Name of the sequence
+	@type SUMMARY: string
+	@param SUMMARY: Proofs used during the classification step
+
+	@rtype: None
+	"""
+	FILESUMMARY.write("{id}\t{saveType}\t{seqClass}\tFINALDEGREE:\t{finalDegree}".format(id=SEQNAME, saveType=SUMMARY["saveType"], seqClass=SUMMARY["class"], finalDegree=SUMMARY["finalDegree"]))
+	if "order" in SUMMARY:
+		FILESUMMARY.write("\t{order}".format(order=SUMMARY["order"]))
+	if "superFamily" in SUMMARY:
+		FILESUMMARY.write("\t{superFamily}\t{proofs}".format(superFamily=SUMMARY["superFamily"], proofs=SUMMARY["superFamilyProofs"]))
+
+	FILESUMMARY.write("\n")

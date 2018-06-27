@@ -18,10 +18,10 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDEN
 	@type DATABASERECORDS: list
 	@param DATABASERECORDS: list of string in which there are the superFamily name to search.
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 6 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (class, order and superFamily)
-		- 1 : for the classification summary (classification_summary)
+		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
 	@param BASELINE: dictionnary containing different superfamily names possible for a given superfamily (usefull for the function superFamilyComparison).
@@ -55,8 +55,9 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDEN
 	####	Do a comparison between the keywords founded
 	finalSuperFamilyName = comparison.superFamilyComparison(superFamilyFound, BASELINE, IDENTITYTHRESHOLD)
 	####	 save the different proofs found for the name determination of the sequence
-	SEQCLASSIFIED[FEATURES[0]]["log"] += str("BLAST : %s\tPROTPROFILES : %s\tPREDICTED_SUPERFAMILY: %s"%(superFamilyFound["blast"], \
-	superFamilyFound["protProfiles"], finalSuperFamilyName))
+	SEQCLASSIFIED[FEATURES[0]]["superFamilyProofs"] = superFamilyFound
+	# SEQCLASSIFIED[FEATURES[0]]["summary"] += str("BLAST : %s\tPROTPROFILES : %s\tPREDICTED_SUPERFAMILY: %s"%(superFamilyFound["blast"], \
+	# superFamilyFound["protProfiles"], finalSuperFamilyName))
 	return finalSuperFamilyName
 
 def searchProfilesName(FEATURES, SEQCLASSIFIED, DATABASERECORD, PROFILESFOUND, BASELINE):
@@ -137,12 +138,11 @@ def searchBlastName(FEATURES, SEQCLASSIFIED, DATABASERECORD, BLASTFOUND, BASELIN
 	@type FEATURES: list
 	@param FEATURES: names of the features (potentialChimeric, class, order, ...) find in the sequence.
 	@type SEQCLASSIFIED: dictionnary
-	@param SEQCLASSIFIED: Used in case a keyword hasn't be found. dictionnary storing the result of the classification into 6 dictionnaries :
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (class, order and superFamily)
-		- 1 : for the classification summary (classification_summary)
-		- 1 : for the unknown keyword (unknown_keyword)
-	@type DATABASERECORD: string
+		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
+		- 1 : for the unknown keyword (unknown_keyword)	@type DATABASERECORD: string
 	@param DATABASERECORD: profiles that will be parsed to find the keywords.
 	@type BLASTFOUND: dictionnary
 	@param BLASTFOUND: count of the blast name found for one sequence during the superFamilyDetermination.
