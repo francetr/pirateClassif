@@ -75,6 +75,7 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 		elif FEATURES[4] == "noCat":
 			SEQCLASSIFIED[FEATURES[0]]["saveType"]="noCat"
 			SEQCLASSIFIED[FEATURES[0]]["class"]="undefined"
+			searchOrder=True
 		####	 NonTE
 		else:
 			SEQCLASSIFIED[FEATURES[0]]["saveType"]="nonTE"
@@ -83,8 +84,6 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	else:
 		SEQCLASSIFIED[FEATURES[0]]["saveType"]="potentialChimeric"
 		SEQCLASSIFIED[FEATURES[0]]["class"]="potentialChimeric"
-	# ####	Initialize a summary for concerned sequences that will be put into a summary file and add the length, the type and the class of the sequence
-	# SEQCLASSIFIED[FEATURES[0]]["summary"]=str("{name}\t{length}\t{saveType}\t{seqClass}\t".format(name=FEATURES[0], length=FEATURES[1], saveType=SEQCLASSIFIED[FEATURES[0]]["saveType"], seqClass=SEQCLASSIFIED[FEATURES[0]]["class"]))
 	####	Initialize a unknown_keyword for concerned sequences that will be put into an unknown_keyword file. It concerned unknown_keywords found during search of BLAST and PROTPROFILES keywords
 	SEQCLASSIFIED[FEATURES[0]]["unknown_keyword"]=str("")
 	####	The sequence is a TE so order need to be determined
@@ -132,8 +131,6 @@ def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	else:
 		SEQCLASSIFIED[FEATURES[0]]["order"]=FEATURES[5]
 		searchSuperFamily=True
-	# ####	Add the order of the sequence onto the summary file
-	# SEQCLASSIFIED[FEATURES[0]]["summary"]+=str("{order}\t".format(order=SEQCLASSIFIED[FEATURES[0]]["order"]))
 
 	####	The superFamily need to be determined
 	if searchSuperFamily:
@@ -206,8 +203,6 @@ def associateSuperFamily(FEATURES, SEQCLASSIFIED, FINALSUPERFAMILYNAME):
 	if name == "potentialChimeric":
 		####	Pass the saveType from TE in potnetialChimeric
 		SEQCLASSIFIED[FEATURES[0]]["saveType"] = "potentialChimeric"
-		####	Rewrite the correct saveType of the sequence in the summary
-		# SEQCLASSIFIED[FEATURES[0]]["summary"]=SEQCLASSIFIED[FEATURES[0]]["summary"].replace("\tTE\t", "\tpotentialChimeric\t")
 
 	####	Define the name of the superFamily sequence as FINALSUPERFAMILYNAME
 	SEQCLASSIFIED[FEATURES[0]]["superFamily"] = FINALSUPERFAMILYNAME
@@ -260,5 +255,3 @@ def finalDegreeClassification(FEATURES, SEQCLASSIFIED):
 		else:
 			finalDegree = SEQCLASSIFIED[FEATURES[0]]["superFamily"]
 	SEQCLASSIFIED[FEATURES[0]]["finalDegree"] = finalDegree
-
-	# SEQCLASSIFIED[FEATURES[0]]["summary"] += "\tFINALDEGREE:\t%s\n"%(finalDegree)
