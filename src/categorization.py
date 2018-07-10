@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python2
 # coding: utf8
 
 """ @author: Tristan Frances """
@@ -22,7 +22,7 @@ def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	@type SEQCLASSIFIED: dictionnary
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 4 : for the results (length, completeness, class and finalDegree), that we'll find for each sequences
 		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
@@ -34,7 +34,7 @@ def initCategorization(SEQUENCE, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	"""
 	features=SEQUENCE.split("\t")
 	####	Instanciation of the key for the sequence which will contain 6 dictionnaries: 4 for the results (TE, nonTE, potentialChimeric and noCat), 1 for the type of file save and one for the summary
-	SEQCLASSIFIED[features[0]]={"length":features[1]}
+	SEQCLASSIFIED[features[0]]={"length":features[1], "completeness":features[6]}
 	classDetermination(features, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD)
 	####	determine the final degree of the sequence
 	finalDegreeClassification(features, SEQCLASSIFIED)
@@ -52,7 +52,7 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	@type SEQCLASSIFIED: dictionnary
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 4 : for the results (length, completeness, class and finalDegree), that we'll find for each sequences
 		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
@@ -109,7 +109,7 @@ def orderDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 	@type SEQCLASSIFIED: dictionnary
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 4 : for the results (length, completeness, class and finalDegree), that we'll find for each sequences
 		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
@@ -153,7 +153,7 @@ def superFamilyDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOL
 	@type SEQCLASSIFIED: dictionnary
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 4 : for the results (length, completeness, class and finalDegree), that we'll find for each sequences
 		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
@@ -188,7 +188,7 @@ def associateSuperFamily(FEATURES, SEQCLASSIFIED, FINALSUPERFAMILYNAME):
 	@type SEQCLASSIFIED: dictionnary
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 4 : for the results (length, completeness, class and finalDegree), that we'll find for each sequences
 		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 	@type FINALSUPERFAMILYNAME: string
@@ -224,7 +224,7 @@ def finalDegreeClassification(FEATURES, SEQCLASSIFIED):
 	@type SEQCLASSIFIED: dictionnary
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 4 : for the results (length, completeness, class and finalDegree), that we'll find for each sequences
 		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 
@@ -253,5 +253,13 @@ def finalDegreeClassification(FEATURES, SEQCLASSIFIED):
 			finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
 		####	A superFamily has been found
 		else:
-			finalDegree = SEQCLASSIFIED[FEATURES[0]]["superFamily"]
+			#### Search the name of the superFamily
+			superFamily = re.search(r'([^_]+)', SEQCLASSIFIED[FEATURES[0]]["superFamily"]).groups()[0]
+			#### The superFamily is undefined
+			if superFamily == "undefined":
+				finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
+			#### The superFamily is not undefined
+			else:
+				finalDegree = SEQCLASSIFIED[FEATURES[0]]["superFamily"]
+
 	SEQCLASSIFIED[FEATURES[0]]["finalDegree"] = finalDegree

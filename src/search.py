@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python2
 # coding: utf8
 
 """ @author: Tristan Frances """
@@ -20,7 +20,7 @@ def searchDifferentName(FEATURES, SEQCLASSIFIED, DATABASERECORDS, BASELINE, IDEN
 	@type SEQCLASSIFIED: dictionnary
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 4 : for the results (length, completeness, class and finalDegree), that we'll find for each sequences
 		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)
 	@type BASELINE: dictionnary
@@ -138,7 +138,7 @@ def searchBlastName(FEATURES, SEQCLASSIFIED, DATABASERECORD, BLASTFOUND, BASELIN
 	@type SEQCLASSIFIED: dictionnary
 	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
 		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
-		- 3 : for the results (length, class and finalDegree), that we'll find for each sequences
+		- 4 : for the results (length, completeness, class and finalDegree), that we'll find for each sequences
 		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
 		- 1 : for the unknown keyword (unknown_keyword)	@type DATABASERECORD: string
 	@param DATABASERECORD: profiles that will be parsed to find the keywords.

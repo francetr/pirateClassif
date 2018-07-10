@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python2
 # coding: utf8
 
 """ @author: Tristan Frances """
