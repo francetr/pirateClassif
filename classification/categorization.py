@@ -240,18 +240,22 @@ def finalDegreeClassification(FEATURES, SEQCLASSIFIED):
 		else:
 			finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
 
-	####	Case uncategorized
+	#### Case uncategorized
 	elif SEQCLASSIFIED[FEATURES[0]]["saveType"] == "noCat":
 		finalDegree = SEQCLASSIFIED[FEATURES[0]]["class"]
-	####	Case non TE
+	#### Case non TE
 	elif SEQCLASSIFIED[FEATURES[0]]["saveType"] == "nonTE":
 		finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
-	####	Case TE
+	#### Case TE
 	else:
 		####	No superFamily have been found
 		if not "superFamily" in SEQCLASSIFIED[FEATURES[0]]:
-			finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
-		####	A superFamily has been found
+			#### Case, the order is undefined:
+			if "undefined" in SEQCLASSIFIED[FEATURES[0]]["order"]:
+				finalDegree = SEQCLASSIFIED[FEATURES[0]]["class"]
+			else:
+				finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
+		#### A superFamily has been found
 		else:
 			#### Search the name of the superFamily
 			superFamily = re.search(r'([^_]+)', SEQCLASSIFIED[FEATURES[0]]["superFamily"]).groups()[0]

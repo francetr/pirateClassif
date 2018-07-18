@@ -6,7 +6,9 @@
 import sys
 import readInput
 import save
+import MCL
 from timeit import default_timer as timer
+
 
 ############
 #	Help command : scriptClassif -h
@@ -83,7 +85,11 @@ def main():
 	except IndexError:
 		print("/!\ Error: Error with the Fasta file provided {}\n####	Classification aborted".format(fastaFile))
 		sys.exit(1)
+	#### Save prelibraries files and summary
 	save.save(fasta, seqClassified)
+
+	#### Launch the MCL for each sequences in order to retrieve their superFamily
+	# MCL.launchMCL()
 
 ####################
 #	   MAIN
