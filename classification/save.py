@@ -97,15 +97,23 @@ def save(FASTA, SEQCLASSIFIED):
 			#### Save sequences with finalDegree equal to an order (LTR, DIRS, PLE, ...)
 			for order in allSaves["order"]:
 				if SEQCLASSIFIED[seqName]["finalDegree"] == order:
-					fileOrder=open("classification_result/prelibraries/TE/order/{order}_undefined.fasta".format(order=order), "a")
-					fileOrder.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
-					fileOrder.close()
+					#### Since for Maverick and Helitron, the order is the same as the superFamily name, we don't count it
+					if  order not in allSaves["superFamily"]:
+						fileOrder=open("classification_result/prelibraries/TE/order/{order}_undefined.fasta".format(order=order), "a")
+						fileOrder.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
+						fileOrder.close()
+					#### If it is a Maverick or Helitron, we save the sequence directly in the superFamily sequences
+					else:
+						fileOrder=open("classification_result/prelibraries/TE/superFamily/{order}.fasta".format(order=order), "a")
+						fileOrder.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
+						fileOrder.close()
 
 			#### Check there is a superFamily for the sequence
 			if "superFamily" in SEQCLASSIFIED[seqName]:
 				#### Save sequences according their superFamily, if exists, (Copia, Gypsy, Mariner ...)
 				for superFamily in allSaves["superFamily"]:
-					if SEQCLASSIFIED[seqName]["finalDegree"] == superFamily:
+					#### Check the superFamily name is not the same than the order name (like Maverick or Helitron)
+					if SEQCLASSIFIED[seqName]["finalDegree"] == superFamily and SEQCLASSIFIED[seqName]["order"] not in allSaves["superFamily"] :
 						fileSuperFamily=open("classification_result/prelibraries/TE/superFamily/{superFamily}.fasta".format(superFamily=superFamily), "a")
 						fileSuperFamily.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
 						fileSuperFamily.close()
@@ -132,7 +140,6 @@ def save(FASTA, SEQCLASSIFIED):
 		saveSummary(fileSummary, seqName, SEQCLASSIFIED[seqName])
 	fileUnknownKeyword.close()
 	fileSummary.close()
-
 	print("Number of different saveType files : {saveTypeFile}\nNumber of different class files : {classFile}\nNumber of different order files : {orderFile}\nNumber of different superFamily files : {superFamilyFile}\n".format(\
 	saveTypeFile=len(allSaves["saveType"]), classFile=len(allSaves["class"]), orderFile=len(allSaves["order"]), superFamilyFile=len(allSaves["superFamily"])))
 	# print("Number of different saveType files : {saveTypeFile}\nNumber of different class files : {classFile}\nNumber of different order files : {orderFile}\nNumber of different superFamily files : {superFamilyFile}\nNumber of different autonomous files : {autonomous}\n".format(\

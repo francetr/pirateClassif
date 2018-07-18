@@ -71,9 +71,9 @@ def main():
 			cptnoCat+=1
 		if seqClassified[seq]["unknown_keyword"] != "\n":
 			cptError+=1
-
 	print("Number total of sequences found : %d" %((cptTE + cptnonTE + cptnoCat + cptChimeric)))
-	print("Number total of TE : %d; with recognized TE : %d, uncategorized : %d, potentialChimeric : %d"%((cptTE + cptnoCat + cptChimeric), cptTE, cptnoCat, cptChimeric))
+	print("Number total of TE : %d; with recognized TE : %d, potentialChimeric : %d"%((cptTE + cptChimeric), cptTE, cptChimeric))
+	print("Number total of uncategorized seqeunces : %d"%(cptnoCat))
 	print("Number of sequences found for nonTE : %d" %(cptnonTE))
 	print("Number of sequence with unknown keywords found: %s\n"%(cptError))
 
@@ -88,9 +88,10 @@ def main():
 	#### Save prelibraries files and summary
 	save.save(fasta, seqClassified)
 
+
 	#### Launch the MCL for each sequences in order to retrieve their superFamily
 	# MCL.launchMCL()
-
+	MCL.saveLibraries()
 ####################
 #	   MAIN
 ####################
