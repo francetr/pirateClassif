@@ -7,7 +7,7 @@ import shutil
 
 """ @author: Tristan Frances """
 
-def save(FASTA, SEQCLASSIFIED):
+def saveResult(FASTA, SEQCLASSIFIED):
 	"""
 
 	Save the categorized sequences in different FASTA files.
@@ -40,32 +40,9 @@ def save(FASTA, SEQCLASSIFIED):
 		os.mkdir("classification_result/prelibraries/TE/order")
 		os.mkdir("classification_result/prelibraries/TE/superFamily")
 
-	#### List all the libraries that will be created
 	#TODO construction automatic of different libraries
-	allSaves = {"saveType":[], "class":[], "order":[], "superFamily":[], "transpositionMode":["autonomous","non_autonomous"]}
-	for sequence in SEQCLASSIFIED.keys():
-		#### Check if the saveType of the sequence is not in the saveType list, avoid redundancy
-		if not SEQCLASSIFIED[sequence]["saveType"] in allSaves["saveType"]:
-			allSaves["saveType"].append(SEQCLASSIFIED[sequence]["saveType"])
-		if SEQCLASSIFIED[sequence]["saveType"] == "TE":
-			#### Check if there is a defined superFamily for the sequence
-			if not SEQCLASSIFIED[sequence]["class"] in allSaves["class"]:
-				#### Check if the class of the sequence is not in the saveType list, avoid redundancy
-				allSaves["class"].append(SEQCLASSIFIED[sequence]["class"])
-
-			#### Check if there is a defined superFamily for the sequence
-			if not SEQCLASSIFIED[sequence]["order"] in allSaves["order"]:
-				#### Check if the order of the sequence is not in the saveType list, avoid redundancy
-				allSaves["order"].append(SEQCLASSIFIED[sequence]["order"])
-
-			#### Check if there is a defined superFamily for the sequence
-			if "superFamily" in SEQCLASSIFIED[sequence]:
-				#### Search for possible superFamily name
-				name = re.search(r'([^_]+)', SEQCLASSIFIED[sequence]["superFamily"]).groups()[0]
-				#### Check if the superFamily of the sequence is not in the saveType list, avoid redundancy
-				if not name in allSaves["superFamily"]:
-					#### Define the name of the superFamily sequence as FINALSUPERFAMILYNAME
-					allSaves["superFamily"].append(name)
+	#### List all the prelibraries that will be created
+	allSaves = findAllSaves(SEQCLASSIFIED)
 
 	fileSummary = open("classification_result/Classification_summary.txt", "w")
 	print("Save classification summary of the sequences into \"%s\" file"%(fileSummary.name))
@@ -96,40 +73,20 @@ def save(FASTA, SEQCLASSIFIED):
 
 			#### Save sequences with finalDegree equal to an order (LTR, DIRS, PLE, ...)
 			for order in allSaves["order"]:
-				if SEQCLASSIFIED[seqName]["finalDegree"] == order:
-					#### Since for Maverick and Helitron, the order is the same as the superFamily name, we don't count it
-					if  order not in allSaves["superFamily"]:
-						fileOrder=open("classification_result/prelibraries/TE/order/{order}_undefined.fasta".format(order=order), "a")
-						fileOrder.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
-						fileOrder.close()
-					#### If it is a Maverick or Helitron, we save the sequence directly in the superFamily sequences
-					else:
-						fileOrder=open("classification_result/prelibraries/TE/superFamily/{order}.fasta".format(order=order), "a")
-						fileOrder.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
-						fileOrder.close()
+				if SEQCLASSIFIED[seqName]["finalDegree"] == str("%s_undefined"%(order)):
+					fileOrder=open("classification_result/prelibraries/TE/order/{order}_undefined.fasta".format(order=order), "a")
+					fileOrder.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
+					fileOrder.close()
 
 			#### Check there is a superFamily for the sequence
 			if "superFamily" in SEQCLASSIFIED[seqName]:
 				#### Save sequences according their superFamily, if exists, (Copia, Gypsy, Mariner ...)
 				for superFamily in allSaves["superFamily"]:
 					#### Check the superFamily name is not the same than the order name (like Maverick or Helitron)
-					if SEQCLASSIFIED[seqName]["finalDegree"] == superFamily and SEQCLASSIFIED[seqName]["order"] not in allSaves["superFamily"] :
+					if SEQCLASSIFIED[seqName]["finalDegree"] == superFamily:
 						fileSuperFamily=open("classification_result/prelibraries/TE/superFamily/{superFamily}.fasta".format(superFamily=superFamily), "a")
 						fileSuperFamily.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
 						fileSuperFamily.close()
-
-			#### Check there is an order for the sequence
-			# if "order" in SEQCLASSIFIED[seqName]:
-			# 	#### Save sequences considered as autonomous
-			# 	if not (SEQCLASSIFIED[seqName]["order"] == "MITE" or SEQCLASSIFIED[seqName]["order"] == "TRIM" or SEQCLASSIFIED[seqName]["order"] == "LARD" or SEQCLASSIFIED[seqName]["order"] == "SINE"):
-			# 		fileAutonomous = open("prelibraries/TE/{autonomous}.fasta".format(autonomous=allSaves["transpositionMode"][0]), "a")
-			# 		fileAutonomous.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
-			# 		fileAutonomous.close()
-			# 	#### Save sequences considered as non autonomous
-			# 	else:
-			# 		fileNonAutonomous = open("prelibraries/TE/{nonAutonomous}.fasta".format(nonAutonomous=allSaves["transpositionMode"][1]), "a")
-			# 		fileNonAutonomous.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
-			# 		fileNonAutonomous.close()
 
 		#### Save the unknown keywords of the baseline, if any
 		if SEQCLASSIFIED[seqName]["unknown_keyword"] != "\n" :
@@ -141,9 +98,47 @@ def save(FASTA, SEQCLASSIFIED):
 	fileUnknownKeyword.close()
 	fileSummary.close()
 	print("Number of different saveType files : {saveTypeFile}\nNumber of different class files : {classFile}\nNumber of different order files : {orderFile}\nNumber of different superFamily files : {superFamilyFile}\n".format(\
-	saveTypeFile=len(allSaves["saveType"]), classFile=len(allSaves["class"]), orderFile=len(allSaves["order"]), superFamilyFile=len(allSaves["superFamily"])))
+	saveTypeFile=len(allSaves["saveType"]), classFile=len(os.listdir("classification_result/prelibraries/TE/class")), orderFile=len(os.listdir("classification_result/prelibraries/TE/order")), superFamilyFile=len(os.listdir("classification_result/prelibraries/TE/superFamily"))))
 	# print("Number of different saveType files : {saveTypeFile}\nNumber of different class files : {classFile}\nNumber of different order files : {orderFile}\nNumber of different superFamily files : {superFamilyFile}\nNumber of different autonomous files : {autonomous}\n".format(\
 	# saveTypeFile=len(allSaves["saveType"]), classFile=len(allSaves["class"]), orderFile=len(allSaves["order"]), superFamilyFile=len(allSaves["superFamily"]), autonomous=len(allSaves["transpositionMode"])))
+
+def findAllSaves(SEQCLASSIFIED):
+	"""
+	@type SEQCLASSIFIED: dictionnary
+	@param SEQCLASSIFIED: dictionnary storing the result of the classification into 8 dictionnaries :
+		- 1 : for the file which saves sequences (saveType: TE; or nonTE; or potentialChimeric; or noCat);
+		- 4 : for the results (length, completeness, class and finalDegree), that we'll find for each sequences
+		- 3 : for the order, for the predictedSuperFamily and 1 for the proofs. (These 2 dic are just for TE or potentialChimeric)
+		- 1 : for the unknown keyword (unknown_keyword)
+
+	@rtype: dictionnary
+	@return: dictionnary containing the names of the prelibraries files that will be created.
+	"""
+	allSaves = {"saveType":[], "class":[], "order":[], "superFamily":[]}
+	for sequence in SEQCLASSIFIED.keys():
+		#### Check if the saveType of the sequence is not in the saveType list, avoid redundancy
+		if not SEQCLASSIFIED[sequence]["saveType"] in allSaves["saveType"]:
+			allSaves["saveType"].append(SEQCLASSIFIED[sequence]["saveType"])
+		if SEQCLASSIFIED[sequence]["saveType"] == "TE":
+			#### Check if there is a defined superFamily for the sequence
+			if not SEQCLASSIFIED[sequence]["class"] in allSaves["class"]:
+				#### Check if the class of the sequence is not in the saveType list, avoid redundancy
+				allSaves["class"].append(SEQCLASSIFIED[sequence]["class"])
+
+			#### Check if there is a defined superFamily for the sequence
+			if not SEQCLASSIFIED[sequence]["order"] in allSaves["order"]:
+				#### Check if the order of the sequence is not in the saveType list, avoid redundancy
+				allSaves["order"].append(SEQCLASSIFIED[sequence]["order"])
+
+			#### Check if there is a defined superFamily for the sequence
+			if "superFamily" in SEQCLASSIFIED[sequence]:
+				#### Search for possible superFamily name
+				name = re.search(r'([^_]+)', SEQCLASSIFIED[sequence]["superFamily"]).groups()[0]
+				#### Check if the superFamily of the sequence is not in the saveType list, avoid redundancy
+				if not name in allSaves["superFamily"]:
+					#### Define the name of the superFamily sequence as FINALSUPERFAMILYNAME
+					allSaves["superFamily"].append(name)
+	return allSaves
 
 def saveUnknownKeyword(FILEUNKNOWNKEYWORD, UNKNOWNKEYWORD):
 	"""

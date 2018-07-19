@@ -254,14 +254,19 @@ def finalDegreeClassification(FEATURES, SEQCLASSIFIED):
 			if "undefined" in SEQCLASSIFIED[FEATURES[0]]["order"]:
 				finalDegree = SEQCLASSIFIED[FEATURES[0]]["class"]
 			else:
-				finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
+				#### The order has the same name than the superFamily (ex: Helitron, Maverick or Crypton).
+				#### In order to avoid a repetition of sequence in the construction of prelibraries, we add _undefined to their finalDegree to distinguish order from superFamily
+				finalDegree = str("%s_undefined"%(SEQCLASSIFIED[FEATURES[0]]["order"]))
+
 		#### A superFamily has been found
 		else:
 			#### Search the name of the superFamily
 			superFamily = re.search(r'([^_]+)', SEQCLASSIFIED[FEATURES[0]]["superFamily"]).groups()[0]
 			#### The superFamily is undefined
 			if superFamily == "undefined":
-				finalDegree = SEQCLASSIFIED[FEATURES[0]]["order"]
+				#### The order has the same name than the superFamily (ex: Helitron, Maverick or Crypton).
+				#### In order to avoid a repetition of sequence in the construction of prelibraries, we add _undefined to their order name to distinguish order from superFamily
+				finalDegree = str("%s_undefined"%(SEQCLASSIFIED[FEATURES[0]]["order"]))
 			#### The superFamily is not undefined
 			else:
 				finalDegree = SEQCLASSIFIED[FEATURES[0]]["superFamily"]

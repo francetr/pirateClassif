@@ -86,12 +86,12 @@ def main():
 		print("/!\ Error: Error with the Fasta file provided {}\n####	Classification aborted".format(fastaFile))
 		sys.exit(1)
 	#### Save prelibraries files and summary
-	save.save(fasta, seqClassified)
-
+	save.saveResult(fasta, seqClassified)
 
 	#### Launch the MCL for each sequences in order to retrieve their superFamily
-	# MCL.launchMCL()
+	MCL.launchMCL()
 	MCL.saveLibraries()
+
 ####################
 #	   MAIN
 ####################
