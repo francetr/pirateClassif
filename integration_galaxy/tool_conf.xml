@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<toolbox>
+  <section id="getext" name="Input Data">
+    <tool file="data_source/upload.xml" />
+  </section>
+  <section id="textutil" name="Text Manipulation">
+    <tool file="filters/catWrapper.xml" hidden="True" />
+    <tool file="filters/convert_characters.xml" />
+    <tool file="filters/mergeCols.xml" />
+    <tool file="filters/cutWrapper.xml" hidden="True" />
+    <tool file="filters/pasteWrapper.xml" />
+    <tool file="filters/secure_hash_message_digest.xml" />
+    <tool file="/home/jeremy/galaxy/tools/Pipeline/tab2fasta/tabular_to_fasta.xml"/>
+    <tool file="/home/jeremy/galaxy/tools/Pipeline/rename_header/rename_header.xml" />
+     <tool file="/home/jeremy/galaxy/tools/Pipeline/Add_suffix/Add_suffix.xml" />
+  </section>
+  <section id="group" name="Join, Subtract and Group">
+    <tool file="filters/joiner.xml" />
+    <tool file="filters/compare.xml" />
+    <tool file="stats/grouping.xml" />
+  </section>
+    <label id="Pipeline" text="PiRATE" />
+  <section name="STEP 1.1: Detection" id="Detection" >
+    <label text="Build repeated elements" id="raw" />
+        <tool file="/home/jeremy/galaxy/tools/Pipeline/RepeatExplorer/repeatexplorer.xml" />
+        <tool file="/home/jeremy/galaxy/tools/Pipeline/dnaPipeTE/dnaPipeTE.xml" />
+        <tool file="/home/jeremy/galaxy/tools/Pipeline/RepARK/RepARK.xml" />
+    <label text="Repetitiveness-based" id="assembled" />
+         <tool file="/home/jeremy/galaxy/tools/Pipeline/REPET/REPET.xml" />
+         <tool file="/home/jeremy/galaxy/tools/Pipeline/RepeatScout/repeatscout.xml" />
+    <label text="Structural-based" id="struct"  />
+         <tool file="/home/jeremy/galaxy/tools/Pipeline/helsearch/helsearch.xml" />
+         <tool file="⁄home⁄jeremy⁄galaxy⁄tools⁄Pipeline⁄TEannot⁄TEannot.xml" />
+         <tool file="/home/jeremy/galaxy/tools/Pipeline/MITE-Hunter/MITE_Hunter.xml" />
+         <tool file="/home/jeremy/galaxy/tools/Pipeline/Sine_Finder/sine_finder.xml" />
+         <tool file="/home/jeremy/galaxy/tools/Pipeline/LTRharvest/LTRharvest.xml" />
+         <tool file="/home/jeremy/galaxy/tools/Pipeline/MGEScan/mgescan.xml" />
+    <label text="Similarity-based" id="similarity" />
+         <tool file="/home/jeremy/galaxy/tools/Pipeline/Hmmer/hmmer.xml" />
+         <tool file="/home/jeremy/galaxy/tools/Pipeline/RepeatMasker/repeatmasker.xml" />
+  </section>
+  <section name="STEP 1.2: Clustering" id="clustering" >
+    <tool file="/home/jeremy/galaxy/tools/Pipeline/removesmalls/removesmalls.xml" />
+    <tool file="/home/jeremy/galaxy/tools/Pipeline/cdhit/cdhit.xml" />
+  </section>
+  <section name="STEP 2.1: Classification" id="Classification" >
+    <tool file="/home/jeremy/galaxy/tools/Pipeline/PASTEC/PASTEC.xml" />
+    <tool file="/home/jeremy/galaxy/tools/Pipeline/pirateClassif/classification.xml" />
+  </section>
+    <section name="STEP 2.2: Manual check" id="validation" >
+    <tool file="/home/jeremy/galaxy/tools/Pipeline/MCL/MCL.xml" />
+    <tool file="/home/jeremy/galaxy/tools/Pipeline/FamiliesFinder/FamiliesFinder.xml" />
+  </section>
+  <section name="STEP 3: Annotation" id="Annotation" >
+    <tool file="/home/jeremy/galaxy/tools/Pipeline/TEannot/TEannot.xml" />
+    <tool file="/home/jeremy/galaxy/tools/Pipeline/TEannot2/TEannot2.xml" />
+  </section>
+</toolbox>

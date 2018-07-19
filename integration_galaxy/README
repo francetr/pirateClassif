@@ -1,0 +1,11 @@
+This file describe how you can incorporate the classification script onto PiRATE
+To do it there are several files that you need to respect an architecture in the VM. You first need to put the directory containing the source code (pirateClassif) into the directory /home/jeremy/galaxy/tools/Pipeline/
+At least repositories MCL and classification and file classification.xml (used to add a classification panel onto the galaxy tools panel) need to be in it.
+
+This repository (integration_galaxy) contains:
+ - integrated_tool_panel.xml (located in /home/jeremy/galaxy) : used to specify how to integrate the tools onto galaxy
+ - tool_conf.xml (located in /home/jeremy/galaxy/config) : configuration of each tool
+
+NB :
+You also need to copy/paste the whole repository containing the classification scripts (must be named as classification) in the repository classification that you have created in /home/jeremy/galaxy/tools/Pipeline/
+To summarize, the source code of classification is onto the repository /home/jeremy/galaxy/tools/Pipeline/pirateClassif

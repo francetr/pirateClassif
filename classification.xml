@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<tool id="PiRATEclassif" name="PiRATEclassif">
+ <requirements>
+ </requirements>
+    <stdio>
+        <exit_code range="1:" />
+    </stdio>
+<description>Give a classification of each sequences</description>
+<command><![CDATA[
+mkdir -p inputs
+
+cp $PASTEC /home/jeremy/galaxy/tools/Pipeline/pirateClassif/inputs/pastec.txt &&
+
+cp $genome /home/jeremy/galaxy/tools/Pipeline/pirateClassif/inputs/genome.fasta &&
+
+python /home/jeremy/galaxy/tools/Pipeline//scriptClassif.py $PASTEC $genome --baseline /home/jeremy/galaxy/tools/Pipeline/pirateClassif/classification/base_reference.txt -e $threshold &&
+
+tar -zcvf classification_result.tgz classification/classification_result/ &&
+
+cp ./classification_result.tgz $output
+
+]]></command>
+  <inputs>
+     <param name="PASTEC" format="txt" type="data" label="PASTEC file" help="This file is the output file given by PASTEC tool"></param>
+     <param name="genome" format="fasta" type="data" label="Genomic sequences" help="This file is the input file, containing FASTA sequences, given to PASTEC tool"></param>
+     <param name="threshold" type="float" value="100"  label="identity threshold" help="This correspond to the threshold for which we will attribut a given superFamily to a sequence"></param>
+  </inputs>
+  <outputs>
+    <data name="output" format="tgz" label="classification result"/>
+  </outputs>
+  <help>
+
+
+===
+Classification
+===
+
+The purpose of this tool is too automatically classify TEs found in the sequences, according Wicker's classification, and then creates libraries that can directly be used to the annotation step
+
+! READ ME !
+===========
+
+Input data must be in the good format :
+
+PASTEC file is the output file provided by the tool PASTEC (usually txt).
+
+FASTA file is the FASTA file used as input to PASTEC (fasta or fa).
+
+identity threshold is lesser or equal to 100 and greater or equal to 0. Note that, if the input is greater than 100 it will be adjust to 100, if it is lesser to 0, it will be adjust to 0.
+
+Description
+===========
+
+This program is a part of the PiRATE project. It aims to automatize the step of classification for TE.
+
+More informations
+=================
+
+Implemented in this local Galaxy by Tristan FRANCES
+(2018) MMS - Université Le Mans
+Le Mans, FRANCE
+
+
+</help>
+</tool>

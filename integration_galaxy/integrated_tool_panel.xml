@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<toolbox>
+    <!--
+    This is Galaxy's integrated tool panel and should be modified directly only for
+    reordering tools inside a section. Each time Galaxy starts up, this file is
+    synchronized with the various tool config files: tools, sections and labels
+    added to one of these files, will be added also here in the appropriate place,
+    while elements removed from the tool config files will be correspondingly
+    deleted from this file.
+    To modify locally managed tools (e.g. from tool_conf.xml) modify that file
+    directly and restart Galaxy. Whenever possible Tool Shed managed tools (e.g.
+    from shed_tool_conf.xml) should be managed from within the Galaxy interface or
+    via its API - but if changes are necessary (such as to hide a tool or re-assign
+    its section) modify that file and restart Galaxy.
+    -->
+    <section id="getext" name="Get Data" version="">
+        <tool id="upload1" />
+    </section>
+    <section id="textutil" name="Text Manipulation" version="">
+        <tool id="toolshed.g2.bx.psu.edu/repos/devteam/fasta_formatter/cshl_fasta_formatter/1.0.0" />
+        <tool id="toolshed.g2.bx.psu.edu/repos/mandorodriguez/concat_fasta_files/concat_fasta_files/1.0.0" />
+        <tool id="cat1" />
+        <tool id="Convert characters1" />
+        <tool id="mergeCols1" />
+        <tool id="Cut1" />
+        <tool id="tab2fasta" />
+        <tool id="Rename fasta headers" />
+        <tool id="addsuffix" />
+        <tool id="Paste1" />
+        <tool id="secure_hash_message_digest" />
+    </section>
+    <section id="group" name="Join, Subtract and Group" version="">
+        <tool id="toolshed.g2.bx.psu.edu/repos/devteam/fastq_paired_end_interlacer/fastq_paired_end_interlacer/1.2" />
+        <tool id="join1" />
+        <tool id="comp1" />
+        <tool id="Grouping1" />
+    </section>
+    <section id="filter" name="Filter and Sort" version="">
+        <tool id="toolshed.g2.bx.psu.edu/repos/devteam/fastq_quality_filter/cshl_fastq_quality_filter/1.0.0" />
+        <tool id="toolshed.g2.bx.psu.edu/repos/devteam/fastq_filter/fastq_filter/1.0.0" />
+    </section>
+    <section id="convert" name="Convert Formats" version="">
+        <tool id="toolshed.g2.bx.psu.edu/repos/devteam/fasta_to_tabular/fasta2tab/1.1.0" />
+        <tool id="toolshed.g2.bx.psu.edu/repos/devteam/fastq_to_fasta/cshl_fastq_to_fasta/1.0.0" />
+    </section>
+    <section id="fetchAlign" name="Fetch Alignments" version="">
+        <tool id="toolshed.g2.bx.psu.edu/repos/devteam/tophat2/tophat2/2.1.1" />
+    </section>
+    <label id="Pipeline" text="PiRATE" version="" />
+    <section id="Detection" name="STEP 1.1: Detection" version="">
+        <label id="raw" text="Build repeated elements" version="" />
+        <tool id="Repeatexplorer" />
+        <tool id="PipeTE" />
+        <tool id="RepARK" />
+        <label id="assembled" text="Repetitiveness-based" version="" />
+        <tool id="TEdenovo" />
+        <tool id="repeatscout" />
+        <label id="struct" text="Structural-based" version="" />
+        <tool id="Helsearch" />
+        <tool id="MITE-Hunter" />
+        <tool id="sine_finder" />
+        <tool id="LTRharvest" />
+        <tool id="MGEScannonLTR" />
+        <label id="similarity" text="Similarity-based" version="" />
+        <tool id="HMMER" />
+        <tool id="RepeatMasker" />
+    </section>
+    <section id="clustering" name="STEP 1.2: Clustering" version="">
+        <tool id="removesmalls" />
+        <tool id="cdhit" />
+    </section>
+    <section id="Classification" name="STEP 2.1: Classification" version="">
+        <tool id="PASTEC" />
+        <tool id="PiRATEclassif" />
+    </section>
+    <section id="validation" name="STEP 2.2: Manual check" version="">
+        <tool id="MCL" />
+        <tool id="FamiliesFinder" />
+    </section>
+    <section id="Annotation" name="STEP 3: Annotation" version="">
+        <tool id="TEannot" />
+        <tool id="TEannot2" />
+    </section>
+</toolbox>
