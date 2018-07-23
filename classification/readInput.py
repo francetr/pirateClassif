@@ -180,7 +180,7 @@ def readFasta(FASTA):
 		####	Parse every line/sequence of the file
 			for record in SeqIO.parse(handle, "fasta"):
 				####	Save the sequence in a dictionnary
-				seqReturned[record.id]={"seq":record.seq}
+				seqReturned[record.id]={"seq":record.seq.upper()}
 		return seqReturned
 	except (FileNotFoundError, NameError) as e:
 		####	prevent the opening if the file name is incorrect
