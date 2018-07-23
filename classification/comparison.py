@@ -66,11 +66,23 @@ def compareKeywordsFounded(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYT
 			name = compareWickerClassification(BLAST, PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYTHRESHOLD)
 
 	####	Last case, MULTIPLE BLAST keywords have been founded
-	#TODO : Is it needed to define an identityThreshold for BLAST keywords?
 	elif len(BLAST) > 1:
-		name = "potentialChimeric"
-		for superFamily in BLAST:
-			name += str("_"+superFamily)
+		####	Ignore undefined BLAST keyword if it is founded with one anoter BLAST keyword, and give the superFamily name as the other keyword
+		if (len(BLAST) <= 2) and ("undefined" in BLAST):
+			####	Creates a copy of the BLAST dictionnary, removing the key undefined to conserve only the other keyword
+			BLASTcopy = BLAST.copy(); del BLASTcopy["undefined"]
+			####	NO type of PROPROFILES keyword have been founded
+			if len(PROTPROFILES)==0:
+				for key in BLASTcopy:
+					name=key
+			####	ONE or MULTIPLE type of PROPROFILES keyword have been founded
+			elif len(PROTPROFILES)>=1:
+				name=compareWickerClassification(BLASTcopy, PROTPROFILES, SUPERFAMILYASSOCIATED, IDENTITYTHRESHOLD)
+		####	Else considere it as potentialChimeric
+		else:
+			name = "potentialChimeric"
+			for superFamily in BLAST:
+				name += str("_"+superFamily)
 	# print(name, BLAST, PROTPROFILES)
 	return name
 

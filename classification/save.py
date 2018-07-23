@@ -68,14 +68,14 @@ def saveResult(FASTA, SEQCLASSIFIED):
 			for seqClass in allSaves["class"]:
 				if SEQCLASSIFIED[seqName]["finalDegree"] == seqClass:
 					fileClass=open("classification_result/prelibraries/TE/class/{seqClass}_undefined.fasta".format(seqClass=seqClass), "a")
-					fileClass.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
+					fileClass.write(">{seqName}_{seqClass}_undefined_undefined\n{seq}\n".format(seqName=seqName, seqClass=SEQCLASSIFIED[seqName]['class'], seq=FASTA[seqName]['seq']))
 					fileClass.close()
 
 			#### Save sequences with finalDegree equal to an order (LTR, DIRS, PLE, ...)
 			for order in allSaves["order"]:
 				if SEQCLASSIFIED[seqName]["finalDegree"] == str("%s_undefined"%(order)):
 					fileOrder=open("classification_result/prelibraries/TE/order/{order}_undefined.fasta".format(order=order), "a")
-					fileOrder.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
+					fileOrder.write(">{seqName}_{seqClass}_{order}_undefined\n{seq}\n".format(seqName=seqName, seqClass=SEQCLASSIFIED[seqName]['class'], order=SEQCLASSIFIED[seqName]['order'], seq=FASTA[seqName]['seq']))
 					fileOrder.close()
 
 			#### Check there is a superFamily for the sequence
@@ -85,7 +85,7 @@ def saveResult(FASTA, SEQCLASSIFIED):
 					#### Check the superFamily name is not the same than the order name (like Maverick or Helitron)
 					if SEQCLASSIFIED[seqName]["finalDegree"] == superFamily:
 						fileSuperFamily=open("classification_result/prelibraries/TE/superFamily/{superFamily}.fasta".format(superFamily=superFamily), "a")
-						fileSuperFamily.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
+						fileSuperFamily.write(">{seqName}_{seqClass}_{order}_{superFamily}\n{seq}\n".format(seqName=seqName, seqClass=SEQCLASSIFIED[seqName]['class'], order=SEQCLASSIFIED[seqName]['order'], superFamily=SEQCLASSIFIED[seqName]['superFamily'], seq=FASTA[seqName]['seq']))
 						fileSuperFamily.close()
 
 		#### Save the unknown keywords of the baseline, if any
@@ -98,9 +98,7 @@ def saveResult(FASTA, SEQCLASSIFIED):
 	fileUnknownKeyword.close()
 	fileSummary.close()
 	print("Number of different saveType files : {saveTypeFile}\nNumber of different class files : {classFile}\nNumber of different order files : {orderFile}\nNumber of different superFamily files : {superFamilyFile}\n".format(\
-	saveTypeFile=len(allSaves["saveType"]), classFile=len(os.listdir("classification_result/prelibraries/TE/class")), orderFile=len(os.listdir("classification_result/prelibraries/TE/order")), superFamilyFile=len(os.listdir("classification_result/prelibraries/TE/superFamily"))))
-	# print("Number of different saveType files : {saveTypeFile}\nNumber of different class files : {classFile}\nNumber of different order files : {orderFile}\nNumber of different superFamily files : {superFamilyFile}\nNumber of different autonomous files : {autonomous}\n".format(\
-	# saveTypeFile=len(allSaves["saveType"]), classFile=len(allSaves["class"]), orderFile=len(allSaves["order"]), superFamilyFile=len(allSaves["superFamily"]), autonomous=len(allSaves["transpositionMode"])))
+	saveTypeFile=len(os.listdir("classification_result/prelibraries/")), classFile=len(os.listdir("classification_result/prelibraries/TE/class")), orderFile=len(os.listdir("classification_result/prelibraries/TE/order")), superFamilyFile=len(os.listdir("classification_result/prelibraries/TE/superFamily"))))
 
 def findAllSaves(SEQCLASSIFIED):
 	"""

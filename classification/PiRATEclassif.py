@@ -72,8 +72,7 @@ def main():
 		if seqClassified[seq]["unknown_keyword"] != "\n":
 			cptError+=1
 	print("Number total of sequences found : %d" %((cptTE + cptnonTE + cptnoCat + cptChimeric)))
-	print("Number total of TE : %d; with recognized TE : %d, potentialChimeric : %d"%((cptTE + cptChimeric), cptTE, cptChimeric))
-	print("Number total of uncategorized seqeunces : %d"%(cptnoCat))
+	print("Number total of TE : %d; with uncategorized seqeunces : %d, recognized TE : %d, potentialChimeric : %d"%((cptnoCat+ cptTE + cptChimeric), cptnoCat, cptTE, cptChimeric))
 	print("Number of sequences found for nonTE : %d" %(cptnonTE))
 	print("Number of sequence with unknown keywords found: %s\n"%(cptError))
 
