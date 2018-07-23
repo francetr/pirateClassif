@@ -22,14 +22,14 @@ FILESPATH=`find /home/jeremy/galaxy/tools/Pipeline/pirateClassif/classification/
 #### Loop to copy the FASTA prelibraries, created after the scriptClassif, into the MCL directory.
 for FILE in $FILESPATH
 do
-  #### retrieve the FILE name without the extension
+	#### retrieve the FILE name without the extension
 	SUFFIXNAME=`basename $FILE .fasta` &&
-  #### Create a repository for each sequence where the MCL result will be store
-  mkdir -p "/home/jeremy/galaxy/tools/Pipeline/pirateClassif/MCL/WORK/$SUFFIXNAME/" &&
-  #### Go to the directory where the MCL will be apply
+	#### Create a repository for each sequence where the MCL result will be store
+	mkdir -p "/home/jeremy/galaxy/tools/Pipeline/pirateClassif/MCL/WORK/$SUFFIXNAME/" &&
+	#### Go to the directory where the MCL will be apply
 	cd "/home/jeremy/galaxy/tools/Pipeline/pirateClassif/MCL/WORK/$SUFFIXNAME"  &&
 	#### First remove short sequences with cd-hit-est
-	cd-hit-est -aS 1 -c 0.9 -g 1 -r 1 -i $FILE -o tmp.fasta
+	cd-hit-est -aS 0.8 -c 0.8 -g 1 -r 1 -i $FILE -o tmp.fasta
 	#### Rename the prelibraries files as it should be
 	mv tmp.fasta `basename $FILE`
 	# cp $FILE /home/jeremy/galaxy/tools/Pipeline/pirateClassif/MCL/WORK/$SUFFIXNAME/
@@ -43,12 +43,12 @@ for FILE in $MCLFILESPATH
 do
 	#### retrieve the FILE name without the extension
 	SUFFIXNAME=`basename $FILE .fasta` &&
-  #### Apply fasta_formatter to format the max length of all the files containing FASTA sequences to 60 nt (else MCL will not work)
-  fasta_formatter -i $FILE -o ${FILE}_new -w 60 &&
-  #### Rename the fasta FILE into the normal name
-  mv ${FILE}_new $FILE &&
+	#### Apply fasta_formatter to format the max length of all the files containing FASTA sequences to 60 nt (else MCL will not work)
+	fasta_formatter -i $FILE -o ${FILE}_new -w 60 &&
+	#### Rename the fasta FILE into the normal name
+	mv ${FILE}_new $FILE &&
 
-  #### Change the working directory into the directory containing the FASTA sequence, else MCL won't work
+	#### Change the working directory into the directory containing the FASTA sequence, else MCL won't work
 	cd /home/jeremy/galaxy/tools/Pipeline/pirateClassif/MCL/WORK/$SUFFIXNAME
 	#### Apply the MCL for each files containing FASTA sequence
 	/home/jeremy/Pipeline/REPET_2.5/bin/PostAnalyzeTELib.py -a 1 -i `basename $FILE` -M MCL -v 5 &&
