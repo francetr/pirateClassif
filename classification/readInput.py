@@ -228,15 +228,8 @@ def readConfig(CONFIG):
 				configFilter[line[0]]["outputName"]=line[1]
 				configFilter[line[0]]["lengthMin"]=int(line[2].split(":")[0])
 				configFilter[line[0]]["lengthMax"]=int(line[2].split(":")[1])
-				if line[3].lower() == "na" :
-					configFilter[line[0]]["removedTool"]=line[3]
-				else:
-					configFilter[line[0]]["removedTool"]=[tool for tool in line[3].split(":")]
-				#### Take into account if multiple tools areused as filter
-				if line[4].lower() == "na" :
-					configFilter[line[0]]["onlySelectedtools"]=line[4]
-				else:
-					configFilter[line[0]]["onlySelectedtools"]=[tool for tool in line[4].split(":")]
+				configFilter[line[0]]["removedTools"]=[tool for tool in line[3].split(":")]
+				configFilter[line[0]]["onlySelectedtools"]=[tool for tool in line[4].split(":")]
 				configFilter[line[0]]["autonomousLib"]=line[5]
 				configFilter[line[0]]["totalTELib"]=line[6]
 				configFilter[line[0]]["totalRepeatLib"]=line[7]

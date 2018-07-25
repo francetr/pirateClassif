@@ -191,7 +191,7 @@ def saveFilteredSequences(CONFIG):
 		- outputName : name of the output file
 		- lengthMin : minimal length of the sequence
 		- lengthMax : maximum length of the sequence
-		- removedTool : name of the tool used on the sequence. Remove the sequences found by this tool
+		- removedTools : name of the tool used on the sequence. Remove the sequences found by this tool
 		- onlySelectedtools : name of the tool used on the sequence. Select only the sequences found by this tool
 		- autonomousLib : boolean (yes/no) indicating if sequence constitute autonomous librarie
 		- totalTELib : boolean (yes/no) indicating if sequence constitute total TEs librarie
@@ -226,7 +226,7 @@ def saveFilteredSequences(CONFIG):
 		#### Parse all the sequences
 		for id in sequences:
 			#### Check the finalClassification of the sequences is in the ID
-			if finalClassification in id:
+			if finalClassification.lower() in id.lower():
 				applyFilters(id, sequences, finalClassification, CONFIG, dicoLibraries)
 				pass
 
@@ -251,20 +251,20 @@ def applyFilters(ID, SEQUENCES, FINALCLASSIFICATION, CONFIG, DICOLIBRARIES):
 	#### First we check if tools used to detect the TE are from the removedTool or the onlySelectedtools of the CONFIG file
 	#### Find if the tool used to find the TE is a part of the removedTool from the CONFIG file : True it is find, else False
 	findRemovedTool=False
-	for removedTool in CONFIG[FINALCLASSIFICATION]["removedTool"]:
+	for removedTool in CONFIG[FINALCLASSIFICATION]["removedTools"]:
 		if ID.lower().find(removedTool.lower()) == 0:
 			findRemovedTool=True
 
 	#### Find if the tool used to find the TE is one of the onlySelectedtools from the CONFIG file : True it is find, else False
 	findSelectedTool=False
 	for selectedTool in CONFIG[FINALCLASSIFICATION]["onlySelectedtools"]:
-		if ID.lower().find(selectedTool.lower()) == 0:
+		if ID.lower().find(selectedTool.lower()) == 0 or selectedTool.lower() == "na":
 			findSelectedTool=True
-	# print(ID, CONFIG[FINALCLASSIFICATION]["onlySelectedtools"], findSelectedTool)
 
-	# print(type(SEQUENCES[ID]["length"]))
 	#### Control the length of the sequence with the CONFIG
 	if SEQUENCES[ID]["length"] >= CONFIG[FINALCLASSIFICATION]["lengthMin"] and SEQUENCES[ID]["length"] <= CONFIG[FINALCLASSIFICATION]["lengthMax"]:
-		if findRemovedTool:
-			print(ID)
-		# pass
+		#### Control if the tool used to detect TE is in the removedTool : if not, sequence can be in library autonomous TE
+		# if not findRemovedTool:
+		# 	if findSelectedTool:
+		# 		pass
+		pass
