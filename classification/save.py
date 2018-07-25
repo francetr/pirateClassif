@@ -203,7 +203,7 @@ def saveFilteredSequences(CONFIG):
 	findTE = subprocess.Popen('find classification_result/prelibraries/TE -name "*.fasta" 2> /dev/null', shell=True, stdout=subprocess.PIPE);
 	#### String containing all the preLibraries file name
 	preLibraries = findTE.stdout.read().decode("utf-8").strip()
-	
+
 	#### find noCat prelibrary
 	findNoCat = subprocess.Popen('find classification_result/prelibraries/ -name "noCat.fasta" 2> /dev/null', shell=True, stdout=subprocess.PIPE);
 	#### String containing all the preLibraries file name
@@ -262,6 +262,9 @@ def applyFilters(ID, SEQUENCES, FINALCLASSIFICATION, CONFIG, DICOLIBRARIES):
 			findSelectedTool=True
 	# print(ID, CONFIG[FINALCLASSIFICATION]["onlySelectedtools"], findSelectedTool)
 
+	# print(type(SEQUENCES[ID]["length"]))
 	#### Control the length of the sequence with the CONFIG
-	if SEQUENCES[id]["length"] >= CONFIG[FINALCLASSIFICATION]["lengthMin"] and SEQUENCES[id]["length"] <= CONFIG[FINALCLASSIFICATION]["lengthMax"]:
-		pass
+	# if SEQUENCES[ID]["length"] >= CONFIG[FINALCLASSIFICATION]["lengthMin"] and SEQUENCES[ID]["length"] <= CONFIG[FINALCLASSIFICATION]["lengthMax"]:
+		# if findRemovedTool:
+		# 	print(ID)
+		# pass

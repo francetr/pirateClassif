@@ -217,6 +217,8 @@ def readConfig(CONFIG):
 		####	Open the classif file
 		with open(CONFIG, "r") as f:
 			print("Begin of the categorization\n")
+			#### Skip the header row
+			next(f)
 			####	Parse every line/sequence of the file
 			for line in f:
 				line=line.replace("\t\t", "\t").strip() # remove the first column double tab and carriage return of the line
@@ -224,8 +226,8 @@ def readConfig(CONFIG):
 				#### Defintion of the filter onto the config dictionnary
 				configFilter[line[0]]={}
 				configFilter[line[0]]["outputName"]=line[1]
-				configFilter[line[0]]["lengthMin"]=line[2].split(":")[0]
-				configFilter[line[0]]["lengthMax"]=line[2].split(":")[1]
+				configFilter[line[0]]["lengthMin"]=int(line[2].split(":")[0])
+				configFilter[line[0]]["lengthMax"]=int(line[2].split(":")[1])
 				if line[3].lower() == "na" :
 					configFilter[line[0]]["removedTool"]=line[3]
 				else:
