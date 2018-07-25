@@ -264,7 +264,7 @@ def applyFilters(ID, SEQUENCES, FINALCLASSIFICATION, CONFIG, DICOLIBRARIES):
 
 	# print(type(SEQUENCES[ID]["length"]))
 	#### Control the length of the sequence with the CONFIG
-	# if SEQUENCES[ID]["length"] >= CONFIG[FINALCLASSIFICATION]["lengthMin"] and SEQUENCES[ID]["length"] <= CONFIG[FINALCLASSIFICATION]["lengthMax"]:
-		# if findRemovedTool:
-		# 	print(ID)
+	if SEQUENCES[ID]["length"] >= CONFIG[FINALCLASSIFICATION]["lengthMin"] and SEQUENCES[ID]["length"] <= CONFIG[FINALCLASSIFICATION]["lengthMax"]:
+		if findRemovedTool:
+			print(ID)
 		# pass
