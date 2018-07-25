@@ -4,6 +4,8 @@
 import re
 import os
 import shutil
+import subprocess
+import readInput
 
 """ @author: Tristan Frances """
 
@@ -177,3 +179,89 @@ def saveSummary(FILESUMMARY, SEQNAME, SUMMARY):
 	else:
 		FILESUMMARY.write("\tNA\tNA\tNA")
 	FILESUMMARY.write("\t{finalDegree}\n".format(finalDegree=SUMMARY["finalDegree"]))
+
+def saveFilteredSequences(CONFIG):
+	"""
+	Save filtered sequences according the config file.
+
+	Keyword arguments:
+	@type CONFIG: dictionnary
+	@param CONFIG:  dictionnary with parameters to filter sequences (which will be used to create final libraries) {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
+		There are currently 8 keys for this dictionnary:
+		- outputName : name of the output file
+		- lengthMin : minimal length of the sequence
+		- lengthMax : maximum length of the sequence
+		- removedTool : name of the tool used on the sequence. Remove the sequences found by this tool
+		- onlySelectedtools : name of the tool used on the sequence. Select only the sequences found by this tool
+		- autonomousLib : boolean (yes/no) indicating if sequence constitute autonomous librarie
+		- totalTELib : boolean (yes/no) indicating if sequence constitute total TEs librarie
+		- totalRepeatLib : boolean (yes/no) indicating if sequence constitute repeated elements librarie
+
+	@rtype: None
+	"""
+	#### find all the prelibraries
+	findTE = subprocess.Popen('find classification_result/prelibraries/TE -name "*.fasta" 2> /dev/null', shell=True, stdout=subprocess.PIPE);
+	#### String containing all the preLibraries file name
+	preLibraries = findTE.stdout.read().decode("utf-8").strip()
+	
+	#### find noCat prelibrary
+	findNoCat = subprocess.Popen('find classification_result/prelibraries/ -name "noCat.fasta" 2> /dev/null', shell=True, stdout=subprocess.PIPE);
+	#### String containing all the preLibraries file name
+	noCatLibrarie = findNoCat.stdout.read().decode("utf-8").strip()
+
+	listPrelibraries = []
+	#### dictionnaries that will contains all the id's sequences for concerned libraries
+	dicoLibraries={"listTEAutonomous":[], "listTotalTE":[], "listRepeated":[]}
+
+	listPrelibraries.append(noCatLibrarie)
+	#### Add all the name of prelibraries in listPrelibraries
+	for file in preLibraries.split("\n"):
+		listPrelibraries.append(file)
+	#### Parse all the prelibrary
+	for preLibrary in listPrelibraries:
+		#### Retrieve the final classification name of the ET from the file name
+		finalClassification = os.path.basename(preLibrary).split(".fasta")[0]
+		#### Read and store the fasta sequences of the prelibraries
+		sequences=readInput.readFasta(preLibrary)
+		#### Parse all the sequences
+		for id in sequences:
+			#### Check the finalClassification of the sequences is in the ID
+			if finalClassification in id:
+				applyFilters(id, sequences, finalClassification, CONFIG, dicoLibraries)
+				pass
+
+
+def applyFilters(ID, SEQUENCES, FINALCLASSIFICATION, CONFIG, DICOLIBRARIES):
+	"""
+	Apply filters from the CONFIG file to creates the final libraries.
+
+	@type ID: string
+	@param ID: string of the id of the sequence
+	@type SEQUENCES: dictionnary
+	@param SEQUENCES: dictionnary containing the fasta sequence of the preLibraries
+	@type FINALCLASSIFICATION: string
+	@param FINALCLASSIFICATION: string indicating the final classification of the sequence (usefull to compare SEQUENCES with the CONFIG file)
+	@type CONFIG: dictionnary
+	@param CONFIG:  dictionnary with parameters to filter sequences (which will be used to create final libraries) {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
+	@type DICOLIBRARIES: dictionnary
+	@param DICOLIBRARIES:  dictionnary that will contain the id of the sequences to construct the 3 final libraries {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
+
+	@rtype: None
+	"""
+	#### First we check if tools used to detect the TE are from the removedTool or the onlySelectedtools of the CONFIG file
+	#### Find if the tool used to find the TE is a part of the removedTool from the CONFIG file : True it is find, else False
+	findRemovedTool=False
+	for removedTool in CONFIG[FINALCLASSIFICATION]["removedTool"]:
+		if ID.lower().find(removedTool.lower()) == 0:
+			findRemovedTool=True
+
+	#### Find if the tool used to find the TE is one of the onlySelectedtools from the CONFIG file : True it is find, else False
+	findSelectedTool=False
+	for selectedTool in CONFIG[FINALCLASSIFICATION]["onlySelectedtools"]:
+		if ID.lower().find(selectedTool.lower()) == 0:
+			findSelectedTool=True
+	# print(ID, CONFIG[FINALCLASSIFICATION]["onlySelectedtools"], findSelectedTool)
+
+	#### Control the length of the sequence with the CONFIG
+	if SEQUENCES[id]["length"] >= CONFIG[FINALCLASSIFICATION]["lengthMin"] and SEQUENCES[id]["length"] <= CONFIG[FINALCLASSIFICATION]["lengthMax"]:
+		pass

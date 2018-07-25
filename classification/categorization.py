@@ -69,7 +69,7 @@ def classDetermination(FEATURES, SEQCLASSIFIED, BASELINE, IDENTITYTHRESHOLD):
 		####	Check the class of the sequence if it is not chimeric : class I or II
 		if FEATURES[4] == "I" or FEATURES[4] == "II" :
 			SEQCLASSIFIED[FEATURES[0]]["saveType"]="TE"
-			SEQCLASSIFIED[FEATURES[0]]["class"]=FEATURES[4]
+			SEQCLASSIFIED[FEATURES[0]]["class"]="Class%s"%FEATURES[4]
 			searchOrder=True
 		####	NoCat
 		elif FEATURES[4] == "noCat":

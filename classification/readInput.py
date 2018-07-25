@@ -23,6 +23,7 @@ def retrieveArguments():
 	parser.add_argument("fasta", type=str, help="fasta file providing the sequence")
 	parser.add_argument("-e", metavar="IDENTITY", type=float, nargs="?", default=100.0, help="Threshold for considering two sequences as identical, enter an integer from 0 to 100, default is 100.")
 	parser.add_argument("--baseline", type=str, nargs="?", default="base_reference.txt", help="baseline file giving the different names possible for a superfamily")
+	parser.add_argument("--config", type=str, nargs="?", default="Filter_pirateClassif.txt", help="config file for the creation of libraries")
 	args = parser.parse_args()
 	####	If identity threshold > 100 convert it to the value 100
 	if args.e >= 100:
@@ -159,7 +160,7 @@ def readFasta(FASTA):
 	"""
 	Read a FASTA file as input and return it as a string. Use the SeqIO from the package Bio of BioPython.
 
-	Return a dictionnary which contains the sequence and the id of each sequences that are in the FASTA file.
+	Return a dictionnary which contains the sequence, the id and the length of each sequences that are in the FASTA file.
 
 	Keyword argument:
 	@type FASTA: string
@@ -172,6 +173,8 @@ def readFasta(FASTA):
 		- description : description of the sequence
 		- number of features : number of features of the sequence
 		- seq : sequence concerned
+		- length : length of the sequence
+
 	"""
 	seqReturned={}
 	try:
@@ -180,9 +183,64 @@ def readFasta(FASTA):
 		####	Parse every line/sequence of the file
 			for record in SeqIO.parse(handle, "fasta"):
 				####	Save the sequence in a dictionnary
-				seqReturned[record.id]={"seq":record.seq.upper()}
+				seqReturned[record.id]={"seq":record.seq.upper(), "length":len(record.seq)}
 		return seqReturned
 	except (FileNotFoundError, NameError) as e:
 		####	prevent the opening if the file name is incorrect
 		print("/!\	Error: {}\n####	Classification aborted".format(e))
+		sys.exit(1)
+
+def readConfig(CONFIG):
+	"""
+	Read the config file as input and return it as a dictionnary.
+
+	Return a dictionnary which contains the sequence and the id of each sequences that are in the FASTA file.
+
+	Keyword argument:
+	@type CONFIG: string
+	@param CONFIG: name of the config file containing the filters to apply in order to create the libraries.
+
+	@rtype: dictionnary
+	@return: dictionnary with parameters to filter sequences (which will be used to create final libraries) {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
+		There are currently 8 keys for this dictionnary:
+		- outputName : name of the output file
+		- lengthMin : minimal length of the sequence
+		- lengthMax : maximum length of the sequence
+		- removedTool : name of the tool used on the sequence. Remove the sequences found by this tool
+		- onlySelectedtools : name of the tool used on the sequence. Select the sequences found by this tool
+		- autonomousLib : boolean (yes/no) indicating if sequence constitute autonomous librarie
+		- totalTELib : boolean (yes/no) indicating if sequence constitute total TEs librarie
+		- totalRepeatLib : boolean (yes/no) indicating if sequence constitute repeated elements librarie
+	"""
+	configFilter={}
+	try:
+		####	Open the classif file
+		with open(CONFIG, "r") as f:
+			print("Begin of the categorization\n")
+			####	Parse every line/sequence of the file
+			for line in f:
+				line=line.replace("\t\t", "\t").strip() # remove the first column double tab and carriage return of the line
+				line=line.split("\t")
+				#### Defintion of the filter onto the config dictionnary
+				configFilter[line[0]]={}
+				configFilter[line[0]]["outputName"]=line[1]
+				configFilter[line[0]]["lengthMin"]=line[2].split(":")[0]
+				configFilter[line[0]]["lengthMax"]=line[2].split(":")[1]
+				if line[3].lower() == "na" :
+					configFilter[line[0]]["removedTool"]=line[3]
+				else:
+					configFilter[line[0]]["removedTool"]=[tool for tool in line[3].split(":")]
+				#### Take into account if multiple tools areused as filter
+				if line[4].lower() == "na" :
+					configFilter[line[0]]["onlySelectedtools"]=line[4]
+				else:
+					configFilter[line[0]]["onlySelectedtools"]=[tool for tool in line[4].split(":")]
+				configFilter[line[0]]["autonomousLib"]=line[5]
+				configFilter[line[0]]["totalTELib"]=line[6]
+				configFilter[line[0]]["totalRepeatLib"]=line[7]
+
+			return configFilter
+	except (FileNotFoundError, NameError) as e:
+		####	Prevent the opening if the file name is incorrect
+		print("/!\	Error: {}\n####	Read config file aborted".format(e))
 		sys.exit(1)

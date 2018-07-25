@@ -38,6 +38,8 @@ def main():
 	print("The identity threshold used is {identity} %".format(identity=identityThreshold))
 	baselineFile=args.baseline
 	print("The baseline file used is %s\n"%(baselineFile))
+	configFile=args.config
+	print("The baseline file used is %s\n"%(configFile))
 
 	####	Reading of the baseline file ####
 	try:
@@ -84,12 +86,26 @@ def main():
 	except IndexError:
 		print("/!\ Error: Error with the Fasta file provided {}\n####	Classification aborted".format(fastaFile))
 		sys.exit(1)
+
 	#### Save prelibraries files and summary
 	save.saveResult(fasta, seqClassified)
 
-	#### Launch the MCL for each sequences in order to retrieve their superFamily
-	MCL.launchMCL()
-	MCL.saveLibraries()
+
+
+	# TODO : Creates files with the config file that will be used to creates the 3 final libraries
+	####	Reading of the config file
+	try:
+		print("####	Read of the config file")
+		config=readInput.readConfig(configFile)
+		print("####	End of reading of the config file\n")
+	except IndexError:
+		print("/!\ Error: Error with the config file provided {}\n####	Program aborted".format(configFile))
+		sys.exit(1)
+
+	save.saveFilteredSequences(config)
+	#### NOT USED ANYMORE : Launch the MCL for each sequences in order to retrieve their superFamily
+	# MCL.launchMCL()
+	# MCLsaveLibraries()
 
 ####################
 #	   MAIN
