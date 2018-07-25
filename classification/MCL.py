@@ -6,6 +6,7 @@
 import os
 import glob
 import subprocess
+import re
 
 def launchMCL():
 	"""
@@ -39,22 +40,14 @@ def saveLibraries():
 	#TODO
 	listFiles=[]
 	listClassification=[]
-	for(rep, subRep, files) in os.walk("/home/jeremy/galaxy/tools/Pipeline/pirateClassif/MCL/WORK"):
-		#### Retrieve the classification name of MCL sequences, from the file name
-		try :
-			listClassification.append(subRep)
-			listFiles.append(files)
-		except (FileNotFoundError, NameError) as e:
-			print("/!\ Error this file does not exist : %s"%(e))
+	listNonAutonomous=["TRIM","LARD","SINE","MITE","7SL","5SL","tRNA"]
+
 	#### Use the find bash command to retrieve all the classification name of the libraries
 	bashCommand = subprocess.Popen('find /home/jeremy/galaxy/tools/Pipeline/pirateClassif/MCL/WORK/ -name "*_MCL.fa" 2> /dev/null', shell=True, stdout=subprocess.PIPE);
-	MCLsequences = bashCommand.stdout.read()
-	print(MCLsequences)
-
-	# for files in listeFiles:
-	#     if file
-	#
-	# print(listFiles)
-	# print(listClassification[0])
-	# for name in glob.glob("/home/jeremy/galaxy/tools/Pipeline/classification/MCL/WORK/*"):
-	#     print (name)
+	MCLsequences = bashCommand.stdout.read().decode("utf-8")
+	#### Add the classification name in a list
+	for file in MCLsequences.strip().split("\n"):
+		listClassification.append(os.path.basename(file).split("_MCL.fa")[0])
+	for file in listClassification:
+		if file in listNonAutonomous or file in ["%s_undefined"%(na) for na in listNonAutonomous]:
+			print(file)

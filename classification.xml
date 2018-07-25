@@ -13,7 +13,7 @@ cp $PASTEC /home/jeremy/galaxy/tools/Pipeline/pirateClassif/inputs/pastec.txt &&
 
 cp $genome /home/jeremy/galaxy/tools/Pipeline/pirateClassif/inputs/genome.fasta &&
 
-python /home/jeremy/galaxy/tools/Pipeline//scriptClassif.py $PASTEC $genome --baseline /home/jeremy/galaxy/tools/Pipeline/pirateClassif/classification/base_reference.txt -e $threshold &&
+python /home/jeremy/galaxy/tools/Pipeline//scriptClassif.py $PASTEC $genome --baseline /home/jeremy/galaxy/tools/Pipeline/pirateClassif/classification/base_reference.txt --config /home/jeremy/galaxy/tools/Pipeline/pirateClassif/classification/Filter_pirateClassif.txt -e $threshold &&
 
 tar -zcvf classification_result.tgz classification/classification_result/ &&
 
