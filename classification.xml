@@ -7,15 +7,14 @@
     </stdio>
 <description>Give a classification of each sequences</description>
 <command><![CDATA[
-mkdir -p inputs
 
-cp $PASTEC /home/jeremy/galaxy/tools/Pipeline/pirateClassif/inputs/pastec.txt &&
+cp $PASTEC /home/jeremy/galaxy/tools/Pipeline/pirateClassif/pastec.txt &&
 
-cp $genome /home/jeremy/galaxy/tools/Pipeline/pirateClassif/inputs/genome.fasta &&
+cp $genome /home/jeremy/galaxy/tools/Pipeline/pirateClassif/genome.fasta &&
 
-python /home/jeremy/galaxy/tools/Pipeline//scriptClassif.py $PASTEC $genome --baseline /home/jeremy/galaxy/tools/Pipeline/pirateClassif/classification/base_reference.txt --config /home/jeremy/galaxy/tools/Pipeline/pirateClassif/classification/Filter_pirateClassif.txt -e $threshold &&
+python /home/jeremy/galaxy/tools/Pipeline/pirateClassif/classification/PiRATEclassif.py $PASTEC $genome --baseline /home/jeremy/galaxy/tools/Pipeline/pirateClassif/classification/base_reference.txt --config /home/jeremy/galaxy/tools/Pipeline/pirateClassif/classification/Filter_pirateClassif.txt -e $threshold &&
 
-tar -zcvf classification_result.tgz classification/classification_result/ &&
+tar -zcvf classification_result.tgz ./classification_result/ &&
 
 cp ./classification_result.tgz $output
 
