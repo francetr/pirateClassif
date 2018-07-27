@@ -203,7 +203,7 @@ def readConfig(CONFIG):
 	@rtype: dictionnary
 	@return: dictionnary with parameters to filter sequences (which will be used to create final libraries) {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
 		There are currently 8 keys for this dictionnary:
-		- outputName : name of the output file
+		- finalClassification : final Classification given to the sequence by the classification script
 		- lengthMin : minimal length of the sequence
 		- lengthMax : maximum length of the sequence
 		- removedTool : name of the tool used on the sequence. Remove the sequences found by this tool
@@ -216,7 +216,6 @@ def readConfig(CONFIG):
 	try:
 		####	Open the classif file
 		with open(CONFIG, "r") as f:
-			print("Begin of the categorization\n")
 			#### Skip the header row
 			next(f)
 			####	Parse every line/sequence of the file
@@ -224,15 +223,15 @@ def readConfig(CONFIG):
 				line=line.replace("\t\t", "\t").strip() # remove the first column double tab and carriage return of the line
 				line=line.split("\t")
 				#### Defintion of the filter onto the config dictionnary
-				configFilter[line[0]]={}
-				configFilter[line[0]]["outputName"]=line[1]
-				configFilter[line[0]]["lengthMin"]=int(line[2].split(":")[0])
-				configFilter[line[0]]["lengthMax"]=int(line[2].split(":")[1])
-				configFilter[line[0]]["removedTools"]=[tool for tool in line[3].split(":")]
-				configFilter[line[0]]["onlySelectedtools"]=[tool for tool in line[4].split(":")]
-				configFilter[line[0]]["autonomousLib"]=line[5]
-				configFilter[line[0]]["totalTELib"]=line[6]
-				configFilter[line[0]]["totalRepeatLib"]=line[7]
+				configFilter[line[1]]={}
+				configFilter[line[1]]["finalClassification"]=line[0]
+				configFilter[line[1]]["lengthMin"]=int(line[2].split(":")[0])
+				configFilter[line[1]]["lengthMax"]=int(line[2].split(":")[1])
+				configFilter[line[1]]["removedTools"]=[tool for tool in line[3].split(":")]
+				configFilter[line[1]]["onlySelectedtools"]=[tool for tool in line[4].split(":")]
+				configFilter[line[1]]["autonomousLib"]=line[5]
+				configFilter[line[1]]["totalTELib"]=line[6]
+				configFilter[line[1]]["totalRepeatLib"]=line[7]
 
 			return configFilter
 	except (FileNotFoundError, NameError) as e:

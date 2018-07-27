@@ -88,7 +88,7 @@ def main():
 		sys.exit(1)
 
 	#### Save prelibraries files and summary
-	save.saveResult(fasta, seqClassified)
+	save.saveClassificationResult(fasta, seqClassified)
 
 
 

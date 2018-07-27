@@ -9,7 +9,7 @@ import readInput
 
 """ @author: Tristan Frances """
 
-def saveResult(FASTA, SEQCLASSIFIED):
+def saveClassificationResult(FASTA, SEQCLASSIFIED):
 	"""
 
 	Save the categorized sequences in different FASTA files.
@@ -36,6 +36,7 @@ def saveResult(FASTA, SEQCLASSIFIED):
 	finally:
 		#### Creates the prelibraries directories
 		os.mkdir("classification_result")
+		os.mkdir("classification_result/libraries")
 		os.mkdir("classification_result/prelibraries/")
 		os.mkdir("classification_result/prelibraries/TE")
 		os.mkdir("classification_result/prelibraries/TE/class")
@@ -61,7 +62,7 @@ def saveResult(FASTA, SEQCLASSIFIED):
 		for saveType in allSaves["saveType"]:
 			if (SEQCLASSIFIED[seqName]["saveType"] == saveType) and (saveType != "TE"):
 				fileType=open("classification_result/prelibraries/{saveType}.fasta".format(saveType=saveType), "a")
-				fileType.write(">{seqName}\n{seq}\n".format(seqName=seqName, seq=FASTA[seqName]['seq']))
+				fileType.write(">{seqName}_{saveType}\n{seq}\n".format(seqName=seqName, saveType=saveType, seq=FASTA[seqName]['seq']))
 				fileType.close()
 
 		#### Only for TE sequences
@@ -188,7 +189,7 @@ def saveFilteredSequences(CONFIG):
 	@type CONFIG: dictionnary
 	@param CONFIG:  dictionnary with parameters to filter sequences (which will be used to create final libraries) {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
 		There are currently 8 keys for this dictionnary:
-		- outputName : name of the output file
+		- finalClassification : final Classification given to the sequence by the classification script
 		- lengthMin : minimal length of the sequence
 		- lengthMax : maximum length of the sequence
 		- removedTools : name of the tool used on the sequence. Remove the sequences found by this tool
@@ -211,13 +212,15 @@ def saveFilteredSequences(CONFIG):
 
 	listPrelibraries = []
 	#### dictionnaries that will contains all the id's sequences for concerned libraries
-	dicoLibraries={"listTEAutonomous":[], "listTotalTE":[], "listRepeated":[]}
+	dicoLibraries={"autonomousLib":[], "totalTELib":[], "totalRepeatLib":[]}
 
 	listPrelibraries.append(noCatLibrarie)
 	#### Add all the name of prelibraries in listPrelibraries
 	for file in preLibraries.split("\n"):
 		listPrelibraries.append(file)
 	#### Parse all the prelibrary
+	print("####	Creation of the three final libraries")
+
 	for preLibrary in listPrelibraries:
 		#### Retrieve the final classification name of the ET from the file name
 		finalClassification = os.path.basename(preLibrary).split(".fasta")[0]
@@ -228,7 +231,20 @@ def saveFilteredSequences(CONFIG):
 			#### Check the finalClassification of the sequences is in the ID
 			if finalClassification.lower() in id.lower():
 				applyFilters(id, sequences, finalClassification, CONFIG, dicoLibraries)
-				pass
+
+	for preLibrary in listPrelibraries:
+		#### Retrieve the final classification name of the ET from the file name
+		finalClassification = os.path.basename(preLibrary).split(".fasta")[0]
+		#### Read and store the fasta sequences of the prelibraries
+		sequences=readInput.readFasta(preLibrary)
+		#### Save the three finals libraries
+		saveLibraries(sequences, dicoLibraries)
+
+	print("Number of sequences in listAutonomousTE : {nbAutonomous}\nNumber of sequences in listTotalTE : {nbTotalTE}\nNumber of sequences in Repeated : {nbRepeated}".format(\
+	nbAutonomous=len(dicoLibraries["autonomousLib"]), nbTotalTE=len(dicoLibraries["totalTELib"]), nbRepeated=len(dicoLibraries["totalRepeatLib"])))
+
+
+
 
 
 def applyFilters(ID, SEQUENCES, FINALCLASSIFICATION, CONFIG, DICOLIBRARIES):
@@ -243,28 +259,61 @@ def applyFilters(ID, SEQUENCES, FINALCLASSIFICATION, CONFIG, DICOLIBRARIES):
 	@param FINALCLASSIFICATION: string indicating the final classification of the sequence (usefull to compare SEQUENCES with the CONFIG file)
 	@type CONFIG: dictionnary
 	@param CONFIG:  dictionnary with parameters to filter sequences (which will be used to create final libraries) {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
-	@type DICOLIBRARIES: dictionnary
-	@param DICOLIBRARIES:  dictionnary that will contain the id of the sequences to construct the 3 final libraries {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
 
 	@rtype: None
 	"""
 	#### First we check if tools used to detect the TE are from the removedTool or the onlySelectedtools of the CONFIG file
-	#### Find if the tool used to find the TE is a part of the removedTool from the CONFIG file : True it is find, else False
-	findRemovedTool=False
-	for removedTool in CONFIG[FINALCLASSIFICATION]["removedTools"]:
-		if ID.lower().find(removedTool.lower()) == 0:
-			findRemovedTool=True
+	#### Parse the dictionnary containing CONFIG information
+	for sortedOutput in CONFIG:
+		#### Look for te finalClassification corresponding to the sequence
+		if CONFIG[sortedOutput]["finalClassification"].lower() == FINALCLASSIFICATION.lower():
+			#### Find if the tool used to find the TE is a part of the removedTool from the CONFIG file : True it is find, else False
+			findRemovedTool=False
+			for removedTool in CONFIG[sortedOutput]["removedTools"]:
+				if ID.lower().find(removedTool.lower()) == 0:
+					findRemovedTool=True
 
-	#### Find if the tool used to find the TE is one of the onlySelectedtools from the CONFIG file : True it is find, else False
-	findSelectedTool=False
-	for selectedTool in CONFIG[FINALCLASSIFICATION]["onlySelectedtools"]:
-		if ID.lower().find(selectedTool.lower()) == 0 or selectedTool.lower() == "na":
-			findSelectedTool=True
+			#### Find if the tool used to find the TE is one of the onlySelectedtools from the CONFIG file : True it is find, else False
+			findSelectedTool=False
+			for selectedTool in CONFIG[sortedOutput]["onlySelectedtools"]:
+				if ID.lower().find(selectedTool.lower()) == 0 or selectedTool.lower() == "na":
+					findSelectedTool=True
 
-	#### Control the length of the sequence with the CONFIG
-	if SEQUENCES[ID]["length"] >= CONFIG[FINALCLASSIFICATION]["lengthMin"] and SEQUENCES[ID]["length"] <= CONFIG[FINALCLASSIFICATION]["lengthMax"]:
-		#### Control if the tool used to detect TE is in the removedTool : if not, sequence can be in library autonomous TE
-		# if not findRemovedTool:
-		# 	if findSelectedTool:
-		# 		pass
-		pass
+			#### Control the length of the sequence with the CONFIG
+			if SEQUENCES[ID]["length"] >= CONFIG[sortedOutput]["lengthMin"] and SEQUENCES[ID]["length"] < CONFIG[sortedOutput]["lengthMax"]:
+				#### Control if the tool used to detect TE is in the removedTool : if not, sequence can be in library autonomous TE
+				if not findRemovedTool and findSelectedTool:
+					#### Control in which libraries the sequence can be added
+					#### List of ID for construct librarie of potential autonomous TE
+					if CONFIG[sortedOutput]["autonomousLib"].lower()=="yes":
+						DICOLIBRARIES["autonomousLib"].append(ID)
+					#### List of ID for construct librarie of total TE
+					if CONFIG[sortedOutput]["totalTELib"].lower()=="yes":
+						DICOLIBRARIES["totalTELib"].append(ID)
+					#### List of ID for construct librarie of repeated Elements
+					if CONFIG[sortedOutput]["totalRepeatLib"].lower()=="yes":
+						DICOLIBRARIES["totalRepeatLib"].append(ID)
+
+
+def saveLibraries(SEQUENCES, DICOLIBRARIES):
+	"""
+	Save the three libraries that will be used for the annotation step of PiRATE.
+
+	@type SEQUENCES: dictionnary
+	@param SEQUENCES: dictionnary containing the fasta sequence of the preLibraries
+	@type DICOLIBRARIES: dictionnary
+	@param DICOLIBRARIES:  dictionnary that will contain the id of the sequences to construct the 3 final libraries {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
+	- listAutonomousTE
+	- listTotalTE
+	- listRepeated
+
+	@rtype = None
+	"""
+	#### Parse the list containing the id ofthe sequences that will built the three libraries
+	for library in DICOLIBRARIES:
+		libraryFile = open("classification_result/libraries/{library}.fasta".format(library=library), "a")
+		#### Parse the sequence
+		for id in SEQUENCES:
+			if id in DICOLIBRARIES[library]:
+				libraryFile.write(">{id}\n{seq}\n".format(id=id, seq=SEQUENCES[id]["seq"]))
+		libraryFile.close()
