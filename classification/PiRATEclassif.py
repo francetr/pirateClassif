@@ -102,7 +102,7 @@ def main():
 		print("/!\ Error: Error with the config file provided {}\n####	Program aborted".format(configFile))
 		sys.exit(1)
 
-	save.saveFilteredSequences(config)
+	save.initFilters(config)
 	#### NOT USED ANYMORE : Launch the MCL for each sequences in order to retrieve their superFamily
 	# MCL.launchMCL()
 	# MCLsaveLibraries()

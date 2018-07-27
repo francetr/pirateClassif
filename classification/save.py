@@ -181,7 +181,7 @@ def saveSummary(FILESUMMARY, SEQNAME, SUMMARY):
 		FILESUMMARY.write("\tNA\tNA\tNA")
 	FILESUMMARY.write("\t{finalDegree}\n".format(finalDegree=SUMMARY["finalDegree"]))
 
-def saveFilteredSequences(CONFIG):
+def initFilters(CONFIG):
 	"""
 	Save filtered sequences according the config file.
 
