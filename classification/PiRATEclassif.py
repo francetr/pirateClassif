@@ -6,7 +6,8 @@
 import sys
 import readInput
 import save
-import MCL
+# import MCL
+import filter
 from timeit import default_timer as timer
 
 
@@ -14,7 +15,7 @@ from timeit import default_timer as timer
 #	Help command : scriptClassif -h
 #   Commandes to launch this script :
 #	   python3 <path/toward/this/script> <path/toward/the/classif/file> <path/toward/the/fasta/file>
-# example	   python3 code/scriptClassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta
+# example	   python3 PiRATEclassif.py ArabiTEdenovo.txt ArabiTEdenovo.fasta
 #	   or  ./<path/toward/the>/scriptClassif.py <path/toward/the/classif/file> <path/toward/the/fasta/file>
 ############
 
@@ -102,7 +103,7 @@ def main():
 		print("/!\ Error: Error with the config file provided {}\n####	Program aborted".format(configFile))
 		sys.exit(1)
 
-	save.initFilters(config)
+	filter.initFilters(config)
 	#### NOT USED ANYMORE : Launch the MCL for each sequences in order to retrieve their superFamily
 	# MCL.launchMCL()
 	# MCLsaveLibraries()

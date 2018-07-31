@@ -203,14 +203,14 @@ def readConfig(CONFIG):
 	@rtype: dictionnary
 	@return: dictionnary with parameters to filter sequences (which will be used to create final libraries) {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
 		There are currently 8 keys for this dictionnary:
-		- finalClassification : final Classification given to the sequence by the classification script
-		- lengthMin : minimal length of the sequence
-		- lengthMax : maximum length of the sequence
-		- removedTool : name of the tool used on the sequence. Remove the sequences found by this tool
-		- onlySelectedtools : name of the tool used on the sequence. Select the sequences found by this tool
-		- autonomousLib : boolean (yes/no) indicating if sequence constitute autonomous librarie
-		- totalTELib : boolean (yes/no) indicating if sequence constitute total TEs librarie
-		- totalRepeatLib : boolean (yes/no) indicating if sequence constitute repeated elements librarie
+			- finalClassification : final Classification given to the sequence by the classification script
+			- lengthMin : minimal length of the sequence
+			- lengthMax : maximum length of the sequence
+			- removedTool : name of the tool used on the sequence. Remove the sequences found by this tool
+			- onlySelectedtools : name of the tool used on the sequence. Select the sequences found by this tool
+			- autonomousLib : boolean (yes/no) indicating if sequence constitute autonomous librarie
+			- totalTELib : boolean (yes/no) indicating if sequence constitute total TEs librarie
+			- totalRepeatLib : boolean (yes/no) indicating if sequence constitute repeated elements librarie
 	"""
 	configFilter={}
 	try:

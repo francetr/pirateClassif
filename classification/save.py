@@ -5,7 +5,6 @@ import re
 import os
 import shutil
 import subprocess
-import readInput
 
 """ @author: Tristan Frances """
 
@@ -36,6 +35,7 @@ def saveClassificationResult(FASTA, SEQCLASSIFIED):
 	finally:
 		#### Creates the prelibraries directories
 		os.mkdir("classification_result")
+		os.mkdir("classification_result/intermediateLibraries")
 		os.mkdir("classification_result/libraries")
 		os.mkdir("classification_result/prelibraries/")
 		os.mkdir("classification_result/prelibraries/TE")
@@ -171,128 +171,48 @@ def saveSummary(FILESUMMARY, SEQNAME, SUMMARY):
 	@rtype: None
 	"""
 	FILESUMMARY.write("{id}\t{length}\t{saveType}\t{completeness}\t{seqClass}".format(id=SEQNAME, length=SUMMARY["length"], saveType=SUMMARY["saveType"], completeness=SUMMARY["completeness"], seqClass=SUMMARY["class"]))
+	#### Write the order if existing
 	if "order" in SUMMARY:
 		FILESUMMARY.write("\t{order}".format(order=SUMMARY["order"]))
 	else:
 		FILESUMMARY.write("\tNA")
+	#### Write the superFamily if existing
 	if "superFamily" in SUMMARY:
-		FILESUMMARY.write("\t{superFamily}\t{blastProofs}\t{protProofs}".format(superFamily=SUMMARY["superFamily"], blastProofs=SUMMARY["superFamilyProofs"]["blast"], protProofs=SUMMARY["superFamilyProofs"]["protProfiles"]))
+		FILESUMMARY.write("\t{superFamily}".format(superFamily=SUMMARY["superFamily"]))
 	else:
-		FILESUMMARY.write("\tNA\tNA\tNA")
+		FILESUMMARY.write("\tNA")
+	#### Check if there is superFamily proofs
+	if "superFamilyProofs" in SUMMARY:
+		#### Write the BLAST proofs if existing
+		if "blast" in SUMMARY["superFamilyProofs"]:
+			FILESUMMARY.write("\t{blastProofs}".format(blastProofs=SUMMARY["superFamilyProofs"]["blast"]))
+		else:
+			FILESUMMARY.write("\tNA")
+		#### Write the PROTPROFILES proofs if existing
+		if "protProfiles" in SUMMARY["superFamilyProofs"]:
+			FILESUMMARY.write("\t{protProofs}".format(protProofs=SUMMARY["superFamilyProofs"]["protProfiles"]))
+		else:
+			FILESUMMARY.write("\tNA")
 	FILESUMMARY.write("\t{finalDegree}\n".format(finalDegree=SUMMARY["finalDegree"]))
 
-def initFilters(CONFIG):
+def saveIntermadiateLibraries(SEQUENCES, ID, CONFIG, SORTEDOUTPUT):
 	"""
-	Save filtered sequences according the config file.
-
-	Keyword arguments:
-	@type CONFIG: dictionnary
-	@param CONFIG:  dictionnary with parameters to filter sequences (which will be used to create final libraries) {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
-		There are currently 8 keys for this dictionnary:
-		- finalClassification : final Classification given to the sequence by the classification script
-		- lengthMin : minimal length of the sequence
-		- lengthMax : maximum length of the sequence
-		- removedTools : name of the tool used on the sequence. Remove the sequences found by this tool
-		- onlySelectedtools : name of the tool used on the sequence. Select only the sequences found by this tool
-		- autonomousLib : boolean (yes/no) indicating if sequence constitute autonomous librarie
-		- totalTELib : boolean (yes/no) indicating if sequence constitute total TEs librarie
-		- totalRepeatLib : boolean (yes/no) indicating if sequence constitute repeated elements librarie
-
-	@rtype: None
-	"""
-	#### find all the prelibraries
-	findTE = subprocess.Popen('find classification_result/prelibraries/TE -name "*.fasta" 2> /dev/null', shell=True, stdout=subprocess.PIPE);
-	#### String containing all the preLibraries file name
-	preLibraries = findTE.stdout.read().decode("utf-8").strip()
-
-	#### find noCat prelibrary
-	findNoCat = subprocess.Popen('find classification_result/prelibraries/ -name "noCat.fasta" 2> /dev/null', shell=True, stdout=subprocess.PIPE);
-	#### String containing all the preLibraries file name
-	noCatLibrarie = findNoCat.stdout.read().decode("utf-8").strip()
-
-	listPrelibraries = []
-	#### dictionnaries that will contains all the id's sequences for concerned libraries
-	dicoLibraries={"autonomousLib":[], "totalTELib":[], "totalRepeatLib":[]}
-
-	listPrelibraries.append(noCatLibrarie)
-	#### Add all the name of prelibraries in listPrelibraries
-	for file in preLibraries.split("\n"):
-		listPrelibraries.append(file)
-	#### Parse all the prelibrary
-	print("####	Creation of the three final libraries")
-
-	for preLibrary in listPrelibraries:
-		#### Retrieve the final classification name of the ET from the file name
-		finalClassification = os.path.basename(preLibrary).split(".fasta")[0]
-		#### Read and store the fasta sequences of the prelibraries
-		sequences=readInput.readFasta(preLibrary)
-		#### Parse all the sequences
-		for id in sequences:
-			#### Check the finalClassification of the sequences is in the ID
-			if finalClassification.lower() in id.lower():
-				applyFilters(id, sequences, finalClassification, CONFIG, dicoLibraries)
-
-	for preLibrary in listPrelibraries:
-		#### Retrieve the final classification name of the ET from the file name
-		finalClassification = os.path.basename(preLibrary).split(".fasta")[0]
-		#### Read and store the fasta sequences of the prelibraries
-		sequences=readInput.readFasta(preLibrary)
-		#### Save the three finals libraries
-		saveLibraries(sequences, dicoLibraries)
-
-	print("Number of sequences in listAutonomousTE : {nbAutonomous}\nNumber of sequences in listTotalTE : {nbTotalTE}\nNumber of sequences in Repeated : {nbRepeated}".format(\
-	nbAutonomous=len(dicoLibraries["autonomousLib"]), nbTotalTE=len(dicoLibraries["totalTELib"]), nbRepeated=len(dicoLibraries["totalRepeatLib"])))
-
-
-
-
-
-def applyFilters(ID, SEQUENCES, FINALCLASSIFICATION, CONFIG, DICOLIBRARIES):
-	"""
-	Apply filters from the CONFIG file to creates the final libraries.
+	Save intermediate libraries : differenciates the short from the long sequences according the CONFIG file.
 
 	@type ID: string
 	@param ID: string of the id of the sequence
 	@type SEQUENCES: dictionnary
 	@param SEQUENCES: dictionnary containing the fasta sequence of the preLibraries
-	@type FINALCLASSIFICATION: string
-	@param FINALCLASSIFICATION: string indicating the final classification of the sequence (usefull to compare SEQUENCES with the CONFIG file)
 	@type CONFIG: dictionnary
 	@param CONFIG:  dictionnary with parameters to filter sequences (which will be used to create final libraries) {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
+	@type SORTEDOUTPUT: string
+	@param SORTEDOUTPUT:  string of the name of the intermediate librarie file
 
 	@rtype: None
 	"""
-	#### First we check if tools used to detect the TE are from the removedTool or the onlySelectedtools of the CONFIG file
-	#### Parse the dictionnary containing CONFIG information
-	for sortedOutput in CONFIG:
-		#### Look for te finalClassification corresponding to the sequence
-		if CONFIG[sortedOutput]["finalClassification"].lower() == FINALCLASSIFICATION.lower():
-			#### Find if the tool used to find the TE is a part of the removedTool from the CONFIG file : True it is find, else False
-			findRemovedTool=False
-			for removedTool in CONFIG[sortedOutput]["removedTools"]:
-				if ID.lower().find(removedTool.lower()) == 0:
-					findRemovedTool=True
-
-			#### Find if the tool used to find the TE is one of the onlySelectedtools from the CONFIG file : True it is find, else False
-			findSelectedTool=False
-			for selectedTool in CONFIG[sortedOutput]["onlySelectedtools"]:
-				if ID.lower().find(selectedTool.lower()) == 0 or selectedTool.lower() == "na":
-					findSelectedTool=True
-
-			#### Control the length of the sequence with the CONFIG
-			if SEQUENCES[ID]["length"] >= CONFIG[sortedOutput]["lengthMin"] and SEQUENCES[ID]["length"] < CONFIG[sortedOutput]["lengthMax"]:
-				#### Control if the tool used to detect TE is in the removedTool : if not, sequence can be in library autonomous TE
-				if not findRemovedTool and findSelectedTool:
-					#### Control in which libraries the sequence can be added
-					#### List of ID for construct librarie of potential autonomous TE
-					if CONFIG[sortedOutput]["autonomousLib"].lower()=="yes":
-						DICOLIBRARIES["autonomousLib"].append(ID)
-					#### List of ID for construct librarie of total TE
-					if CONFIG[sortedOutput]["totalTELib"].lower()=="yes":
-						DICOLIBRARIES["totalTELib"].append(ID)
-					#### List of ID for construct librarie of repeated Elements
-					if CONFIG[sortedOutput]["totalRepeatLib"].lower()=="yes":
-						DICOLIBRARIES["totalRepeatLib"].append(ID)
+	fileIntermediateLib=open("classification_result/intermediateLibraries/{intermediateName}.fasta".format(intermediateName=SORTEDOUTPUT), "a")
+	fileIntermediateLib.write(">{seqName}\n{seq}\n".format(seqName=ID, seq=SEQUENCES[ID]['seq']))
+	fileIntermediateLib.close()
 
 
 def saveLibraries(SEQUENCES, DICOLIBRARIES):
@@ -302,18 +222,19 @@ def saveLibraries(SEQUENCES, DICOLIBRARIES):
 	@type SEQUENCES: dictionnary
 	@param SEQUENCES: dictionnary containing the fasta sequence of the preLibraries
 	@type DICOLIBRARIES: dictionnary
-	@param DICOLIBRARIES:  dictionnary that will contain the id of the sequences to construct the 3 final libraries {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
-	- listAutonomousTE
-	- listTotalTE
-	- listRepeated
+	@param DICOLIBRARIES: dictionnary that will contain the id of the sequences to construct the 3 final libraries {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
+		- listAutonomousTE
+		- listTotalTE
+		- listRepeated
 
-	@rtype = None
+	@rtype: None
 	"""
 	#### Parse the list containing the id ofthe sequences that will built the three libraries
 	for library in DICOLIBRARIES:
 		libraryFile = open("classification_result/libraries/{library}.fasta".format(library=library), "a")
 		#### Parse the sequence
 		for id in SEQUENCES:
+			#### Write the sequence onto its corresponding library
 			if id in DICOLIBRARIES[library]:
 				libraryFile.write(">{id}\n{seq}\n".format(id=id, seq=SEQUENCES[id]["seq"]))
 		libraryFile.close()
