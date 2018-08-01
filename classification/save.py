@@ -238,3 +238,16 @@ def saveLibraries(SEQUENCES, DICOLIBRARIES):
 			if id in DICOLIBRARIES[library]:
 				libraryFile.write(">{id}\n{seq}\n".format(id=id, seq=SEQUENCES[id]["seq"]))
 		libraryFile.close()
+
+def saveRemovedSequences(ID, LIBRARIENAME):
+	"""
+	@type ID: string
+	@param ID: string of the id of the sequence
+	@type LIBRARIENAME: string
+	@param LIBRARIENAME: string of the librarie name for which the id sequence has not been saved
+
+	@rtype: None
+	"""
+	fileRemovedSequences=open("classification_result/libraries/{library}_removed_sequences.txt".format(library=LIBRARIENAME), "a")
+	fileRemovedSequences.write("{id}\n".format(id=ID))
+	fileRemovedSequences.close()
