@@ -92,7 +92,7 @@ def createIntermediateLibraries(LISTPRELIBRARIES, DICOLIBRARIES, CONFIG, DICOFIN
 	@type CONFIG: dictionnary
 	@param CONFIG:  dictionnary with parameters to filter sequences (which will be used to create final libraries) {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
 	@type DICOFINALCLASSIF: dictionnary
-	@param DICOFINALCLASSIF: dictionnary that will contain the id of the sequences and its corresponding finalClassification {B{id} : B{I{finalClassification of the sequence}}
+	@param DICOFINALCLASSIF: dictionnary that will contain the id of the sequences and its corresponding finalClassification {B{id} : B{I{finalClassification of the sequence}}}
 
 	@rtype: None
 	"""
@@ -180,7 +180,7 @@ def retriveFinalLibrarieSequences(INTERMEDIATELIBRARIES, CONFIG, DICOFINALCLASSI
 	@type CONFIG: dictionnary
 	@param CONFIG:  dictionnary with parameters to filter sequences (which will be used to create final libraries) {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
 	@type DICOFINALCLASSIF: dictionnary
-	@param DICOFINALCLASSIF: dictionnary that will contain the id of the sequences and its corresponding finalClassification {B{id} : B{I{finalClassification of the sequence}}
+	@param DICOFINALCLASSIF: dictionnary that will contain the id of the sequences and its corresponding finalClassification {B{id} : B{I{finalClassification of the sequence}}}
 	@type DICOLIBRARIES: dictionnary
 	@param DICOLIBRARIES: dictionnary that will contain the id of the sequences to construct the 3 final libraries {B{key} = hightest classification given for the TE : B{I{value}} = {"seq" : sequence of the CONFIG sequence} }
 		- listAutonomousTE
