@@ -167,7 +167,7 @@ def applyCDHIT(INTERMEDIATELIBRARIES):
 	for file in INTERMEDIATELIBRARIES:
 		fileName = os.path.basename(file).split(".fasta")[0]
 		os.chdir("classification_result/intermediateLibraries/")
-		subprocess.call('cd-hit-est -aS 0.9 -c 0.9 -g 1 -r 1 -i {input}.fasta -o {output}.fasta_tmp'.format(input=fileName, output=fileName), shell=True)
+		subprocess.call('cdhit-est -aS 0.9 -c 0.9 -g 1 -r 1 -i {input}.fasta -o {output}.fasta_tmp'.format(input=fileName, output=fileName), shell=True)
 		subprocess.call("mv {input}.fasta_tmp {output}.fasta".format(input=fileName, output=fileName), shell=True)
 		os.chdir("../..")
 
