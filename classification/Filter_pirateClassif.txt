@@ -2,7 +2,7 @@ Classification_file	Sorted_output_file	Size_min:max	Removed_tools	Only_Selected_
 Copia	Copia_FL_sorted	2500:20000	na	na	yes	yes	yes
 Copia	Copia_frag_sorted	200:2500	na	na	no	yes	yes
 Gypsy	Gypsy_FL_sorted	2500:20000	na	na	yes	yes	yes
-Copia	Gypsy_frag_sorted	200:2500	na	na	no	yes	yes
+Gypsy	Gypsy_frag_sorted	200:2500	na	na	no	yes	yes
 Bel-Pao	Bel-Pao_FL_sorted	2500:20000	na	na	yes	yes	yes
 Bel-Pao	Bel-Pao_frag_sorted	200:2500	na	na	no	yes	yes
 Retrovirus	Retrovirus_FL_sorted	2500:20000	na	na	yes	yes	yes
