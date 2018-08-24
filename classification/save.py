@@ -185,14 +185,23 @@ def saveSummary(FILESUMMARY, SEQNAME, SUMMARY):
 	if "superFamilyProofs" in SUMMARY:
 		#### Write the BLAST proofs if existing
 		if "blast" in SUMMARY["superFamilyProofs"]:
-			FILESUMMARY.write("\t{blastProofs}".format(blastProofs=SUMMARY["superFamilyProofs"]["blast"]))
-		else:
-			FILESUMMARY.write("\tNA")
+			#### Write directly the BLAST proofs
+			if len(SUMMARY["superFamilyProofs"]["blast"])>0:
+				FILESUMMARY.write("\t{blastProofs}".format(blastProofs=SUMMARY["superFamilyProofs"]["blast"]))
+			#### Replace {} by NA
+			else:
+				FILESUMMARY.write("\tNA")
+
 		#### Write the PROTPROFILES proofs if existing
 		if "protProfiles" in SUMMARY["superFamilyProofs"]:
-			FILESUMMARY.write("\t{protProofs}".format(protProofs=SUMMARY["superFamilyProofs"]["protProfiles"]))
-		else:
-			FILESUMMARY.write("\tNA")
+			#### Write PROTPROFILES proofs
+			if len(SUMMARY["superFamilyProofs"]["protProfiles"])>0:
+				FILESUMMARY.write("\t{protProofs}".format(protProofs=SUMMARY["superFamilyProofs"]["protProfiles"]))
+			#### Replace {} by NA
+			else:
+				FILESUMMARY.write("\tNA")
+	else:
+		FILESUMMARY.write("\tNA\tNA")
 	FILESUMMARY.write("\t{finalDegree}\n".format(finalDegree=SUMMARY["finalDegree"]))
 
 def saveIntermadiateLibraries(SEQUENCES, ID, CONFIG, SORTEDOUTPUT):
