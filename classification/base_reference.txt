@@ -1,4 +1,4 @@
-Mariner	Tc1-Mariner
+Mariner	Tc1-Mariner:Mariner
 hAT	hAT
 PIF-Harbinger	PIF-Harbinger
 PiggyBac	PiggyBac
